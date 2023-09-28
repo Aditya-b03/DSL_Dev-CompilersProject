@@ -1,2 +1,3 @@
 # DSL_Dev-CompliersProject
-UniCourse Compiler(CS3423) Final Project Repo
+UniCourse @ IIT Hyderabad
+Compiler(CS3423) Final Project Repo
