@@ -16,15 +16,13 @@
 
 
 %token NUMBER STRING_LITERAL CHAR_LITERAL BOOL_LITERAL
-%token FUNCTION RETURN
-%token CLASS THIS
+%token CLASS RETURN
 %token DATA_TYPE_PR DATA_TYPE_NEW
-%token TEAM MEMBER TASK EVENT MEETING DOCUMENT
 %token ARITH_OP UNARY_OP ASSIGN_OP ARROW NEG
-%token FOR WHILE DO IF ELSE
+%token FOR WHILE IF ELSE
 %token REL_OP LOGICAL_OP
-%token IDENTIFIER 
-%token LSB RSB LCB RCB LPB RPB SEMICOLON COMMA COLON PERIOD
+%token IDENTIFIER SELF
+%token LSB RSB LCB RCB LPB RPB SEMICOLON COMMA PERIOD
 %token STRUCT TYPEDEF
 %token INCLUDE
 
@@ -65,7 +63,7 @@ function_dec: DATA_TYPE_NEW IDENTIFIER LPB function_params RPB
     | DATA_TYPE_PR IDENTIFIER LPB function_params RPB
     ;
 
-function_args: function_params COMMA function_param
+function_params: function_params COMMA function_param
     | function_param
     |
     ;
@@ -105,6 +103,75 @@ statement: decl_stmt
     |
     ;
 
+decl_stmt: DATA_TYPE_NEW decl SEMICOLON
+    | DATA_TYPE_PR decl SEMICOLON
+    ;
+
+decl: decl COMMA IDENTIFIER
+    | IDENTIFIER
+    ;
+
+expr_stmt: LHS ASSIGN_OP RHS SEMICOLON
+    | LHS UNARY_OP SEMICOLON
+    ;
+
+if_stmt: IF LPB predicate RPB LCB statement RCB
+    | IF LPB predicate RPB LCB statement RCB ELSE LCB statement RCB
+    ;
+
+for_stmt: FOR LPB decl_stmt SEMICOLON predicate SEMICOLON expr_stmt RPB LCB statement RCB
+    | FOR LPB decl_stmt SEMICOLON predicate SEMICOLON expr_stmt RPB statement
+    ;
+
+while_stmt: WHILE LPB predicate RPB LCB statement RCB
+    ;
+
+return_stmt: RETURN SEMICOLON
+    | RETURN RHS SEMICOLON
+    ;
+
+call_stmt: call SEMICOLON
+    ;
+
+call: IDENTIFIER LPB call_args RPB
+    ;
+
+call_args: call_args COMMA RHS
+    | RHS
+    |
+    ;
+
+predicate: predicate LOGICAL_OP predicate
+    | predicate REL_OP predicate
+    | LPB predicate RPB
+    | NEG predicate
+    | RHS
+    ;  
+
+RHS: RHS ARITH_OP RHS
+    | RHS REL_OP RHS
+    | RHS LOGICAL_OP RHS
+    | LPB RHS RPB
+    | UNARY_OP RHS
+    | IDENTIFIER
+    | NUMBER
+    | STRING_LITERAL
+    | CHAR_LITERAL
+    | BOOL_LITERAL
+    | call
+    | IDENTIFIER ARROW IDENTIFIER
+    | IDENTIFIER PERIOD IDENTIFIER
+    | IDENTIFIER LSB RHS RSB
+    ;
+
+LHS: IDENTIFIER
+    | IDENTIFIER ARROW IDENTIFIER
+    | IDENTIFIER PERIOD IDENTIFIER
+    | IDENTIFIER LSB RHS RSB
+    ;
+
+
+
 %%
 
 // error handling
@@ -139,7 +206,7 @@ int main(int argc, char* argv[]) {
         }
 
         // get the file Name in suffix
-        char *suffix = (char*)malloc(100*sizeof(char));
+        char suffix = (char)malloc(100*sizeof(char));
         i = filestart;
         while(argv[1][i] != '.'){
             suffix[i-filestart] = argv[1][i];
@@ -147,8 +214,8 @@ int main(int argc, char* argv[]) {
         }
 
         // append suffix to outfile and C_outfile name
-        char *outfile = (char*)malloc(100*sizeof(char));
-        char *C_outfile = (char*)malloc(100*sizeof(char));
+        char outfile = (char)malloc(100*sizeof(char));
+        char C_outfile = (char)malloc(100*sizeof(char));
         sprintf(outfile,"TP2/seq_tokens_%s.txt",suffix);
         sprintf(C_outfile,"TP2/parsed_%s.parsed",suffix);
         
@@ -164,4 +231,4 @@ int main(int argc, char* argv[]) {
     }
     yyparse();
     return 0;
-} 
+}
