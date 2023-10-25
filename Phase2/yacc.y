@@ -15,254 +15,94 @@
 %}
 
 
-%token DIGITS STRING_LITERAL CHAR_LITERAL BOOL_LITERAL
-%token FUNCTION CLASS RETURN DECLARE EXPR CALL THIS
-%token INT CHAR STRING VOID BOOL
-%token ADD SUB MUL DIV INCR DECR ASSIGN ARROW NEG
-%token FOR WHILE DO IF ELSE LOOP
-%token CONDITIONAL CONJ
-%token IDENTIFIER CLASS_IDENTIFIER
-%token LSB RSB LCB RCB LPB RPB SEMICOLON COMMA COLON
+%token NUMBER STRING_LITERAL CHAR_LITERAL BOOL_LITERAL
+%token FUNCTION RETURN
+%token CLASS THIS
+%token DATA_TYPE_PR DATA_TYPE_NEW
+%token TEAM MEMBER TASK EVENT MEETING DOCUMENT
+%token ARITH_OP UNARY_OP ASSIGN_OP ARROW NEG
+%token FOR WHILE DO IF ELSE
+%token REL_OP LOGICAL_OP
+%token IDENTIFIER 
+%token LSB RSB LCB RCB LPB RPB SEMICOLON COMMA COLON PERIOD
+%token STRUCT TYPEDEF
+%token INCLUDE
 
 %%
-// start symbol
-code: 
-     function code
+start: include_stmts code
+    | code
+    ;
+
+include_stmts: include_stmts include_stmt
+    | include_stmt
+    ;
+
+include_stmt: INCLUDE STRING_LITERAL
+    ;
+
+code: statement code
+    | function code
+    | struct_code code 
     | class code
     |
     ;
 
-// [No. of arguments or methods]
-indexing:
-    LSB DIGITS RSB
+struct_code: struct_def
+    | TYPEDEF struct_def
+    ;
+
+struct_def: STRUCT IDENTIFIER LCB struct_body RCB SEMICOLON
+    ;
+
+struct_body: struct_body decl_stmt
     |
     ;
 
-// declaration time - arguments
-dec_arguments:
-    type IDENTIFIER COMMA dec_arguments
-    |type IDENTIFIER
+function: function_dec LCB function_body RCB
+    ;
+
+function_dec: DATA_TYPE_NEW IDENTIFIER LPB function_params RPB
+    | DATA_TYPE_PR IDENTIFIER LPB function_params RPB
+    ;
+
+function_args: function_params COMMA function_param
+    | function_param
     |
     ;
 
-
-// datatypes
-type:
-    INT
-    | CHAR
-    | STRING
-    | VOID
-    | BOOL
-    | CLASS_IDENTIFIER
+function_param: DATA_TYPE_NEW IDENTIFIER
+    | DATA_TYPE_PR IDENTIFIER
+    | IDENTIFIER IDENTIFIER
     ;
 
-
-
-function_declaration:
-    FUNCTION type IDENTIFIER indexing LPB dec_arguments RPB {
-        // check for return stmt
-        return_flag = 1;
-        fprintf(yyout," : function definition");}
-    ;
-
-
-function:
-    function_declaration LCB stmts RCB {
-        if(return_flag){
-            char *err = (char*)malloc(100*sizeof(char));
-            sprintf(err,"Error: missing return statement");
-            yyerror(err);
-            exit(0);
-        }
-    }
-    ;
-
-
-class_declaration:
-    CLASS CLASS_IDENTIFIER indexing {fprintf(yyout," : class definition");}
-    ;
-
-
-class:
-    class_declaration LCB in_class_code RCB
-    ;
-
-in_class_code:
-    function in_class_code
-    | class_stmt in_class_code
+function_body: function_body statement
+    | statement
     |
     ;
 
-// In class statements
-class_stmt:
-    declare_stmt
-    | expr_stmt
+class: class_dec LCB class_body RCB
     ;
 
+class_dec: CLASS IDENTIFIER
+    ;
 
-stmts:
-    stmt stmts
-    | LCB stmts RCB stmts
+class_body: class_body class_stmt
     |
     ;
 
+class_stmt: function class_stmt
+    | decl_stmt class_stmt
+    | expr_stmt class_stmt
+    ;
 
-// various statements 
-stmt:
-     declare_stmt 
-    | expr_stmt  
+statement: decl_stmt
     | if_stmt
-    | while_stmt
     | for_stmt
-    | call_stmt
+    | while_stmt
     | return_stmt
-    | unary_stmt SEMICOLON
-    ;
-
-// declaration statement
-declare_stmt:
-    DECLARE type mul_id SEMICOLON {fprintf(yyout," : declaration statement");}
-    ;
-
-// multiple declaration
-mul_id:
-    IDENTIFIER COMMA mul_id
-    | IDENTIFIER
-    ;
-
-
-// expression statement
-expr_stmt:
-    EXPR id ASSIGN nested_expr SEMICOLON {
-                                    if(!for_loop)fprintf(yyout," : expression statement");
-                                    nested_call = 0;
-                                    }
-    ;
-
-
-nested_expr:
-    LPB nested_expr RPB
-    | LPB nested_expr RPB CONJ nested_expr
-    | LPB nested_expr RPB CONDITIONAL nested_expr
-    | expr
-    ;
-
-expr:
-    terminal CONJ nested_expr
-    | terminal CONDITIONAL nested_expr
-    | terminal
-    ;
-
-// all kind of terminal expressions
-terminal:
-    ADD LPB nested_expr COMMA nested_expr RPB
-    | SUB LPB nested_expr COMMA nested_expr RPB 
-    | MUL LPB nested_expr COMMA nested_expr RPB
-    | DIV LPB nested_expr COMMA nested_expr RPB
-    | id
-    | DIGITS
-    | BOOL_LITERAL
-    | STRING_LITERAL
-    | CHAR_LITERAL
-    | NEG LPB nested_expr RPB
-    | NEG id
-    | call_expr
-    | call_expr_with_object
-    ;
-
-
-// identifier
-id:
-    IDENTIFIER
-    | IDENTIFIER ARROW id
-
-
-// unary statement
-unary_stmt:
-    INCR LPB id RPB {if(!for_loop)fprintf(yyout," : call statement");}
-    | DECR LPB id RPB {if(!for_loop)fprintf(yyout," : call statement");}
-    ;
-
-
-
-// conditional statements
-if_dec:
-    IF LPB nested_expr RPB {nested_call = 0;fprintf(yyout," : conditional statement");}
-
-if_stmt:
-    if_dec DO LCB stmts RCB 
-    | if_dec DO LCB stmts RCB otherwise LCB stmts RCB 
-    ;
-
-otherwise:
-    ELSE {fprintf(yyout," : conditional statement");}
-    ;
-
-
-
-// loop statements
-
-// while loop
-while_dec:
-    LOOP WHILE LPB nested_expr RPB { fprintf(yyout," : loop");}
-    ;
-while_stmt:
-    while_dec DO LCB stmts RCB 
-    ;
-
-
-// for loop
-for_dec:
-    FOR LPB expr_stmt nested_expr SEMICOLON unary_stmt RPB {
-        fprintf(yyout," : loop");
-        for_loop = 0;
-        }
-    | FOR LPB expr_stmt nested_expr SEMICOLON RPB {
-        fprintf(yyout," : loop");
-        for_loop = 0;
-        }
-    ;
-for_stmt:
-    for_dec LCB stmts RCB 
-    ;
-
-
-
-// call statements
-call_arguments:
-    nested_expr COMMA call_arguments
-    | nested_expr
+    | call_stmt
+    | expr_stmt
     |
-    ;
-
-call_expr: 
-    CALL IDENTIFIER indexing LPB call_arguments RPB
-    ;
-call_expr_with_object:
-    CALL IDENTIFIER ARROW id indexing LPB call_arguments RPB 
-    | CALL THIS ARROW id indexing LPB call_arguments RPB
-    ;
-
-call_stmt:
-    call_expr SEMICOLON {if(!nested_call)fprintf(yyout," : call statement");}
-    | call_expr_with_object SEMICOLON {if(!nested_call)fprintf(yyout," : call statement with object");}
-    ;
-
-
-
-
-// return statement
-return_stmt:
-    RETURN nested_expr SEMICOLON {
-        return_flag = 0;
-        nested_call = 0;    
-        fprintf(yyout," : return statement");
-    }
-    | RETURN VOID SEMICOLON {
-        return_flag = 0;
-        nested_call = 0;    
-        fprintf(yyout," : return statement");
-    }
     ;
 
 %%

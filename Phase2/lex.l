@@ -33,6 +33,7 @@ DOCUMENT "document"
 DATA_TYPE_NEW {TEAM}|{MEMBERS}|{TASK}|{EVENT}|{MEETING}|{DOCUMENT}
 
 ARITH_OP "+"|"-"|"/"|"*"
+UNARY_OP "++"|"--"
 REL_OP "is"|"is not"|">"|"<"|">="|"<=" //First two are == and !=
 LOGICAL_OP "and"|"or"|"not" //This is &&, || and !
 ASSIGN_OP "+="|"-="|"="|"*="|"/="
@@ -105,6 +106,9 @@ WHITESPACE [ \t\n]+
 }
 {DATA_TYPE_NEW} {
   return DATA_TYPE_NEW;
+}
+{UNARY_OP} {
+  return UNARY_OP;
 }
 {ARITH_OP} {
   return ARITH_OP;
