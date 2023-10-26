@@ -3,7 +3,8 @@
     #include <string.h>
     #include <stdlib.h>
     int yylex(void);
-    void yyerror(char *);
+  
+  void yyerror(char *);
     extern char* yytext;
     extern FILE *yyout;
     extern FILE *yyin;
@@ -14,20 +15,26 @@
     int return_flag = 0;
 %}
 
-//void functions, neg, array declaration
+// neg, array declaration
 
-%token NUMBER STRING_LITERAL CHAR_LITERAL BOOL_LITERAL
+%token NUMBER STRING_LITERAL BOOL_LITERAL
 %token CLASS RETURN
-%token DATA_TYPE_PR DATA_TYPE_NEW
-%token ARITH_OP UNARY_OP ASSIGN_OP ARROW
+%token INT STRING BOOL FLOAT VOID LIST DOCUMENT TEAM MEMBERS TASK EVENT MEETING CALENDAR
+%token ADD SUB MUL DIV MOD
+%token UNARY_OP
+%token ASSIGN_OP REL_OP
+%token AND OR NOT INTERSECTION_OP UNION_OP
 %token FOR WHILE IF ELSE
 %token COMP CONJ
 %token IDENTIFIER SELF
-%token LSB RSB LCB RCB LPB RPB SEMICOLON COMMA PERIOD
-%token STRUCT TYPEDEF
-%token INCLUDE
+%token LSB RSB LCB RCB LPB RPB SEMICOLON COMMA DOT COLON ARROW
+%token STRUCT 
+%token INCLUDE TYPEDEF
 
 %%
+
+
+
 start: include_stmts code
     | code
     ;
@@ -41,7 +48,7 @@ include_stmt: INCLUDE STRING_LITERAL
 
 identifier: IDENTIFIER
     | IDENTIFIER ARROW IDENTIFIER
-    | IDENTIFIER PERIOD IDENTIFIER
+    | IDENTIFIER DOT IDENTIFIER
     ;
 
 code: decl_stmt code
@@ -69,6 +76,7 @@ function: function_dec LCB statements RCB
 function_dec: DATA_TYPE_NEW IDENTIFIER LPB function_params RPB
     | DATA_TYPE_PR IDENTIFIER LPB function_params RPB
     | IDENTIFIER IDENTIFIER LPB function_params RPB
+    | VOID IDENTIFIER LPB function_params RPB
     ;
 
 function_params: function_params COMMA function_param
@@ -178,12 +186,10 @@ RHS: RHS ARITH_OP RHS
     | identifier
     | NUMBER
     | STRING_LITERAL
-    | CHAR_LITERAL
     | BOOL_LITERAL
     | call
     | IDENTIFIER LSB RHS RSB
     ;
-
 
 %%
 
