@@ -18,6 +18,7 @@ LOOP_WHILE "while"
 LOOP_FOR "for"
 IF "if"
 ELSE "else"
+LIST "list"
 
 INCLUDE "#include"
 
@@ -25,21 +26,23 @@ DIGIT [0-9]
 NUMBER {DIGIT}+
 STRING \"([^\"\\]*(\\.[^\"\\]*)*)\"
 
-DATA_TYPE_PR "int"|"float"|"bool"|"string"|"struct"|"char"|"void"
+DATA_TYPE_PR "int"|"float"|"bool"|"string"|"void"
 DOCUMENT "document"
-DATA_TYPE_NEW "team"|"members"|"task"|"event"|"meeting"|{DOCUMENT}
+DATA_TYPE_NEW "team"|"members"|"task"|"event"|"meeting"|"calendar"
 
 PUNCTUATION [,;:.]
 
-ARITH_OP "+"|"-"|"/"|"*"
-REL_OP "is"|"is not"|">"|"<"|">="|"<=" //First two are == and !=
-LOGICAL_OP "and"|"or"|"not" //This is &&, || and !
-ASSIGN_OP "+="|"-="|"="
-INTERSECTION_OP "&" // speific to our language
-UNION_OP "|" // specific to our language
+ARITH_OP "+"|"-"|"/"|"*"|"%" 
+REL_OP "is"|"is not"|">"|"<"|">="|"<=" 
+LOGICAL_OP "and"|"or"|"not" 
+ASSIGN_OP "+="|"-="|"="|"/="|"*="|"%="
+SET_OP "&="|"|=" 
+UNARY_OP "++"|"--"
+INTERSECTION_OP "&" 
+UNION_OP "|" 
 ARROW "->"
 BRACKETS    [(){}\[\]]
-VIEWS "flow"|"board"|"calendar"|"report"
+VIEWS "flow"|"board"|"report"
 
 
 ID [A-Za-z][A-Za-z0-9_]*
@@ -59,13 +62,13 @@ ID [A-Za-z][A-Za-z0-9_]*
   return RETURN;
 }
 {BOOL} {
-  return BOOL;
+  return BOOL_LITERAL;
 }
 {LOOP_WHILE} {
-  return LOOP_WHILE;
+  return WHILE;
 }
 {LOOP_FOR} {
-  return LOOP_FOR;
+  return FOR;
 }
 {IF} {
   return IF;
@@ -77,21 +80,16 @@ ID [A-Za-z][A-Za-z0-9_]*
   return NUMBER;
 }
 {STRING} {
-  return STRING_VAL;
+  return STRING_LITERAL;
 }
 {DATA_TYPE_PR} {
     char* c1 = "int";
-    char* c2 = "char";
     char* c3 = "string";
     char* c4 = "bool";
     char* c5 = "void";   
     char* c6 = "float";
-    char* c7 = "struct";
     if(strcmp(yytext,c1)==0){
       return INT;
-    }
-    else if(strcmp(yytext,c2)==0){
-      return CHAR;
     }
     else if(strcmp(yytext,c3)==0){
       return STRING;
@@ -105,9 +103,6 @@ ID [A-Za-z][A-Za-z0-9_]*
     else if(strcmp(yytext,c6)==0){
       return FLOAT;
     }
-    else if(strcmp(yytext,c7)==0){
-      return STRUCT;
-    }
 }
 {DOCUMENT} {
   return DOCUMENT;
@@ -118,6 +113,7 @@ ID [A-Za-z][A-Za-z0-9_]*
     char* c3 = "task";
     char* c4 = "event";
     char* c5 = "meeting";
+    char* c6 = "calendar";
     if(strcmp(yytext,c1)==0){
         return TEAM;
     }
@@ -133,9 +129,9 @@ ID [A-Za-z][A-Za-z0-9_]*
     else if(strcmp(yytext,c5)==0){
         return MEETING;
     }
-    else{
-        return DATA_TYPE_NEW;
-    }
+    else if(strcmp(yytext,c6)==0){
+        return CALENDAR;
+    }    
 }
 {PUNCTUATION} {
     char* c1 = ",";
@@ -156,13 +152,49 @@ ID [A-Za-z][A-Za-z0-9_]*
     }
 }
 {ARITH_OP} {
-  return ARITH_OP;
+  char* c1 = "+";
+  char* c2 = "-";
+  char* c3 = "/";
+  char* c4 = "*";
+  char* c5 = "%";
+  if(strcmp(yytext,c1)==0){
+    return ADD;
+  }
+  else if(strcmp(yytext,c2)==0){
+    return SUB;
+  }
+  else if(strcmp(yytext,c3)==0){
+    return DIV;
+  }
+  else if(strcmp(yytext,c4)==0){
+    return MUL;
+  }
+  else if(strcmp(yytext,c5)==0){
+    return MOD;
+  }
 }
 {REL_OP} {
   return REL_OP;
 }
+{SET_OP} {
+  return SET_OP;
+}
+{UNARY_OP} {
+  return UNARY_OP;
+}
 {LOGICAL_OP} {
-  return LOGICAL_OP;
+  char* c1 = "and";
+  char* c2 = "or";
+  char* c3 = "not";
+  if(strcmp(yytext,c1)==0){
+    return AND;
+  }
+  else if(strcmp(yytext,c2)==0){
+    return OR;
+  }
+  else if(strcmp(yytext,c3)==0){
+    return NOT;
+  }
 }
 {ASSIGN_OP} {
   return ASSIGN_OP;
@@ -207,5 +239,10 @@ ID [A-Za-z][A-Za-z0-9_]*
 }
 {ID} {
   return ID;
+}
+. {
+  printf("Unrecognized character %s\n", yytext);
+  yyerror("Unrecognized character");
+  return yytext[0];
 }
 
