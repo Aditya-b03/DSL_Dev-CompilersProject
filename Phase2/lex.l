@@ -107,6 +107,9 @@ ID [A-Za-z][A-Za-z0-9_]*
 {DOCUMENT} {
   return DOCUMENT;
 }
+{LIST} {
+  return LIST;
+}
 {DATA_TYPE_NEW} {
     char* c1 = "team";
     char* c2 = "members";
