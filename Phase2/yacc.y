@@ -14,13 +14,14 @@
     int return_flag = 0;
 %}
 
+//void functions, neg, array declaration
 
 %token NUMBER STRING_LITERAL CHAR_LITERAL BOOL_LITERAL
 %token CLASS RETURN
 %token DATA_TYPE_PR DATA_TYPE_NEW
-%token ARITH_OP UNARY_OP ASSIGN_OP ARROW NEG
+%token ARITH_OP UNARY_OP ASSIGN_OP ARROW
 %token FOR WHILE IF ELSE
-%token REL_OP LOGICAL_OP
+%token COMP CONJ
 %token IDENTIFIER SELF
 %token LSB RSB LCB RCB LPB RPB SEMICOLON COMMA PERIOD
 %token STRUCT TYPEDEF
@@ -38,14 +39,20 @@ include_stmts: include_stmts include_stmt
 include_stmt: INCLUDE STRING_LITERAL
     ;
 
-code: statement code
+identifier: IDENTIFIER
+    | IDENTIFIER ARROW IDENTIFIER
+    | IDENTIFIER PERIOD IDENTIFIER
+    ;
+
+code: decl_stmt code
+    | expr_stmt code
     | function code
-    | struct_code code 
+    | struct_code code // to remove struct from code
     | class code
     |
     ;
 
-struct_code: struct_def
+struct_code: struct_def  //to remove
     | TYPEDEF struct_def
     ;
 
@@ -54,13 +61,14 @@ struct_def: STRUCT IDENTIFIER LCB struct_body RCB SEMICOLON
 
 struct_body: struct_body decl_stmt
     |
-    ;
+    ; // till here
 
-function: function_dec LCB function_body RCB
+function: function_dec LCB statements RCB
     ;
 
 function_dec: DATA_TYPE_NEW IDENTIFIER LPB function_params RPB
     | DATA_TYPE_PR IDENTIFIER LPB function_params RPB
+    | IDENTIFIER IDENTIFIER LPB function_params RPB
     ;
 
 function_params: function_params COMMA function_param
@@ -73,24 +81,20 @@ function_param: DATA_TYPE_NEW IDENTIFIER
     | IDENTIFIER IDENTIFIER
     ;
 
-function_body: function_body statement
-    | statement
-    |
-    ;
-
-class: class_dec LCB class_body RCB
+class: class_dec LCB class_stmt RCB
     ;
 
 class_dec: CLASS IDENTIFIER
     ;
 
-class_body: class_body class_stmt
-    |
-    ;
-
 class_stmt: function class_stmt
     | decl_stmt class_stmt
     | expr_stmt class_stmt
+    ;
+
+statements : statements statement
+    | statement
+    |
     ;
 
 statement: decl_stmt
@@ -100,30 +104,49 @@ statement: decl_stmt
     | return_stmt
     | call_stmt
     | expr_stmt
-    |
+    | unary_stmt SEMICOLON
+    | SEMICOLON
     ;
 
-decl_stmt: DATA_TYPE_NEW decl SEMICOLON
-    | DATA_TYPE_PR decl SEMICOLON
+unary_stmt: identifier UNARY_OP
     ;
 
-decl: decl COMMA IDENTIFIER
+single_stmt: decl_stmt
+    | call_stmt
+    | expr_stmt
+    ;
+
+decl_stmt: DATA_TYPE_NEW id_list SEMICOLON
+    | DATA_TYPE_PR id_list SEMICOLON
+    | IDENTIFIER id_list SEMICOLON
+    ;
+
+id_list: id_list COMMA IDENTIFIER
     | IDENTIFIER
     ;
 
-expr_stmt: LHS ASSIGN_OP RHS SEMICOLON
-    | LHS UNARY_OP SEMICOLON
+expr_stmt: identifier ASSIGN_OP RHS SEMICOLON
+    | identifier UNARY_OP SEMICOLON
     ;
 
-if_stmt: IF LPB predicate RPB LCB statement RCB
-    | IF LPB predicate RPB LCB statement RCB ELSE LCB statement RCB
+if_stmt: IF LPB predicate RPB LCB statements RCB
+    | IF LPB predicate RPB single_stmt 
+    | IF LPB predicate RPB LCB statements RCB ELSE if_stmt
+    | IF LPB predicate RPB single_stmt ELSE if_stmt
+    | IF LPB predicate RPB LCB statements RCB ELSE LCB statements RCB
+    | IF LPB predicate RPB single_stmt ELSE LCB statements RCB
+    | IF LPB predicate RPB LCB statements RCB ELSE single_stmt
+    | IF LPB predicate RPB single_stmt ELSE single_stmt
     ;
 
-for_stmt: FOR LPB decl_stmt SEMICOLON predicate SEMICOLON expr_stmt RPB LCB statement RCB
-    | FOR LPB decl_stmt SEMICOLON predicate SEMICOLON expr_stmt RPB statement
+for_stmt: FOR LPB decl_stmt SEMICOLON predicate SEMICOLON expr_stmt RPB LCB statements RCB
+    | FOR LPB decl_stmt SEMICOLON predicate SEMICOLON expr_stmt RPB single_stmt
+    | FOR LPB decl_stmt SEMICOLON predicate SEMICOLON unary_stmt RPB LCB statements RCB
+    | FOR LPB decl_stmt SEMICOLON predicate SEMICOLON unary_stmt RPB single_stmt
     ;
 
-while_stmt: WHILE LPB predicate RPB LCB statement RCB
+while_stmt: WHILE LPB predicate RPB LCB statements RCB
+    | WHILE LPB predicate RPB single_stmt
     ;
 
 return_stmt: RETURN SEMICOLON
@@ -133,7 +156,7 @@ return_stmt: RETURN SEMICOLON
 call_stmt: call SEMICOLON
     ;
 
-call: IDENTIFIER LPB call_args RPB
+call: identifier LPB call_args RPB
     ;
 
 call_args: call_args COMMA RHS
@@ -141,35 +164,25 @@ call_args: call_args COMMA RHS
     |
     ;
 
-predicate: predicate LOGICAL_OP predicate
-    | predicate REL_OP predicate
+predicate: predicate CONJ predicate
+    | predicate COMP predicate
     | LPB predicate RPB
-    | NEG predicate
     | RHS
     ;  
 
 RHS: RHS ARITH_OP RHS
-    | RHS REL_OP RHS
-    | RHS LOGICAL_OP RHS
+    | RHS COMP RHS
+    | RHS CONJ RHS
     | LPB RHS RPB
-    | UNARY_OP RHS
-    | IDENTIFIER
+    | unary_stmt
+    | identifier
     | NUMBER
     | STRING_LITERAL
     | CHAR_LITERAL
     | BOOL_LITERAL
     | call
-    | IDENTIFIER ARROW IDENTIFIER
-    | IDENTIFIER PERIOD IDENTIFIER
     | IDENTIFIER LSB RHS RSB
     ;
-
-LHS: IDENTIFIER
-    | IDENTIFIER ARROW IDENTIFIER
-    | IDENTIFIER PERIOD IDENTIFIER
-    | IDENTIFIER LSB RHS RSB
-    ;
-
 
 
 %%
