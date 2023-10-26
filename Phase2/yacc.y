@@ -19,14 +19,14 @@
 
 %token NUMBER STRING_LITERAL BOOL_LITERAL
 %token CLASS RETURN
-%token INT STRING BOOL FLOAT VOID LIST DOCUMENT TEAM MEMBERS TASK EVENT MEETING CALENDAR
+%token INT STRING BOOL FLOAT VOID LIST 
+%token DOCUMENT TEAM MEMBERS TASK EVENT MEETING CALENDAR // yet to add
 %token ADD SUB MUL DIV MOD
 %token UNARY_OP
-%token ASSIGN_OP REL_OP
+%token ASSIGN_OP REL_OP EQUALS // equal update
 %token AND OR NOT INTERSECTION_OP UNION_OP
 %token FOR WHILE IF ELSE
-%token COMP CONJ
-%token IDENTIFIER SELF
+%token IDENTIFIER SELF 
 %token LSB RSB LCB RCB LPB RPB SEMICOLON COMMA DOT COLON ARROW
 %token STRUCT 
 %token INCLUDE TYPEDEF
@@ -47,8 +47,9 @@ include_stmt: INCLUDE STRING_LITERAL
     ;
 
 identifier: IDENTIFIER
-    | IDENTIFIER ARROW IDENTIFIER
-    | IDENTIFIER DOT IDENTIFIER
+    | identifier ARROW IDENTIFIER
+    | identifier DOT IDENTIFIER
+    | SELF DOT identifier
     ;
 
 code: decl_stmt code
@@ -73,19 +74,36 @@ struct_body: struct_body decl_stmt
 function: function_dec LCB statements RCB
     ;
 
-function_dec: DATA_TYPE_NEW IDENTIFIER LPB function_params RPB
-    | DATA_TYPE_PR IDENTIFIER LPB function_params RPB
+function_dec: data_type_new IDENTIFIER LPB function_params RPB
+    | data_type_pr IDENTIFIER LPB function_params RPB
     | IDENTIFIER IDENTIFIER LPB function_params RPB
     | VOID IDENTIFIER LPB function_params RPB
     ;
+
+data_type_new: DOCUMENT      // why??
+    | TEAM
+    | MEMBERS
+    | TASK
+    | EVENT
+    | MEETING
+    | CALENDAR
+    ;
+
+
+data_type_pr:  INT
+    | STRING
+    | BOOL
+    | FLOAT
+    ;
+
 
 function_params: function_params COMMA function_param
     | function_param
     |
     ;
 
-function_param: DATA_TYPE_NEW IDENTIFIER
-    | DATA_TYPE_PR IDENTIFIER
+function_param: data_type_new IDENTIFIER
+    | data_type_pr IDENTIFIER
     | IDENTIFIER IDENTIFIER
     ;
 
@@ -98,6 +116,7 @@ class_dec: CLASS IDENTIFIER
 class_stmt: function class_stmt
     | decl_stmt class_stmt
     | expr_stmt class_stmt
+    |
     ;
 
 statements : statements statement
@@ -124,12 +143,36 @@ single_stmt: decl_stmt
     | expr_stmt
     ;
 
-decl_stmt: DATA_TYPE_NEW id_list SEMICOLON
-    | DATA_TYPE_PR id_list SEMICOLON
+decl_stmt: data_type_new id_list SEMICOLON
+    | data_type_pr id_list SEMICOLON
     | IDENTIFIER id_list SEMICOLON
+    | list id_list  SEMICOLON
+    ;
+
+list: LIST dim COLON data_type_pr 
+    | LIST dim COLON data_type_new 
+    | LIST dim COLON list 
+    ;
+
+list_literal: LCB list_terminal RCB
+    | LCB list_literal RCB
+    | LCB list_terminal RCB COMMA list_literal
+    ;
+
+list_terminal: NUMBER
+    | list_terminal COMMA NUMBER
+    ;
+
+
+dim: dim LSB NUMBER RSB
+    | LSB NUMBER RSB
     ;
 
 id_list: id_list COMMA IDENTIFIER
+    | IDENTIFIER EQUALS RHS
+    | id_list COMMA IDENTIFIER EQUALS RHS
+    | id_list COMMA IDENTIFIER EQUALS list_literal /*this allow a = {{1,2},{3,4}}*/
+    | IDENTIFIER EQUALS list_literal
     | IDENTIFIER
     ;
 
@@ -172,15 +215,24 @@ call_args: call_args COMMA RHS
     |
     ;
 
-predicate: predicate CONJ predicate
-    | predicate COMP predicate
-    | LPB predicate RPB
-    | RHS
-    ;  
+predicate:
+    LPB predicate RPB
+    | LPB predicate RPB conj predicate
+    | LPB predicate RPB REL_OP predicate
+    | expr
+    ;
 
-RHS: RHS ARITH_OP RHS
-    | RHS COMP RHS
-    | RHS CONJ RHS
+expr:
+    RHS conj predicate
+    | RHS REL_OP predicate
+    | RHS
+    ;
+
+
+RHS: RHS arith_op RHS
+    | RHS REL_OP RHS
+    | RHS conj RHS
+    | RHS set_op RHS
     | LPB RHS RPB
     | unary_stmt
     | identifier
@@ -188,7 +240,26 @@ RHS: RHS ARITH_OP RHS
     | STRING_LITERAL
     | BOOL_LITERAL
     | call
-    | IDENTIFIER LSB RHS RSB
+    | identifier dim
+    | NOT LPB predicate RPB
+    | NOT identifier
+    ;
+
+conj:
+    AND
+    | OR
+    ;
+
+set_op:
+    INTERSECTION_OP
+    | UNION_OP
+    ;
+
+arith_op: ADD
+    | SUB
+    | MUL
+    | DIV
+    | MOD
     ;
 
 %%
