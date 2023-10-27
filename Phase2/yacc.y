@@ -47,8 +47,8 @@ include_stmt: INCLUDE STRING_LITERAL
     ;
 
 identifier: IDENTIFIER
-    | identifier ARROW IDENTIFIER
-    | identifier DOT IDENTIFIER
+    | IDENTIFIER ARROW identifier
+    | IDENTIFIER DOT identifier
     | SELF DOT identifier
     ;
 
@@ -120,8 +120,7 @@ class_stmt: function class_stmt
     ;
 
 statements : statements statement
-    | statement
-    |
+    | 
     ;
 
 statement: decl_stmt
@@ -131,7 +130,6 @@ statement: decl_stmt
     | return_stmt
     | call_stmt
     | expr_stmt
-    | unary_stmt SEMICOLON
     | SEMICOLON
     ;
 
@@ -156,7 +154,7 @@ list: LIST dim COLON data_type_pr
 
 list_literal: LCB list_terminal RCB
     | LCB list_literal RCB
-    | LCB list_terminal RCB COMMA list_literal
+    | LCB LCB list_terminal RCB COMMA list_literal RCB
     ;
 
 list_terminal: NUMBER
@@ -169,39 +167,39 @@ dim: dim LSB NUMBER RSB
     ;
 
 id_list: id_list COMMA IDENTIFIER
-    | IDENTIFIER EQUALS RHS
-    | id_list COMMA IDENTIFIER EQUALS RHS
+    | IDENTIFIER EQUALS nested_expr
+    | id_list COMMA IDENTIFIER EQUALS nested_expr
     | id_list COMMA IDENTIFIER EQUALS list_literal /*this allow a = {{1,2},{3,4}}*/
     | IDENTIFIER EQUALS list_literal
     | IDENTIFIER
     ;
 
-expr_stmt: identifier ASSIGN_OP RHS SEMICOLON
+expr_stmt: identifier ASSIGN_OP nested_expr SEMICOLON
     | identifier UNARY_OP SEMICOLON
     ;
 
-if_stmt: IF LPB predicate RPB LCB statements RCB
-    | IF LPB predicate RPB single_stmt 
-    | IF LPB predicate RPB LCB statements RCB ELSE if_stmt
-    | IF LPB predicate RPB single_stmt ELSE if_stmt
-    | IF LPB predicate RPB LCB statements RCB ELSE LCB statements RCB
-    | IF LPB predicate RPB single_stmt ELSE LCB statements RCB
-    | IF LPB predicate RPB LCB statements RCB ELSE single_stmt
-    | IF LPB predicate RPB single_stmt ELSE single_stmt
+if_stmt: IF LPB nested_expr RPB LCB statements RCB
+    | IF LPB nested_expr RPB single_stmt 
+    | IF LPB nested_expr RPB LCB statements RCB ELSE if_stmt
+    | IF LPB nested_expr RPB single_stmt ELSE if_stmt
+    | IF LPB nested_expr RPB LCB statements RCB ELSE LCB statements RCB
+    | IF LPB nested_expr RPB single_stmt ELSE LCB statements RCB
+    | IF LPB nested_expr RPB LCB statements RCB ELSE single_stmt
+    | IF LPB nested_expr RPB single_stmt ELSE single_stmt
     ;
 
-for_stmt: FOR LPB decl_stmt SEMICOLON predicate SEMICOLON expr_stmt RPB LCB statements RCB
-    | FOR LPB decl_stmt SEMICOLON predicate SEMICOLON expr_stmt RPB single_stmt
-    | FOR LPB decl_stmt SEMICOLON predicate SEMICOLON unary_stmt RPB LCB statements RCB
-    | FOR LPB decl_stmt SEMICOLON predicate SEMICOLON unary_stmt RPB single_stmt
+for_stmt: FOR LPB decl_stmt SEMICOLON nested_expr SEMICOLON expr_stmt RPB LCB statements RCB
+    | FOR LPB decl_stmt SEMICOLON nested_expr SEMICOLON expr_stmt RPB single_stmt
+    | FOR LPB decl_stmt SEMICOLON nested_expr SEMICOLON unary_stmt RPB LCB statements RCB
+    | FOR LPB decl_stmt SEMICOLON nested_expr SEMICOLON unary_stmt RPB single_stmt
     ;
 
-while_stmt: WHILE LPB predicate RPB LCB statements RCB
-    | WHILE LPB predicate RPB single_stmt
+while_stmt: WHILE LPB nested_expr RPB LCB statements RCB
+    | WHILE LPB nested_expr RPB single_stmt
     ;
 
 return_stmt: RETURN SEMICOLON
-    | RETURN RHS SEMICOLON
+    | RETURN nested_expr SEMICOLON
     ;
 
 call_stmt: call SEMICOLON
@@ -210,48 +208,42 @@ call_stmt: call SEMICOLON
 call: identifier LPB call_args RPB
     ;
 
-call_args: call_args COMMA RHS
-    | RHS
+call_args: call_args COMMA nested_expr
+    | nested_expr
     |
     ;
 
-predicate:
-    LPB predicate RPB
-    | LPB predicate RPB conj predicate
-    | LPB predicate RPB REL_OP predicate
+nested_expr: LPB nested_expr RPB
+    | LPB nested_expr RPB conj nested_expr
+    | LPB nested_expr RPB REL_OP nested_expr
+    | LPB nested_expr RPB arith_op nested_expr
+    | LPB nested_expr RPB set_op nested_expr
     | expr
     ;
 
-expr:
-    RHS conj predicate
-    | RHS REL_OP predicate
-    | RHS
+expr: expr_terminal conj nested_expr
+    | expr_terminal REL_OP nested_expr
+    | expr_terminal arith_op nested_expr
+    | expr_terminal set_op nested_expr
+    | expr_terminal
     ;
 
-
-RHS: RHS arith_op RHS
-    | RHS REL_OP RHS
-    | RHS conj RHS
-    | RHS set_op RHS
-    | LPB RHS RPB
-    | unary_stmt
+expr_terminal: unary_stmt
     | identifier
     | NUMBER
     | STRING_LITERAL
     | BOOL_LITERAL
     | call
     | identifier dim
-    | NOT LPB predicate RPB
+    | NOT LPB nested_expr RPB
     | NOT identifier
     ;
 
-conj:
-    AND
+conj: AND
     | OR
     ;
 
-set_op:
-    INTERSECTION_OP
+set_op: INTERSECTION_OP
     | UNION_OP
     ;
 
