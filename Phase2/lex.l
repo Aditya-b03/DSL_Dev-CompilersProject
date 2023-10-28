@@ -5,9 +5,8 @@
   FILE *tokens;
   extern FILE *yyout;
 
-
   void print(char* s){
-    printf("%s\n",s);
+    fprintf(yyout,"%s",s);
   }
 
   
@@ -55,12 +54,9 @@ ID [A-Za-z][A-Za-z0-9_]*
 
 %option noyywrap
 %%
-"\n"      {
-    print("newline :");
-    printf("%d", yylineno);
+"\n"      {   
     print(yytext);
-    yylineno++;     //increament the line no.
-    }
+}
 
 {WHITESPACE} {
 
@@ -319,7 +315,6 @@ ID [A-Za-z][A-Za-z0-9_]*
   yyterminate();
 }
 %%
-
 
 // {VIEWS} {
 //   return VIEWS;

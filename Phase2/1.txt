@@ -1,0 +1,50 @@
+
+data type new: team identifier :test_team;
+data type pr:int identifier :i;
+data type new: member identifier :test_member equal := number :2000;
+data type pr:int identifier :a equal := identifier :something.dot :identifier :something;
+comment :$ Add len(test_team.members) as a functionality$
+data type pr:int identifier :func(){
+    identifier :test_member.dot :identifier :salary equal := number :33260;
+    identifier :a equal := number :2;
+    identifier :members.dot :identifier :salary equal := number :20000;
+    identifier :test_member.dot :identifier :test_member equal := string :"12/08/2021";
+    identifier :test_team.dot :identifier :id equal := number :3472;
+    data type new: member identifier :a2;
+    identifier :a2 equal := identifier :create_members(identifier :name equal := string :"John", identifier :email equal := string :"john120@gmail.com", identifier :contact equal := string :"9972073345");
+    identifier :add_team_members(number :3472, {identifier :test_member.dot :identifier :id, identifier :John.dot :identifier :id});
+    
+}
+data type pr:int identifier :main(){
+    for :for (identifier :i equal := number :0; identifier :i relational op :< identifier :len(identifier :test_team.dot :identifier :members); identifier :iunary op :++){ comment :$ Add len(test_team.members) as a functionality$
+        data type pr:float identifier :sal equal :=  identifier :test_team.dot :identifier :members[identifier :i].dot :identifier :salary;
+        if :if (identifier :sal relational op :> number :20000){
+            identifier :test_team.dot :identifier :members[identifier :i].dot :identifier :salary assign op :+= number :10000;
+        }
+    }
+
+    identifier :printf(string :"Looking at team now...");
+    identifier :flow(identifier :test_team);
+
+    data type new: member identifier :member2;
+    identifier :member2.dot :identifier :name equal := string :"Hello";
+
+    identifier :test_team assign op :+= identifier :member2;
+    identifier :test_team2 equal := identifier :test_team;
+
+    identifier :test_team2.dot :identifier :add(identifier :member2); comment :$ Will the member be added again, or overwritten, or an error? $
+    comment :$team.add_member(member2);$ $ This should give an error, as the team is not defined.$
+    comment :$ There are too many ways to add a member, we should reduce that.$
+
+    data type new: task identifier :test_task equal := identifier :create_task(string :"Will this work?", string :"This is to test the addition of a task and assigning.", string :"12/12/2023");
+    identifier :test_task.dot :identifier :lead equal := identifier :member2;
+    identifier :test_task.dot :identifier :status equal := identifier :Doing; comment :$ Can only be three options, any other should give error.$
+    identifier :test_memberunary op :++;
+    identifier :test_task arrow :-> identifier :test_member;
+
+    data type new: team identifier :team3;
+    identifier :team3 equal := identifier :test_team intersection op :& identifier :test_team2;
+
+    identifier :board(identifier :team3);
+
+}

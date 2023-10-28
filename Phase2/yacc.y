@@ -156,12 +156,10 @@ list: LIST dim COLON data_type_pr
     ;
 
 list_literal: LCB list_terminal RCB
-    | LCB list_literal RCB
-    | LCB LCB list_terminal RCB COMMA list_literal RCB
     ;
 
 list_terminal: nested_expr
-    | list_terminal COMMA nested_expr
+    | list_terminal COMMA nested_expr         
     ;
 
 
@@ -217,8 +215,8 @@ call: identifier LPB call_args RPB
 
 call_args: call_args COMMA nested_expr
     | nested_expr
-    | call_args COMMA expr_stmt_without_semicolon
-    | expr_stmt_without_semicolon
+    | call_args COMMA identifier EQUALS nested_expr
+    | identifier EQUALS nested_expr
     |
     ;
 
@@ -238,12 +236,10 @@ expr: expr_terminal conj nested_expr
     ;
 
 expr_terminal: unary_stmt
-    | identifier
     | NUMBER
     | STRING_LITERAL
     | BOOL_LITERAL
     | call
-    | identifier dim
     | NOT LPB nested_expr RPB
     | NOT identifier
     | list_literal
@@ -315,6 +311,7 @@ int main(int argc, char* argv[]) {
         yyout = fopen(C_outfile, "w+"); */
     // }
     yyin = fopen("../testCases/1.test","r");
+    yyout = fopen("1.txt","w+");
     yyparse();
     return 0;
 }
