@@ -13,6 +13,8 @@
     int for_loop = 0;       //nested loop
     int nested_call = 0;    // nested call
     int return_flag = 0;
+
+    
 %}
 
 // neg, array declaration
@@ -32,7 +34,6 @@
 %token INCLUDE TYPEDEF
 
 %%
-
 
 
 start: include_stmts code
@@ -57,7 +58,7 @@ identifier: IDENTIFIER
 
 code: decl_stmt code
     | function code
-    | struct_code code // to remove struct from code
+    | struct_code code 
     | class code
     |
     ;
@@ -152,10 +153,9 @@ decl_stmt: data_type_new id_list SEMICOLON
 
 list: LIST dim COLON data_type_pr 
     | LIST dim COLON data_type_new 
-    | LIST dim COLON list 
     ;
 
-list_literal: LCB list_terminal RCB
+list_literal:  LCB list_terminal RCB 
     ;
 
 list_terminal: nested_expr
@@ -163,8 +163,8 @@ list_terminal: nested_expr
     ;
 
 
-dim: dim LSB nested_expr RSB
-    | LSB nested_expr RSB
+dim: dim  LSB nested_expr RSB 
+    | LSB nested_expr RSB 
     ;
 
 id_list: id_list COMMA IDENTIFIER

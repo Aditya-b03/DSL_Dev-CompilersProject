@@ -1,50 +1,53 @@
 
-data type new: team identifier :test_team;
-data type pr:int identifier :i;
-data type new: member identifier :test_member equal := number :2000;
-data type pr:int identifier :a equal := identifier :something.dot :identifier :something;
-comment :$ Add len(test_team.members) as a functionality$
-data type pr:int identifier :func(){
-    identifier :test_member.dot :identifier :salary equal := number :33260;
-    identifier :a equal := number :2;
-    identifier :members.dot :identifier :salary equal := number :20000;
-    identifier :test_member.dot :identifier :test_member equal := string :"12/08/2021";
-    identifier :test_team.dot :identifier :id equal := number :3472;
-    data type new: member identifier :a2;
-    identifier :a2 equal := identifier :create_members(identifier :name equal := string :"John", identifier :email equal := string :"john120@gmail.com", identifier :contact equal := string :"9972073345");
-    identifier :add_team_members(number :3472, {identifier :test_member.dot :identifier :id, identifier :John.dot :identifier :id});
+team test_team;
+int i;
+member test_member = 2000;
+int a = something.something;
+/* Add len(test_team.members) as a functionality$*/
+int func(){
+    test_member.salary = 33260;
+    a = 2;
+    members.salary = 20000;
+    test_member.test_member = "12/08/2021";
+    test_team.id = 3472;
+    member a2;
+    a2 = create_members(name = "John", email = "john120@gmail.com", contact = "9972073345");
+    add_team_members(3472, {test_member.id, John.id});
     
 }
-data type pr:int identifier :main(){
-    for :for (identifier :i equal := number :0; identifier :i relational op :< identifier :len(identifier :test_team.dot :identifier :members); identifier :iunary op :++){ comment :$ Add len(test_team.members) as a functionality$
-        data type pr:float identifier :sal equal :=  identifier :test_team.dot :identifier :members[identifier :i].dot :identifier :salary;
-        if :if (identifier :sal relational op :> number :20000){
-            identifier :test_team.dot :identifier :members[identifier :i].dot :identifier :salary assign op :+= number :10000;
+int main(){
+    for (i = 0; i < len(test_team.members); i++){ /* Add len(test_team.members) as a functionality$*/
+        float sal =  test_team.members[i].salary;
+        if (sal > 20000){
+            test_team.members[i].salary += 10000;
         }
     }
 
-    identifier :printf(string :"Looking at team now...");
-    identifier :flow(identifier :test_team);
+    printf("Looking at team now...");
+    flow(test_team);
 
-    data type new: member identifier :member2;
-    identifier :member2.dot :identifier :name equal := string :"Hello";
+    member member2;
+    member2.name = "Hello";
 
-    identifier :test_team assign op :+= identifier :member2;
-    identifier :test_team2 equal := identifier :test_team;
+    test_team += member2;
+    test_team2 = test_team;
 
-    identifier :test_team2.dot :identifier :add(identifier :member2); comment :$ Will the member be added again, or overwritten, or an error? $
-    comment :$team.add_member(member2);$ $ This should give an error, as the team is not defined.$
-    comment :$ There are too many ways to add a member, we should reduce that.$
+    test_team2.add(member2); /* Will the member be added again, or overwritten, or an error? $*/
+    /*team.add_member(member2); $ This should give an error, as the team is not defined.$*/
+    /* There are too many ways to add a member, we should reduce that.$*/
 
-    data type new: task identifier :test_task equal := identifier :create_task(string :"Will this work?", string :"This is to test the addition of a task and assigning.", string :"12/12/2023");
-    identifier :test_task.dot :identifier :lead equal := identifier :member2;
-    identifier :test_task.dot :identifier :status equal := identifier :Doing; comment :$ Can only be three options, any other should give error.$
-    identifier :test_memberunary op :++;
-    identifier :test_task arrow :-> identifier :test_member;
+    task test_task = create_task("Will this work?", "This is to test the addition of a task and assigning.", "12/12/2023");
+    test_task.lead = member2;
+    test_task.status = Doing; /* Can only be three options, any other should give error.$*/
+    test_member++;
+    test_task -> test_member;
 
-    data type new: team identifier :team3;
-    identifier :team3 equal := identifier :test_team intersection op :& identifier :test_team2;
+    team team3;
+    team3 = test_team & test_team2;
 
-    identifier :board(identifier :team3);
+    board(team3);
+
+    /*adding list to check it's conversion in cpp file$*/
+     int id[4][5][6];
 
 }

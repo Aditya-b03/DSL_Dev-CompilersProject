@@ -8,8 +8,10 @@
   void print(char* s){
     fprintf(yyout,"%s",s);
   }
-
-  
+  int list_flag = 0;
+  int list_print_flag = 0;
+  char s[100];
+  int i = 0;
 %}
 
 %option noyywrap
@@ -56,70 +58,75 @@ ID [A-Za-z][A-Za-z0-9_]*
 %%
 "\n"      {   
     print(yytext);
+    ;
 }
 
 {WHITESPACE} {
-
   print(yytext);
   ;
 }
 {COMMENTS} {
-  print("comment :");
-  print(yytext);
+
+  print("/*");
+  if(*yytext=='$'){
+    print(yytext+1);
+  }
+  else if(yytext[strlen(yytext)-1]=='$'){   // fix the ending part of comment.
+    yyterminate();
+  }
+  else{
+    print(yytext);
+  }
+  print("*/");
   ;
 }
 {INCLUDE} {
-  print("include :");
-  print(yytext);
+  print("#include");
   return INCLUDE;
 }
 {VOID} {
-  print("void :");
   print(yytext);
   return VOID;
 }
 {RETURN} {
-  print("return :");
   print(yytext);
   return RETURN;
 }
 {BOOL} {
-  print("bool :");
   print(yytext);
   return BOOL_LITERAL;
 }
 {LOOP_WHILE} {
-  print("while :");
   print(yytext);
   return WHILE;
 }
 {LOOP_FOR} {
-  print("for :");
   print(yytext);
   return FOR;
 }
 {IF} {
-  print("if :");
   print(yytext);
   return IF;
 }
 {ELSE} {
-  print("else :");
   print(yytext);
   return ELSE;
 }
 {NUMBER} {
-  print("number :");
-  print(yytext);
+  if(list_flag==1){
+    s[i] = *yytext;
+    i++;
+  }
+  else{
+    print(yytext);
+  }
   return NUMBER;
 }
 {STRING} {
-  print("string :");
   print(yytext);
   return STRING_LITERAL;
 }
 {DATA_TYPE_PR} {
-  print("data type pr:");
   print(yytext);
     char* c1 = "int";
     char* c3 = "string";
@@ -146,13 +153,12 @@ ID [A-Za-z][A-Za-z0-9_]*
   print(yytext);
   return DOCUMENT;
 }
-{LIST} {
-
-  print(yytext);
+{LIST} {            
+  list_flag = 1;
+  list_print_flag=1;
   return LIST;
 }
 {DATA_TYPE_NEW} {
-  print("data type new: ");
   print(yytext);
     char* c1 = "team";
     char* c2 = "member";
@@ -180,27 +186,34 @@ ID [A-Za-z][A-Za-z0-9_]*
     }    
 }
 {PUNCTUATION} {
-  print(yytext);
+  
     char* c1 = ",";
     char* c2 = ";";
     char* c3 = ":";
     char* c4 = ".";
     if(strcmp(yytext,c1)==0){
+        print(yytext);
         return COMMA;
     }
     else if(strcmp(yytext,c2)==0){
+        print(yytext);
         return SEMICOLON;
     }
     else if(strcmp(yytext,c3)==0){
+        if(list_flag==1){
+          list_flag = 0;
+        }
+        else{
+          print(yytext);
+        }
         return COLON;
     }
     else if(strcmp(yytext,c4)==0){
-        print("dot :");
+        print(yytext);
         return DOT;
     }
 }
 {ARITH_OP} {
-  print("arithmetic op :");
   print(yytext);
   char* c1 = "+";
   char* c2 = "-";
@@ -224,17 +237,14 @@ ID [A-Za-z][A-Za-z0-9_]*
   }
 }
 {REL_OP} {
-  print("relational op :");
   print(yytext);
   return REL_OP;
 }
 {UNARY_OP} {
-  print("unary op :");
   print(yytext);
   return UNARY_OP;
 }
 {LOGICAL_OP} {
-  print("logical op :");
   print(yytext);
   char* c1 = "and";
   char* c2 = "or";
@@ -250,35 +260,28 @@ ID [A-Za-z][A-Za-z0-9_]*
   }
 }
 {ASSIGN_OP} {
-  print("assign op :");
   print(yytext);
   return ASSIGN_OP;
 }
 {EQUAL} {
-  print("equal :");
-
   print(yytext);
   return EQUALS;
 }
 
 {INTERSECTION_OP} {
-  print("intersection op :");
   print(yytext);
   return INTERSECTION_OP;
 }
 {UNION_OP} {
-  
-  print("union op :");
   print(yytext);
   return UNION_OP;
 }
 {ARROW} {
-  print("arrow :");
   print(yytext);
   return ARROW;
 }
 {BRACKETS} {
-  print(yytext);
+  
     char* c1 = "(";
     char* c2 = ")";
     char* c3 = "{";
@@ -286,28 +289,63 @@ ID [A-Za-z][A-Za-z0-9_]*
     char* c5 = "[";
     char* c6 = "]";
     if(strcmp(yytext,c1)==0){
+        print(yytext);
         return LPB;
     }
     else if(strcmp(yytext,c2)==0){
+        print(yytext);
         return RPB;
     }
     else if(strcmp(yytext,c3)==0){
+        print(yytext);
         return LCB;
     }
     else if(strcmp(yytext,c4)==0){
+        print(yytext);
         return RCB;
     }
     else if(strcmp(yytext,c5)==0){
+        if(list_flag==1){
+          return LSB;
+        }
+        else{
+          print(yytext);
+        }
         return LSB;
     }
     else if(strcmp(yytext,c6)==0){
+        if(list_flag==1){
+          return RSB;
+        }
+        else{
+          print(yytext);
+        }
         return RSB;
     }
 }
 
 {ID} {
-  print("identifier :");
-  print(yytext);
+
+  if(list_flag==1){
+    s[i] = *yytext;
+    i++;
+  }
+  else{
+    print(yytext);
+    if(list_print_flag==1){
+      fprintf(yyout,"[");
+      for(int j = 0; j<strlen(s);j++){
+        fprintf(yyout,"%c",s[j]);
+        if(j==strlen(s)-1){
+          fprintf(yyout,"]");
+        }
+        else{
+          fprintf(yyout,"][");  
+        }  
+      }
+      list_print_flag = 0;
+    }
+  }
   return IDENTIFIER;
 }
 . {
