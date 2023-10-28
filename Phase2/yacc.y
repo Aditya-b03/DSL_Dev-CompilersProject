@@ -49,11 +49,13 @@ include_stmt: INCLUDE STRING_LITERAL
 identifier: IDENTIFIER
     | IDENTIFIER ARROW identifier
     | IDENTIFIER DOT identifier
+    | IDENTIFIER dim
+    | IDENTIFIER dim ARROW identifier
+    | IDENTIFIER dim DOT identifier
     | SELF DOT identifier
     ;
 
 code: decl_stmt code
-    | expr_stmt code
     | function code
     | struct_code code // to remove struct from code
     | class code
@@ -134,6 +136,7 @@ statement: decl_stmt
     ;
 
 unary_stmt: identifier UNARY_OP
+    | identifier
     ;
 
 single_stmt: decl_stmt
@@ -157,25 +160,29 @@ list_literal: LCB list_terminal RCB
     | LCB LCB list_terminal RCB COMMA list_literal RCB
     ;
 
-list_terminal: NUMBER
-    | list_terminal COMMA NUMBER
+list_terminal: nested_expr
+    | list_terminal COMMA nested_expr
     ;
 
 
-dim: dim LSB NUMBER RSB
-    | LSB NUMBER RSB
+dim: dim LSB nested_expr RSB
+    | LSB nested_expr RSB
     ;
 
 id_list: id_list COMMA IDENTIFIER
     | IDENTIFIER EQUALS nested_expr
     | id_list COMMA IDENTIFIER EQUALS nested_expr
-    | id_list COMMA IDENTIFIER EQUALS list_literal /*this allow a = {{1,2},{3,4}}*/
-    | IDENTIFIER EQUALS list_literal
     | IDENTIFIER
     ;
 
-expr_stmt: identifier ASSIGN_OP nested_expr SEMICOLON
-    | identifier UNARY_OP SEMICOLON
+
+
+expr_stmt: expr_stmt_without_semicolon SEMICOLON
+    ;
+
+expr_stmt_without_semicolon: identifier ASSIGN_OP nested_expr
+    | identifier EQUALS nested_expr
+    | unary_stmt
     ;
 
 if_stmt: IF LPB nested_expr RPB LCB statements RCB
@@ -188,10 +195,10 @@ if_stmt: IF LPB nested_expr RPB LCB statements RCB
     | IF LPB nested_expr RPB single_stmt ELSE single_stmt
     ;
 
-for_stmt: FOR LPB decl_stmt SEMICOLON nested_expr SEMICOLON expr_stmt RPB LCB statements RCB
-    | FOR LPB decl_stmt SEMICOLON nested_expr SEMICOLON expr_stmt RPB single_stmt
-    | FOR LPB decl_stmt SEMICOLON nested_expr SEMICOLON unary_stmt RPB LCB statements RCB
-    | FOR LPB decl_stmt SEMICOLON nested_expr SEMICOLON unary_stmt RPB single_stmt
+for_stmt: FOR LPB decl_stmt  nested_expr SEMICOLON expr_stmt_without_semicolon RPB LCB statements RCB
+    | FOR LPB decl_stmt nested_expr SEMICOLON expr_stmt_without_semicolon RPB single_stmt
+    | FOR LPB expr_stmt nested_expr SEMICOLON expr_stmt_without_semicolon RPB LCB statements RCB
+    | FOR LPB expr_stmt nested_expr SEMICOLON expr_stmt_without_semicolon RPB single_stmt
     ;
 
 while_stmt: WHILE LPB nested_expr RPB LCB statements RCB
@@ -210,6 +217,8 @@ call: identifier LPB call_args RPB
 
 call_args: call_args COMMA nested_expr
     | nested_expr
+    | call_args COMMA expr_stmt_without_semicolon
+    | expr_stmt_without_semicolon
     |
     ;
 
@@ -237,6 +246,7 @@ expr_terminal: unary_stmt
     | identifier dim
     | NOT LPB nested_expr RPB
     | NOT identifier
+    | list_literal
     ;
 
 conj: AND
@@ -258,21 +268,21 @@ arith_op: ADD
 
 // error handling
 void yyerror(char *s) {
-    fprintf(yyout," : invalid statement");
+    //fprintf(yyout," : invalid statement");
     fprintf(stderr, "%s: at line: %d ", s, yylineno);
     fprintf(stderr,"Unexpected Token: %s\n",yytext);
 }
 
 int main(int argc, char* argv[]) {
 
-     //check for input file aurgument
+     /* //check for input file aurgument
     if(argc < 2){
         printf("Missing Argument:./lex_source_program < \"test case path\"");
         return -1;
     }
     else{
         // InFile and Outfile path and Name Handling
-        yyin = fopen(argv[1],"r");
+       
         if(!yyin){
             printf("Error: Input File not found");
             return -1;
@@ -298,19 +308,13 @@ int main(int argc, char* argv[]) {
         // append suffix to outfile and C_outfile name
         char outfile = (char)malloc(100*sizeof(char));
         char C_outfile = (char)malloc(100*sizeof(char));
-        sprintf(outfile,"TP2/seq_tokens_%s.txt",suffix);
-        sprintf(C_outfile,"TP2/parsed_%s.parsed",suffix);
+        sprintf(C_outfile,"TP2/parsed_%s.cpp",suffix);
         
 
         // open the respective files
-        yyout = fopen(C_outfile, "w+");
-        tf = fopen(outfile , "w+");
-
-        fprintf(tf,"Name : Aditya Bacharwar\n");
-        fprintf(tf,"ID : Es21btech11003\n");
-        fprintf(tf,"Input File: %s.clike\n\n", suffix);
-
-    }
+        yyout = fopen(C_outfile, "w+"); */
+    // }
+    yyin = fopen("../testCases/1.test","r");
     yyparse();
     return 0;
 }

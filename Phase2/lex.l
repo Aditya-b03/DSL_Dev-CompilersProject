@@ -1,16 +1,22 @@
 %{
   # include <stdio.h>
   # include <string.h>
-  # include "y.tab.c"
+  # include "y.tab.h"
   FILE *tokens;
-
   extern FILE *yyout;
+
+
+  void print(char* s){
+    printf("%s\n",s);
+  }
+
+  
 %}
 
 %option noyywrap
 
 WHITESPACE [ \t]*
-
+COMMENTS $.*$
 VOID "void"
 RETURN "return"
 BOOL "TRUE"|"FALSE"
@@ -28,15 +34,15 @@ STRING \"([^\"\\]*(\\.[^\"\\]*)*)\"
 
 DATA_TYPE_PR "int"|"float"|"bool"|"string"|"void"
 DOCUMENT "document"
-DATA_TYPE_NEW "team"|"members"|"task"|"event"|"meeting"|"calendar"
+DATA_TYPE_NEW "team"|"member"|"task"|"event"|"meeting"|"calendar"
 
 PUNCTUATION [,;:.]
 
 ARITH_OP "+"|"-"|"/"|"*"|"%" 
 REL_OP "is"|"is not"|">"|"<"|">="|"<=" 
 LOGICAL_OP "and"|"or"|"not" 
-ASSIGN_OP "+="|"-="|"="|"/="|"*="|"%="
-SET_OP "&="|"|=" 
+ASSIGN_OP "+="|"-="|"/="|"*="|"%="|"&="|"|="
+EQUAL "="
 UNARY_OP "++"|"--"
 INTERSECTION_OP "&" 
 UNION_OP "|" 
@@ -49,40 +55,76 @@ ID [A-Za-z][A-Za-z0-9_]*
 
 %option noyywrap
 %%
+"\n"      {
+    print("newline :");
+    printf("%d", yylineno);
+    print(yytext);
+    yylineno++;     //increament the line no.
+    }
+
 {WHITESPACE} {
+
+  print(yytext);
+  ;
+}
+{COMMENTS} {
+  print("comment :");
+  print(yytext);
   ;
 }
 {INCLUDE} {
+  print("include :");
+  print(yytext);
   return INCLUDE;
 }
 {VOID} {
+  print("void :");
+  print(yytext);
   return VOID;
 }
 {RETURN} {
+  print("return :");
+  print(yytext);
   return RETURN;
 }
 {BOOL} {
+  print("bool :");
+  print(yytext);
   return BOOL_LITERAL;
 }
 {LOOP_WHILE} {
+  print("while :");
+  print(yytext);
   return WHILE;
 }
 {LOOP_FOR} {
+  print("for :");
+  print(yytext);
   return FOR;
 }
 {IF} {
+  print("if :");
+  print(yytext);
   return IF;
 }
 {ELSE} {
+  print("else :");
+  print(yytext);
   return ELSE;
 }
 {NUMBER} {
+  print("number :");
+  print(yytext);
   return NUMBER;
 }
 {STRING} {
+  print("string :");
+  print(yytext);
   return STRING_LITERAL;
 }
 {DATA_TYPE_PR} {
+  print("data type pr:");
+  print(yytext);
     char* c1 = "int";
     char* c3 = "string";
     char* c4 = "bool";
@@ -105,14 +147,19 @@ ID [A-Za-z][A-Za-z0-9_]*
     }
 }
 {DOCUMENT} {
+  print(yytext);
   return DOCUMENT;
 }
 {LIST} {
+
+  print(yytext);
   return LIST;
 }
 {DATA_TYPE_NEW} {
+  print("data type new: ");
+  print(yytext);
     char* c1 = "team";
-    char* c2 = "members";
+    char* c2 = "member";
     char* c3 = "task";
     char* c4 = "event";
     char* c5 = "meeting";
@@ -137,6 +184,7 @@ ID [A-Za-z][A-Za-z0-9_]*
     }    
 }
 {PUNCTUATION} {
+  print(yytext);
     char* c1 = ",";
     char* c2 = ";";
     char* c3 = ":";
@@ -151,10 +199,13 @@ ID [A-Za-z][A-Za-z0-9_]*
         return COLON;
     }
     else if(strcmp(yytext,c4)==0){
+        print("dot :");
         return DOT;
     }
 }
 {ARITH_OP} {
+  print("arithmetic op :");
+  print(yytext);
   char* c1 = "+";
   char* c2 = "-";
   char* c3 = "/";
@@ -177,15 +228,18 @@ ID [A-Za-z][A-Za-z0-9_]*
   }
 }
 {REL_OP} {
+  print("relational op :");
+  print(yytext);
   return REL_OP;
 }
-{SET_OP} {
-  return SET_OP;
-}
 {UNARY_OP} {
+  print("unary op :");
+  print(yytext);
   return UNARY_OP;
 }
 {LOGICAL_OP} {
+  print("logical op :");
+  print(yytext);
   char* c1 = "and";
   char* c2 = "or";
   char* c3 = "not";
@@ -200,18 +254,35 @@ ID [A-Za-z][A-Za-z0-9_]*
   }
 }
 {ASSIGN_OP} {
+  print("assign op :");
+  print(yytext);
   return ASSIGN_OP;
 }
+{EQUAL} {
+  print("equal :");
+
+  print(yytext);
+  return EQUALS;
+}
+
 {INTERSECTION_OP} {
+  print("intersection op :");
+  print(yytext);
   return INTERSECTION_OP;
 }
 {UNION_OP} {
+  
+  print("union op :");
+  print(yytext);
   return UNION_OP;
 }
 {ARROW} {
+  print("arrow :");
+  print(yytext);
   return ARROW;
 }
 {BRACKETS} {
+  print(yytext);
     char* c1 = "(";
     char* c2 = ")";
     char* c3 = "{";
@@ -237,15 +308,19 @@ ID [A-Za-z][A-Za-z0-9_]*
         return RSB;
     }
 }
-{VIEWS} {
-  return VIEWS;
-}
+
 {ID} {
-  return ID;
+  print("identifier :");
+  print(yytext);
+  return IDENTIFIER;
 }
 . {
   printf("Unrecognized character %s\n", yytext);
-  yyerror("Unrecognized character");
-  return yytext[0];
+  yyterminate();
 }
+%%
 
+
+// {VIEWS} {
+//   return VIEWS;
+// }
