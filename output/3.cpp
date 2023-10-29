@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 #include "teamScribe.h"
-#include "TeamScribe.h"
+
 
 main data = base.load("../Data/data.json");
 

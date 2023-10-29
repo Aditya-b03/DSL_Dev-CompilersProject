@@ -4,7 +4,7 @@
 #include "teamScribe.h"
 
 
-team test_team;
+
 int i;
 member test_member = 2000;
 int a = something.something;

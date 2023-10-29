@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 #include "teamScribe.h"
-#include "TeamScribe.h"
+
 
 team custom_team_create(string name, string description, string url, string email) {
     /* Custom function for team cration */
