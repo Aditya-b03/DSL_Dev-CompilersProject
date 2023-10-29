@@ -1,0 +1,46 @@
+
+
+class custom_member: member{
+    int performancelevel;
+    int sales;
+
+    void incr_sales()
+    {
+        self -> sales++;
+        return;
+    }
+
+    void well_done(team t, member m)
+    {
+        if(m.id is t.lead.id)
+        {
+            self -> performancelevel++;
+        }
+    }
+};
+
+class custom_team: team{
+    list[]: custom_member members;
+    list[]: custom_team subteams;
+
+    void incr_sales()
+    {
+        self -> sales++;
+        return;
+    }
+
+    void well_done(team t, member m)
+    {
+        if(m.id is t.lead.id)
+        {
+            self -> performancelevel++;
+        }
+    }
+};
+
+main data = base.load("../Data/data.json");
+
+int main()
+{
+    custom_team t;
+}
