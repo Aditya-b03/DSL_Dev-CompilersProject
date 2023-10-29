@@ -1,9 +1,10 @@
 %{
-  # include <stdio.h>
-  # include <string.h>
-  # include "y.tab.h"
+  #include <stdio.h>
+  #include <string.h>
+  #include "y.tab.h"
   FILE *tokens;
   extern FILE *yyout;
+
 
   void print(char* s){
     fprintf(yyout,"%s",s);
@@ -17,7 +18,7 @@
 %option noyywrap
 
 WHITESPACE [ \t]*
-COMMENTS $.*$
+COMMENTS \$[^$]*\$
 VOID "void"
 RETURN "return"
 BOOL "TRUE"|"FALSE"
@@ -57,6 +58,7 @@ ID [A-Za-z][A-Za-z0-9_]*
 %option noyywrap
 %%
 "\n"      {   
+    yylineno++;
     print(yytext);
     ;
 }
@@ -66,18 +68,13 @@ ID [A-Za-z][A-Za-z0-9_]*
   ;
 }
 {COMMENTS} {
-
-  print("/*");
-  if(*yytext=='$'){
-    print(yytext+1);
-  }
-  else if(yytext[strlen(yytext)-1]=='$'){   // fix the ending part of comment.
-    yyterminate();
-  }
-  else{
+  if(yytext[0]=='$' && yytext[strlen(yytext)-1]=='$'){
+    print("/");
+    yytext[0] = '*';
+    yytext[strlen(yytext)-1] = '*';
     print(yytext);
+    print("/");
   }
-  print("*/");
   ;
 }
 {INCLUDE} {
