@@ -1,7 +1,11 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include "teamScribe.h"
 #include "TeamScribe.h"
 
 team custom_team_create(string name, string description, string url, string email) {
-    $ Custom function for team cration $
+    /* Custom function for team cration */
     team t;
     t.name = name;
     t.description = description;
@@ -13,7 +17,7 @@ team custom_team_create(string name, string description, string url, string emai
 }
 
 task custom_task_create(string name, string deadline, string status) {
-    $ Custom Task creating function $
+    /* Custom Task creating function */
     task t;
     t.name = name;
     t.deadline = deadline;
@@ -24,41 +28,41 @@ task custom_task_create(string name, string deadline, string status) {
 }
 
 member custom_team_add_member(team t, string name, string email) {
-    $ Custom function that assigns member to a team and returns the member $
+    /* Custom function that assigns member to a team and returns the member */
     member m;
     m.name = name;
     m.email = email;
-    t.members = realloc(t.members, sizeof("member") * (t.num_members + 1));  $ Handle sizeof $
+    t.members = realloc(t.members, sizeof("member") * (t.num_members + 1));  /* Handle sizeof */
     t.members[t.num_members] = m;
     t.num_members++;
 }
 
-$ main data $
+/* main data */
 
 int main()
 {
-    $ New Team $
+    /* New Team */
 
-    $ Used to load data from previous sessions $
+    /* Used to load data from previous sessions */
     print("../Data/data.json");
     main data = base.load("../Data/data.json");
 
     team t = custom_team_create("Team Scribe", "A team of students from the University of Toronto", "www.meow.com", "hehe@gmail.com");
 
-    $ Creating New Members $
+    /* Creating New Members */
     member a = custom_team_add_member(t, "Ananya", "aynana@gmail.com");
     member b = custom_team_add_member(t, "Aditya Sridhar", "sridhar@gmail.com");
     member c = custom_team_add_member(t, "Avaneesh", "avi@gmail.com");
     member d = custom_team_add_member(t, "Aditya Bacharwar", "brocharwar@gmail.com");
 
-    $ Assign Tasks to list of members $
+    /* Assign Tasks to list of members */
     task t1 = custom_task_create("Finalize on lex", "30-10-23 11:59PM", "in_progress");
     assign_task(t1.id, status = in_progress, members={a,b,c,d}); 
 
     task t2 = custom_task_create("Finalize on yacc", "30-10-23 11:59PM", "in_progress");    
     assign_task(t2.id, status = in_progress, members={a,b,c,d});
 
-    $ Store Data from current session $
+    /* Store Data from current session */
     base.save(data, "../Data/data.json");   
 
     return 0; 

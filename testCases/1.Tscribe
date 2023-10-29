@@ -1,4 +1,5 @@
 
+
 team test_team;
 int i;
 member test_member = 2000;
@@ -38,11 +39,9 @@ int main(){
     test_task.lead = member2;
     test_task.status = Doing; $ Can only be three options, any other should give error.$
     test_member++;
-    test_task -> test_member;
-
+    test_task -> test_member; $take care of  ARROW$
     team team3;
     team3 = test_team & test_team2;
-
     board(team3);
 
 }

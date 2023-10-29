@@ -1,3 +1,7 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include "teamScribe.h"
 #include "TeamScribe.h"
 
 main data = base.load("../Data/data.json");
@@ -18,12 +22,12 @@ int main()
     if(t.find_member(m))
     {
         task t_0 = create_task("Update Team Info", "01-11-23 11:59PM", Assigned, note="Urgent");
-        t_0 -> m;
+        t_0 .add_member( m);
     }
 
     team finances, finances_dummy;
 
-    $ Naive way to search $
+    /* Naive way to search */
     for(int i = 0; i < len(t.subteams); i++)
     {
         if(t.subteam[i].id is "17823")
@@ -33,12 +37,12 @@ int main()
         }
     }
 
-    $ Efficient Search $
+    /* Efficient Search */
     finances = t.search(type = of_type(abc), id = "17823");
 
     meeting finance_sync = create_meeting(name="Finance Team Updates", date = "02-11-23", time = "14:30", team_ = finances);
 
     base.save(data, "../Data/data.json"); 
-    list[d][1][3][2]: team t = data.search(type = of_type(abc), id = "17823"); 
+     team t[d][1][3][2] = data.search(type = of_type(abc), id = "17823"); 
     return 0;
 }

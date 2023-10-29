@@ -48,10 +48,10 @@ include_stmt: INCLUDE STRING_LITERAL
     ;
 
 identifier: IDENTIFIER
-    | IDENTIFIER ARROW identifier
+    | IDENTIFIER ARROW identifier 
     | IDENTIFIER DOT identifier
     | IDENTIFIER dim
-    | IDENTIFIER dim ARROW identifier
+    | IDENTIFIER dim ARROW identifier 
     | IDENTIFIER dim DOT identifier
     | SELF DOT identifier
     ;
@@ -270,15 +270,16 @@ void yyerror(char *s) {
 }
 
 int main(int argc, char* argv[]) {
-
-     /* //check for input file aurgument
+    
+    //check for input file aurgument
+    
     if(argc < 2){
         printf("Missing Argument:./lex_source_program < \"test case path\"");
         return -1;
     }
     else{
         // InFile and Outfile path and Name Handling
-       
+        yyin = fopen(argv[1],"r");
         if(!yyin){
             printf("Error: Input File not found");
             return -1;
@@ -294,7 +295,7 @@ int main(int argc, char* argv[]) {
         }
 
         // get the file Name in suffix
-        char suffix = (char)malloc(100*sizeof(char));
+        char *suffix = (char *)malloc(100*sizeof(char));
         i = filestart;
         while(argv[1][i] != '.'){
             suffix[i-filestart] = argv[1][i];
@@ -302,16 +303,17 @@ int main(int argc, char* argv[]) {
         }
 
         // append suffix to outfile and C_outfile name
-        char outfile = (char)malloc(100*sizeof(char));
-        char C_outfile = (char)malloc(100*sizeof(char));
-        sprintf(C_outfile,"TP2/parsed_%s.cpp",suffix);
+        char *C_outfile = (char *)malloc(100*sizeof(char));
+        sprintf(C_outfile,"../output/%s.cpp",suffix);
         
 
         // open the respective files
-        yyout = fopen(C_outfile, "w+"); */
-    // }
-    yyin = fopen("../testCases/1.test","r");
-    yyout = fopen("1.txt","w+");
+        yyout = fopen(C_outfile, "w+");
+    }
+    fprintf(yyout,"#include <iostream>\n");
+    fprintf(yyout,"#include <string>\n");
+    fprintf(yyout,"#include <vector>\n");
+    fprintf(yyout,"#include \"teamScribe.h\"\n");
     yyparse();
     return 0;
 }

@@ -1,3 +1,8 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include "teamScribe.h"
+
 
 team test_team;
 int i;
@@ -33,16 +38,14 @@ int main(){
     test_team2.add(member2); /* Will the member be added again, or overwritten, or an error? */
     /*team.add_member(member2);*/ /* This should give an error, as the team is not defined.*/
     /* There are too many ways to add a member, we should reduce that.*/
-    /* test_team2.add_member(member2); */  team abc = test_team2 + test_team; /* This should give an error, as the team is not defined.*/
+
     task test_task = create_task("Will this work?", "This is to test the addition of a task and assigning.", "12/12/2023");
     test_task.lead = member2;
     test_task.status = Doing; /* Can only be three options, any other should give error.*/
     test_member++;
-    test_task -> test_member;
-     int id[1][2][3][4] = {1, 2, 3, 4};
+    test_task .add_member( test_member); /*take care of  ARROW*/
     team team3;
     team3 = test_team & test_team2;
-
     board(team3);
 
 }

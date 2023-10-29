@@ -30,6 +30,7 @@ class member {
 	string memberID;
 	string department;
     member(string member_name, string email = NULL, vector<task *>tasks_assigned = {}, string department = NULL, int salary = -1);
+
 };
 
 class team {
@@ -55,5 +56,5 @@ class calendar{
 /*
 member a2;
 task t3;
-
+member.assign_task(t3);
 */
