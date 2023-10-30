@@ -1,0 +1,18 @@
+identifier: main
+identifier: data
+operator: =
+identifier: base
+punctuation: .
+identifier: load
+brackets: (
+constant: "../Data/data.json"
+brackets: )
+punctuation: ;
+comment: $ Prototypes for the add_events and holidays_bonus function $
+datatype: calendar
+identifier: add_events
+brackets: (
+datatype: team
+identifier: t
+brackets: )
+punctuation: ;

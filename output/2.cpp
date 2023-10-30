@@ -4,17 +4,6 @@
 #include "teamScribe.h"
 
 
-team custom_team_create(string name, string description, string url, string email) {
-    /* Custom function for team cration */
-    team t;
-    t.name = name;
-    t.description = description;
-    t.url = url;
-    t.email = email;
-    t.members = NULL;
-    t.num_members = 0;
-    return t;
-}
 
 task custom_task_create(string name, string deadline, string status) {
     /* Custom Task creating function */
@@ -62,8 +51,4 @@ int main()
     task t2 = custom_task_create("Finalize on yacc", "30-10-23 11:59PM", "in_progress");    
     assign_task(t2.id, status = in_progress, members={a,b,c,d});
 
-    /* Store Data from current session */
-    base.save(data, "../Data/data.json");   
-
-    return 0; 
-}
+    &

@@ -2,9 +2,8 @@
   #include <stdio.h>
   #include <string.h>
   #include "y.tab.h"
-  FILE *tokens;
   extern FILE *yyout;
-
+  extern FILE *tf;
 
   void print(char* s){
     fprintf(yyout,"%s",s);
@@ -65,10 +64,12 @@ ID [A-Za-z][A-Za-z0-9_]*
 }
 
 {WHITESPACE} {
+
     print(yytext);
   ;
 }
 {COMMENTS} {
+  fprintf(tf,"comment: %s\n", yytext);
   if(yytext[0]=='$' && yytext[strlen(yytext)-1]=='$'){
     print("/");
     yytext[0] = '*';
@@ -79,38 +80,47 @@ ID [A-Za-z][A-Za-z0-9_]*
   ;
 }
 {INCLUDE} {
+  fprintf(tf,"reserved: %s\n", yytext);
   print("#include");
   return INCLUDE;
 }
 {VOID} {
+  fprintf(tf,"datatype: %s\n", yytext);
   print(yytext);
   return VOID;
 }
 {RETURN} {
+  fprintf(tf,"reserved: %s\n", yytext);
   print(yytext);
   return RETURN;
 }
 {BOOL} {
+  fprintf(tf,"datatype: %s\n", yytext);
   print(yytext);
   return BOOL_LITERAL;
 }
 {LOOP_WHILE} {
+  fprintf(tf,"reserved: %s\n", yytext);
   print(yytext);
   return WHILE;
 }
 {LOOP_FOR} {
+  fprintf(tf,"reserved: %s\n", yytext);
   print(yytext);
   return FOR;
 }
 {IF} {
+  fprintf(tf,"reserved: %s\n", yytext);
   print(yytext);
   return IF;
 }
 {ELSE} {
+  fprintf(tf,"reserved: %s\n", yytext);
   print(yytext);
   return ELSE;
 }
 {NUMBER} {
+  fprintf(tf,"constant: %s\n", yytext);
   if(list_flag==1){
     s[i] = *yytext;
     i++;
@@ -121,10 +131,12 @@ ID [A-Za-z][A-Za-z0-9_]*
   return NUMBER;
 }
 {STRING} {
+  fprintf(tf,"constant: %s\n", yytext);
   print(yytext);
   return STRING_LITERAL;
 }
 {DATA_TYPE_PR} {
+  fprintf(tf,"datatype: %s\n", yytext);
   print(yytext);
     char* c1 = "int";
     char* c3 = "string";
@@ -148,15 +160,18 @@ ID [A-Za-z][A-Za-z0-9_]*
     }
 }
 {DOCUMENT} {
+  fprintf(tf,"datatype: %s\n", yytext);
   print(yytext);
   return DOCUMENT;
 }
-{LIST} {            
+{LIST} {         
+  fprintf(tf,"reserved: %s\n", yytext);   
   list_flag = 1;
   list_print_flag=1;
   return LIST;
 }
 {DATA_TYPE_NEW} {
+  fprintf(tf,"datatype: %s\n", yytext);
   print(yytext);
     char* c1 = "team";
     char* c2 = "member";
@@ -184,7 +199,7 @@ ID [A-Za-z][A-Za-z0-9_]*
     }    
 }
 {PUNCTUATION} {
-  
+    fprintf(tf,"punctuation: %s\n", yytext);
     char* c1 = ",";
     char* c2 = ";";
     char* c3 = ":";
@@ -216,6 +231,7 @@ ID [A-Za-z][A-Za-z0-9_]*
     }
 }
 {ARITH_OP} {
+  fprintf(tf,"operator: %s\n", yytext);
   print(yytext);
   char* c1 = "+";
   char* c2 = "-";
@@ -239,14 +255,17 @@ ID [A-Za-z][A-Za-z0-9_]*
   }
 }
 {REL_OP} {
+  fprintf(tf,"operator: %s\n", yytext);
   print(yytext);
   return REL_OP;
 }
 {UNARY_OP} {
+  fprintf(tf,"operator: %s\n", yytext);
   print(yytext);
   return UNARY_OP;
 }
 {LOGICAL_OP} {
+  fprintf(tf,"operator: %s\n", yytext);
   print(yytext);
   char* c1 = "and";
   char* c2 = "or";
@@ -262,19 +281,23 @@ ID [A-Za-z][A-Za-z0-9_]*
   }
 }
 {ASSIGN_OP} {
+  fprintf(tf,"operator: %s\n", yytext);
   print(yytext);
   return ASSIGN_OP;
 }
 {EQUAL} {
+  fprintf(tf,"operator: %s\n", yytext);
   print(yytext);
   return EQUALS;
 }
 
 {INTERSECTION_OP} {
+  fprintf(tf,"operator: %s\n", yytext);
   print(yytext);
   return INTERSECTION_OP;
 }
 {UNION_OP} {
+  fprintf(tf,"operator: %s\n", yytext);
   print(yytext);
   return UNION_OP;
 }
@@ -284,7 +307,7 @@ ID [A-Za-z][A-Za-z0-9_]*
   return ARROW;
 }
 {BRACKETS} {
-  
+    fprintf(tf,"brackets: %s\n", yytext);
     char* c1 = "(";
     char* c2 = ")";
     char* c3 = "{";
@@ -328,7 +351,7 @@ ID [A-Za-z][A-Za-z0-9_]*
 }
 
 {ID} {
-
+  fprintf(tf,"identifier: %s\n", yytext);
   if(list_flag==1){
     s[i] = *yytext;
     i++;
@@ -351,11 +374,35 @@ ID [A-Za-z][A-Za-z0-9_]*
   }
   return IDENTIFIER;
 }
+
 . {
   printf("Unrecognized character %s\n", yytext);
   yyterminate();
 }
 %%
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // {VIEWS} {
 //   return VIEWS;

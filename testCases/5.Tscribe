@@ -1,6 +1,6 @@
 
 
-class custom_member: member{
+class custom_member{
     int performancelevel;
     int sales;
 
@@ -19,7 +19,7 @@ class custom_member: member{
     }
 };
 
-class custom_team: team{
+class custom_team{
     list[]: custom_member members;
     list[]: custom_team subteams;
 

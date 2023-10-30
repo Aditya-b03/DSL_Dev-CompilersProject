@@ -194,6 +194,7 @@
     int for_loop = 0;       //nested loop
     int nested_call = 0;    // nested call
     int return_flag = 0;
+    extern FILE *tf;
 
     
 
@@ -229,7 +230,7 @@ typedef int YYSTYPE;
 
 
 /* Line 216 of yacc.c.  */
-#line 233 "y.tab.c"
+#line 234 "y.tab.c"
 
 #ifdef short
 # undef short
@@ -578,20 +579,20 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    39,    39,    40,    43,    44,    47,    50,    51,    52,
-      53,    54,    55,    56,    59,    60,    61,    62,    63,    66,
-      67,    70,    73,    74,    77,    80,    81,    82,    83,    86,
-      87,    88,    89,    90,    91,    92,    96,    97,    98,    99,
-     103,   104,   105,   108,   109,   110,   113,   116,   119,   120,
-     121,   122,   125,   126,   129,   130,   131,   132,   133,   134,
-     135,   136,   139,   140,   143,   144,   145,   148,   149,   150,
-     151,   154,   155,   158,   161,   162,   166,   167,   170,   171,
-     172,   173,   178,   181,   182,   183,   186,   187,   188,   189,
-     190,   191,   192,   193,   196,   197,   198,   199,   202,   203,
-     206,   207,   210,   213,   216,   217,   218,   219,   220,   223,
-     224,   225,   226,   227,   228,   231,   232,   233,   234,   235,
-     238,   239,   240,   241,   242,   243,   244,   245,   248,   249,
-     252,   253,   256,   257,   258,   259,   260
+       0,    40,    40,    41,    44,    45,    48,    51,    52,    53,
+      54,    55,    56,    57,    60,    61,    62,    63,    64,    67,
+      68,    71,    74,    75,    78,    81,    82,    83,    84,    87,
+      88,    89,    90,    91,    92,    93,    97,    98,    99,   100,
+     104,   105,   106,   109,   110,   111,   114,   117,   120,   121,
+     122,   123,   126,   127,   130,   131,   132,   133,   134,   135,
+     136,   137,   140,   141,   144,   145,   146,   149,   150,   151,
+     152,   155,   156,   159,   162,   163,   167,   168,   171,   172,
+     173,   174,   179,   182,   183,   184,   187,   188,   189,   190,
+     191,   192,   193,   194,   197,   198,   199,   200,   203,   204,
+     207,   208,   211,   214,   217,   218,   219,   220,   221,   224,
+     225,   226,   227,   228,   229,   232,   233,   234,   235,   236,
+     239,   240,   241,   242,   243,   244,   245,   246,   249,   250,
+     253,   254,   257,   258,   259,   260,   261
 };
 #endif
 
@@ -1795,7 +1796,7 @@ yyreduce:
     {
       
 /* Line 1267 of yacc.c.  */
-#line 1799 "y.tab.c"
+#line 1800 "y.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2009,7 +2010,7 @@ yyreturn:
 }
 
 
-#line 263 "yacc.y"
+#line 264 "yacc.y"
 
 
 // error handling
@@ -2055,10 +2056,12 @@ int main(int argc, char* argv[]) {
         // append suffix to outfile and C_outfile name
         char *C_outfile = (char *)malloc(100*sizeof(char));
         sprintf(C_outfile,"../output/%s.cpp",suffix);
-        
-
+        char *token_file = (char *)malloc(100*sizeof(char));
+        sprintf(token_file,"../output/%s_tokens.txt",suffix);
         // open the respective files
         yyout = fopen(C_outfile, "w+");
+        tf = fopen(token_file,"w+");
+
     }
     fprintf(yyout,"#include <iostream>\n");
     fprintf(yyout,"#include <string>\n");

@@ -1,0 +1,3 @@
+identifier: class
+identifier: custom_member
+punctuation: :

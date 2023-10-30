@@ -13,6 +13,7 @@
     int for_loop = 0;       //nested loop
     int nested_call = 0;    // nested call
     int return_flag = 0;
+    extern FILE *tf;
 
     
 %}
@@ -305,10 +306,12 @@ int main(int argc, char* argv[]) {
         // append suffix to outfile and C_outfile name
         char *C_outfile = (char *)malloc(100*sizeof(char));
         sprintf(C_outfile,"../output/%s.cpp",suffix);
-        
-
+        char *token_file = (char *)malloc(100*sizeof(char));
+        sprintf(token_file,"../output/%s_tokens.txt",suffix);
         // open the respective files
         yyout = fopen(C_outfile, "w+");
+        tf = fopen(token_file,"w+");
+
     }
     fprintf(yyout,"#include <iostream>\n");
     fprintf(yyout,"#include <string>\n");
