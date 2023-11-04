@@ -1,7 +1,8 @@
 %{  
     #include <stdio.h>
-    #include <string.h>
     #include <stdlib.h>
+    #include<vector>
+    #include<string>
     #include "yacc_module.h"
     
     int yylex(void);
@@ -17,8 +18,21 @@
     int return_flag = 0;
     extern FILE *tf;
 
+    map<string, id_entry> global_table;
+    map<string, func_entry> func_table;
     
 %}
+
+%union {
+int type;
+int intAttr;
+vector<string> names_list;
+string name;
+}
+%type <intAttr> INT FLOAT BOOL STRING DOCUMENT TEAM MEMBERS TASK EVENT MEETING CALENDAR
+%type <type> data_type_new data_type_pr
+%type <names_list> id_list
+%type <name> IDENTIFIER
 
 %token NUMBER STRING_LITERAL BOOL_LITERAL
 %token CLASS RETURN
@@ -85,20 +99,20 @@ function_dec: data_type_new IDENTIFIER LPB function_params RPB
     | VOID IDENTIFIER LPB function_params RPB
     ;
 
-data_type_new: DOCUMENT      
-    | TEAM
-    | MEMBERS
-    | TASK
-    | EVENT
-    | MEETING
-    | CALENDAR
+data_type_new: DOCUMENT { $$ = 13; }  
+    | TEAM { $$ = 8; }
+    | MEMBERS   { $$ = 9; }
+    | TASK  { $$ = 10; }
+    | EVENT     { $$ = 11; }
+    | MEETING  { $$ = 12; }
+    | CALENDAR { $$ = 14; }
     ;
 
 
-data_type_pr:  INT
-    | STRING
-    | BOOL
-    | FLOAT
+data_type_pr:  INT { $$ = 0; }
+    | STRING { $$ = 2; }
+    | BOOL  { $$ = 3; }
+    | FLOAT { $$ = 1; }
     ;
 
 
@@ -149,8 +163,30 @@ single_stmt: decl_stmt
     ;
 
 // add id to symbol table, id is class
-decl_stmt: data_type_new id_list SEMICOLON
-    | data_type_pr id_list SEMICOLON
+decl_stmt: data_type_new id_list SEMICOLON {
+        id_entry entry;
+        entry.type = $1;
+        entry.arr = false;
+        entry.scope = 0; // we have to change scope according to nested loops
+        if (insert(global_table, $2, entry)) {
+            // Variable inserted successfully
+        } else {
+            yyerror("Variable already declared");
+        }
+        display(global_table);
+    }
+    | data_type_pr id_list SEMICOLON{
+        id_entry entry;
+        entry.type = $1;
+        entry.arr = false;
+        entry.scope = 0; // we have to change scope according to nested loops
+        if (insert(global_table, $2, entry)) {
+            // Variable inserted successfully
+        } else {
+            yyerror("Variable already declared");
+        }
+        display(global_table);   
+    }
     | IDENTIFIER id_list SEMICOLON
     | list id_list  SEMICOLON
     ;
@@ -175,10 +211,15 @@ dim: dim  LSB nested_expr RSB
     ;
 
 // idlist, type
-id_list: id_list COMMA IDENTIFIER
+id_list: id_list COMMA IDENTIFIER {
+        $$.names_list = $1.names_list;
+        $$.names_list.push_back($3);
+    }
     | IDENTIFIER EQUALS nested_expr
     | id_list COMMA IDENTIFIER EQUALS nested_expr
-    | IDENTIFIER
+    | IDENTIFIER{
+        $$.names_list.push_back($1);
+    }
     ;
 
 expr_stmt: expr_stmt_without_semicolon SEMICOLON

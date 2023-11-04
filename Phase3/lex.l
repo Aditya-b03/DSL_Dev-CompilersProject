@@ -1,7 +1,8 @@
 %{
   #include <stdio.h>
-  #include <string.h>
-  #include "y.tab.h"
+  #include <string>
+  #include <vector>
+  #include "yacc.tab.hpp"
   extern FILE *yyout;
   extern FILE *tf;
 
@@ -138,11 +139,11 @@ ID [A-Za-z][A-Za-z0-9_]*
 {DATA_TYPE_PR} {
   fprintf(tf,"datatype: %s\n", yytext);
   print(yytext);
-    char* c1 = "int";
-    char* c3 = "string";
-    char* c4 = "bool";
-    char* c5 = "void";   
-    char* c6 = "float";
+    string c1 = "int";
+    string c3 = "string";
+    string c4 = "bool";
+    string c5 = "void";   
+    string c6 = "float";
     if(strcmp(yytext,c1)==0){
       return INT;
     }
@@ -173,12 +174,12 @@ ID [A-Za-z][A-Za-z0-9_]*
 {DATA_TYPE_NEW} {
   fprintf(tf,"datatype: %s\n", yytext);
   print(yytext);
-    char* c1 = "team";
-    char* c2 = "member";
-    char* c3 = "task";
-    char* c4 = "event";
-    char* c5 = "meeting";
-    char* c6 = "calendar";
+    string c1 = "team";
+    string c2 = "member";
+    string c3 = "task";
+    string c4 = "event";
+    string c5 = "meeting";
+    string c6 = "calendar";
     if(strcmp(yytext,c1)==0){
         return TEAM;
     }
@@ -200,10 +201,10 @@ ID [A-Za-z][A-Za-z0-9_]*
 }
 {PUNCTUATION} {
     fprintf(tf,"punctuation: %s\n", yytext);
-    char* c1 = ",";
-    char* c2 = ";";
-    char* c3 = ":";
-    char* c4 = ".";
+    string c1 = ",";
+    string c2 = ";";
+    string c3 = ":";
+    string c4 = ".";
     if(strcmp(yytext,c1)==0){
         print(yytext);
         return COMMA;
@@ -233,11 +234,11 @@ ID [A-Za-z][A-Za-z0-9_]*
 {ARITH_OP} {
   fprintf(tf,"operator: %s\n", yytext);
   print(yytext);
-  char* c1 = "+";
-  char* c2 = "-";
-  char* c3 = "/";
-  char* c4 = "*";
-  char* c5 = "%";
+  string c1 = "+";
+  string c2 = "-";
+  string c3 = "/";
+  string c4 = "*";
+  string c5 = "%";
   if(strcmp(yytext,c1)==0){
     return ADD;
   }
@@ -267,9 +268,9 @@ ID [A-Za-z][A-Za-z0-9_]*
 {LOGICAL_OP} {
   fprintf(tf,"operator: %s\n", yytext);
   print(yytext);
-  char* c1 = "and";
-  char* c2 = "or";
-  char* c3 = "not";
+  string c1 = "and";
+  string c2 = "or";
+  string c3 = "not";
   if(strcmp(yytext,c1)==0){
     return AND;
   }
@@ -308,12 +309,12 @@ ID [A-Za-z][A-Za-z0-9_]*
 }
 {BRACKETS} {
     fprintf(tf,"brackets: %s\n", yytext);
-    char* c1 = "(";
-    char* c2 = ")";
-    char* c3 = "{";
-    char* c4 = "}";
-    char* c5 = "[";
-    char* c6 = "]";
+    string c1 = "(";
+    string c2 = ")";
+    string c3 = "{";
+    string c4 = "}";
+    string c5 = "[";
+    string c6 = "]";
     if(strcmp(yytext,c1)==0){
         print(yytext);
         return LPB;
