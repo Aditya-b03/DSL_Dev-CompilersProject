@@ -1,9 +1,7 @@
-#include <map>
-#include <vector>
-#include <string>
-#include <iostream>
-
-using namespace std;
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
 
 /*
 Type Encodings:
@@ -25,86 +23,258 @@ Type Encodings:
     15: class
 */
 
-struct idrec
+struct node
 {
-    bool arr;
-    int type;
-    vector<int> arr_dims;
-    int scope;
+    int val;
+    struct node *next;
 };
 
-typedef struct idrec id_entry;
+typedef struct node node;
+
+struct ilist
+{
+    node *head;
+    node *tail;
+};
+
+typedef struct ilist ilist;
+
+ilist* init_ilist();
+void insert_ilist(ilist *l, int val);
+void display_ilist(ilist *l);
+
+struct idrec
+{
+    char* name;
+    bool arr;
+    int type;
+    ilist arr_dims;
+    int scope;
+    struct idrec *next;
+};
+
+typedef struct idrec idrec;
+
+struct symtab
+{
+    idrec* head;
+    idrec* tail;
+};
+
+typedef struct symtab symtab;
+
+symtab* init_symtab();
+void insert_symtab(symtab *l, idrec *entry);
+void display_symtab(symtab *l);
+void clear_scope_symtab(symtab *l, int scope);
+idrec* search_symtab(symtab *l, char* name);
 
 struct funcrec
 {
-    string name;
+    char* name;
     int type;
-    vector<pair<string, id_entry>> params;
-    map<string, id_entry> local_table;
+    symtab params;
+    symtab local_table;
     int num_params;
+    struct funcrec *next;
 };
 
-typedef struct funcrec func_entry;
+typedef struct funcrec funcrec;
 
-map<string, id_entry> global_table;
-map<string, func_entry> func_table;
+struct functab{
+    funcrec* head;
+    funcrec* tail;
+};
 
-id_entry lookup(map<string, id_entry> &local_table, string name)
+typedef struct functab functab;
+
+functab* init_functab();
+void insert_functab(functab *ft, funcrec *entry);
+void display_functab(functab *ft);
+funcrec* search_functab(functab *ft, char* name);
+
+idrec* lookup(symtab *global_table, symtab *local_table, char* name)
 {
-    if (local_table.find(name) != local_table.end())
-        return local_table[name];
-    else if (global_table.find(name) != global_table.end())
-        return global_table[name];
-    else
-    {
-        id_entry entry;
-        entry.type = -1;
-        return entry;
-    }
+    idrec *temp = search_symtab(local_table, name);
+    if (temp != NULL)
+        return temp;
+    temp = search_symtab(global_table, name);
+    return temp;
 }
 
-bool insert(map<string, id_entry> &local_table, string name, id_entry entry)
+bool insert(symtab *global_table, symtab *local_table, idrec entry)
 {
-    if (lookup(local_table, name).type != -1)
+    idrec *temp = lookup(global_table, local_table, entry.name);
+    if (temp != NULL)
         return false;
-    local_table[name] = entry;
+    insert_symtab(local_table, &entry);
     return true;
 }
 
-void display(map<string, id_entry> &table)
+// // struct for dimlist of identifiers
+// struct dimlist
+// {
+//     vector<int> dims;
+// };
+
+// // struct with dimlist and type
+// struct dimlist_type
+// {
+//     vector<int> dims;
+//     int type;
+// };
+
+// // struct for type
+// struct type
+// {
+//     int type;
+// };
+
+ilist* init_ilist()
 {
-    for (auto it = table.begin(); it != table.end(); it++)
-        cout << it->first << " " << it->second.type << endl;
+    ilist *l = (ilist*) malloc(sizeof(ilist));
+    l->head = NULL;
+    l->tail = NULL;
+    return l;
 }
 
-void display_func_table()
+void insert_ilist(ilist *l, int val)
 {
-    for (auto it = func_table.begin(); it != func_table.end(); it++)
+    node *temp = (node *)malloc(sizeof(node));
+    temp -> val = val;
+    temp -> next = NULL;
+    if (l -> head == NULL)
     {
-        cout << it->first << " " << it->second.type << endl;
-        cout << "Params: " << endl;
-        for (auto it2 = it->second.params.begin(); it2 != it->second.params.end(); it2++)
-            cout << it2->first << " " << it2->second.type << endl;
-        cout << "Local Table: " << endl;
-        display(it->second.local_table);
+        l -> head = temp;
+        l -> tail = temp;
+    }
+    else
+    {
+        l -> tail -> next = temp;
+        l -> tail = temp;
     }
 }
 
-// struct for dimlist of identifiers
-struct dimlist
+void display_ilist(ilist *l)
 {
-    vector<int> dims;
-};
+    node *temp = l -> head;
+    while (temp != NULL)
+    {
+        printf("%d ", temp->val);
+        temp = temp->next;
+    }
+    printf("\n");
+}
 
-// struct with dimlist and type
-struct dimlist_type
+symtab* init_symtab()
 {
-    vector<int> dims;
-    int type;
-};
+    symtab *st = (symtab*) malloc(sizeof(symtab));
+    st -> head = NULL;
+    st -> tail = NULL;
+    return st;
+}
 
-// struct for type
-struct type
+void insert_symtab(symtab *st, idrec *entry)
 {
-    int type;
-};
+    if (st -> head == NULL)
+    {
+        st -> head = entry;
+        st -> tail = entry;
+    }
+    else
+    {
+        st -> tail -> next = entry;
+        st -> tail = entry;
+    }
+    return;
+}
+
+void display_symtab(symtab *st)
+{
+    idrec *temp = st -> head;
+    while (temp != NULL)
+    {
+        printf("%s %d\n", temp -> name, temp -> type);
+        temp = temp -> next;
+    }
+}
+
+void clear_scope_symtab(symtab *st, int scope)
+{
+    idrec *temp = st -> head;
+    while (temp != NULL)
+    {
+        if (temp -> scope < scope)
+            break;
+        temp = temp -> next;
+    }
+    if (temp == NULL)
+        return;
+    st -> tail = temp;
+    temp = temp -> next;
+    while (temp != NULL)
+    {
+        idrec *temp2 = temp;
+        temp = temp -> next;
+        free(temp2);
+    }
+    return;
+}
+
+idrec* search_symtab(symtab *st, char* name)
+{
+    idrec *temp = st -> head;
+    while (temp != NULL)
+    {
+        if (strcmp(temp -> name, name) == 0)
+            return temp;
+        temp = temp -> next;
+    }
+    return NULL;
+}
+
+functab* init_functab()
+{
+    functab *ft = (functab*) malloc(sizeof(functab));
+    ft -> head = NULL;
+    ft -> tail = NULL;
+    return ft;
+}
+
+void insert_functab(functab *ft, funcrec *entry)
+{
+    if (ft -> head == NULL)
+    {
+        ft -> head = entry;
+        ft -> tail = entry;
+    }
+    else
+    {
+        ft -> tail -> next = entry;
+        ft -> tail = entry;
+    }
+    return;
+}
+
+void display_functab(functab *ft)
+{
+    funcrec *temp = ft -> head;
+    while (temp != NULL)
+    {
+        printf("%s %d\n", temp -> name, temp -> type);
+        temp = temp -> next;
+    }
+}
+
+// support for function overloading
+funcrec* search_functab(functab *ft, char* name)
+{
+    funcrec *temp = ft -> head;
+    while (temp != NULL)
+    {
+        if (strcmp(temp -> name, name) == 0)
+            return temp;
+        temp = temp -> next;
+    }
+    return NULL;
+}
