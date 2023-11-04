@@ -23,10 +23,10 @@
 %token NUMBER STRING_LITERAL BOOL_LITERAL
 %token CLASS RETURN
 %token INT STRING BOOL FLOAT VOID LIST 
-%token DOCUMENT TEAM MEMBERS TASK EVENT MEETING CALENDAR // yet to add
+%token DOCUMENT TEAM MEMBERS TASK EVENT MEETING CALENDAR 
 %token ADD SUB MUL DIV MOD
 %token UNARY_OP
-%token ASSIGN_OP REL_OP EQUALS // equal update
+%token ASSIGN_OP REL_OP EQUALS 
 %token AND OR NOT INTERSECTION_OP UNION_OP
 %token FOR WHILE IF ELSE
 %token IDENTIFIER SELF 
@@ -76,6 +76,7 @@ struct_body: struct_body decl_stmt
     ; // till here
 
 function: function_dec LCB statements RCB
+    | function_dec SEMICOLON
     ;
 
 function_dec: data_type_new IDENTIFIER LPB function_params RPB

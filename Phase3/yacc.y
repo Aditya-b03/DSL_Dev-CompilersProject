@@ -2,9 +2,11 @@
     #include <stdio.h>
     #include <string.h>
     #include <stdlib.h>
+    #include "yacc_module.h"
+    
     int yylex(void);
   
-  void yyerror(char *);
+    void yyerror(char *);
     extern char* yytext;
     extern FILE *yyout;
     extern FILE *yyin;
@@ -18,15 +20,13 @@
     
 %}
 
-// neg, array declaration
-
 %token NUMBER STRING_LITERAL BOOL_LITERAL
 %token CLASS RETURN
 %token INT STRING BOOL FLOAT VOID LIST 
-%token DOCUMENT TEAM MEMBERS TASK EVENT MEETING CALENDAR // yet to add
+%token DOCUMENT TEAM MEMBERS TASK EVENT MEETING CALENDAR 
 %token ADD SUB MUL DIV MOD
 %token UNARY_OP
-%token ASSIGN_OP REL_OP EQUALS // equal update
+%token ASSIGN_OP REL_OP EQUALS 
 %token AND OR NOT INTERSECTION_OP UNION_OP
 %token FOR WHILE IF ELSE
 %token IDENTIFIER SELF 
@@ -48,6 +48,7 @@ include_stmts: include_stmts include_stmt
 include_stmt: INCLUDE STRING_LITERAL
     ;
 
+// dimlist
 identifier: IDENTIFIER
     | IDENTIFIER ARROW identifier 
     | IDENTIFIER DOT identifier
@@ -64,7 +65,7 @@ code: decl_stmt code
     |
     ;
 
-struct_code: struct_def  //to remove
+struct_code: struct_def  
     | TYPEDEF struct_def
     ;
 
@@ -73,7 +74,7 @@ struct_def: STRUCT IDENTIFIER LCB struct_body RCB SEMICOLON
 
 struct_body: struct_body decl_stmt
     |
-    ; // till here
+    ; 
 
 function: function_dec LCB statements RCB
     ;
@@ -84,7 +85,7 @@ function_dec: data_type_new IDENTIFIER LPB function_params RPB
     | VOID IDENTIFIER LPB function_params RPB
     ;
 
-data_type_new: DOCUMENT      // why??
+data_type_new: DOCUMENT      
     | TEAM
     | MEMBERS
     | TASK
@@ -137,6 +138,7 @@ statement: decl_stmt
     | SEMICOLON
     ;
 
+// check id in symbol table
 unary_stmt: identifier UNARY_OP
     | identifier
     ;
@@ -146,44 +148,49 @@ single_stmt: decl_stmt
     | expr_stmt
     ;
 
+// add id to symbol table, id is class
 decl_stmt: data_type_new id_list SEMICOLON
     | data_type_pr id_list SEMICOLON
     | IDENTIFIER id_list SEMICOLON
     | list id_list  SEMICOLON
     ;
 
+// dimlist, type
 list: LIST dim COLON data_type_pr 
     | LIST dim COLON data_type_new 
     ;
 
+// dimlist, type
 list_literal:  LCB list_terminal RCB 
     ;
 
+// dimlist, type
 list_terminal: nested_expr
     | list_terminal COMMA nested_expr         
     ;
 
-
+// dimlist, type
 dim: dim  LSB nested_expr RSB 
     | LSB nested_expr RSB 
     ;
 
+// idlist, type
 id_list: id_list COMMA IDENTIFIER
     | IDENTIFIER EQUALS nested_expr
     | id_list COMMA IDENTIFIER EQUALS nested_expr
     | IDENTIFIER
     ;
 
-
-
 expr_stmt: expr_stmt_without_semicolon SEMICOLON
     ;
 
+// check lhs and rhs, check assignop (seprate assignop)
 expr_stmt_without_semicolon: identifier ASSIGN_OP nested_expr
     | identifier EQUALS nested_expr
     | unary_stmt
     ;
 
+// nested_expr is bool
 if_stmt: IF LPB nested_expr RPB LCB statements RCB
     | IF LPB nested_expr RPB single_stmt 
     | IF LPB nested_expr RPB LCB statements RCB ELSE if_stmt
@@ -194,16 +201,19 @@ if_stmt: IF LPB nested_expr RPB LCB statements RCB
     | IF LPB nested_expr RPB single_stmt ELSE single_stmt
     ;
 
+// nested_expr is bool
 for_stmt: FOR LPB decl_stmt  nested_expr SEMICOLON expr_stmt_without_semicolon RPB LCB statements RCB
     | FOR LPB decl_stmt nested_expr SEMICOLON expr_stmt_without_semicolon RPB single_stmt
     | FOR LPB expr_stmt nested_expr SEMICOLON expr_stmt_without_semicolon RPB LCB statements RCB
     | FOR LPB expr_stmt nested_expr SEMICOLON expr_stmt_without_semicolon RPB single_stmt
     ;
 
+// nested_expr is bool
 while_stmt: WHILE LPB nested_expr RPB LCB statements RCB
     | WHILE LPB nested_expr RPB single_stmt
     ;
 
+// check return type
 return_stmt: RETURN SEMICOLON
     | RETURN nested_expr SEMICOLON
     ;
@@ -211,9 +221,11 @@ return_stmt: RETURN SEMICOLON
 call_stmt: call SEMICOLON
     ;
 
+// check id in function table
 call: identifier LPB call_args RPB
     ;
 
+// typelist
 call_args: call_args COMMA nested_expr
     | nested_expr
     | call_args COMMA identifier EQUALS nested_expr
@@ -221,6 +233,7 @@ call_args: call_args COMMA nested_expr
     |
     ;
 
+// type
 nested_expr: LPB nested_expr RPB
     | LPB nested_expr RPB conj nested_expr
     | LPB nested_expr RPB REL_OP nested_expr
@@ -229,6 +242,7 @@ nested_expr: LPB nested_expr RPB
     | expr
     ;
 
+// type
 expr: expr_terminal conj nested_expr
     | expr_terminal REL_OP nested_expr
     | expr_terminal arith_op nested_expr
@@ -236,6 +250,8 @@ expr: expr_terminal conj nested_expr
     | expr_terminal
     ;
 
+// type
+// check id in symbol table
 expr_terminal: unary_stmt
     | NUMBER
     | STRING_LITERAL
@@ -246,6 +262,7 @@ expr_terminal: unary_stmt
     | list_literal
     ;
 
+// op
 conj: AND
     | OR
     ;
@@ -254,6 +271,7 @@ set_op: INTERSECTION_OP
     | UNION_OP
     ;
 
+// op
 arith_op: ADD
     | SUB
     | MUL
