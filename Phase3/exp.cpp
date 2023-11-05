@@ -3,7 +3,7 @@
 
 int main()
 {
-    int a;
+    int a, v, d;
     string b;
     float c;
     return 0;

@@ -1,5 +1,6 @@
 %{
  #include <stdio.h>
+ #include <stdbool.h>
  #include "yacc.tab.h"
  extern FILE *yyout;
  extern FILE *tf;
@@ -379,6 +380,7 @@ ID [A-Za-z][A-Za-z0-9_]*
      list_print_flag = 0;
    }
  }
+ yylval.id.name = strdup(yytext);
  return IDENTIFIER;
 }
 

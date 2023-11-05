@@ -19,9 +19,9 @@ fi
 # Step 1: Run Flex (lex.l)
 flex lex.l
 # Step 2: Run Yacc (yacc.y)
-yacc -d yacc.y
+bison -d yacc.y
 # Step 3: Compile the generated code
-gcc lex.yy.c y.tab.c -o a.out
+gcc lex.yy.c yacc.tab.c -o a.out
 # Step 4: Execute the generated program with the input file
 ./a.out "$input_file"
 

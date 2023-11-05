@@ -1,6 +1,7 @@
 %{ 
    #include <stdio.h>
    #include <stdlib.h>
+   #include <stdbool.h>
    #include "yacc_module.h"
 
 
@@ -19,16 +20,24 @@
    extern FILE *tf;
 
 
-   symtab *global_table;
-   functab *function_table;
+   struct symtab *global_table;
+   struct functab *function_table;
 
 
 %}
 
-
+// implement typedef again!!
 %union{
-   slist *namelist;
+   struct id{
+      char* name;
+      bool isClass;
+   }id;
+   struct slist *namelist;
    int type;
+   struct list{
+      int type;
+      struct ilist *dimlist;
+   }list;
 }
 
 
@@ -47,11 +56,13 @@
 %token IDENTIFIER SELF
 %token LSB RSB LCB RCB LPB RPB SEMICOLON COMMA DOT COLON ARROW
 %token STRUCT
-%token INCLUDE TYPEDEF
+%token INCLUDE 
 
 
 %type <type> data_type_new data_type_pr
 %type <namelist> id_list
+%type <id> IDENTIFIER
+%type <list> list
 
 
 %%
@@ -59,12 +70,15 @@
 
 
 
-start: include_stmts code{
+start:{
+   global_table = init_symtab();
+ } 
+   include_stmts code{
    display_symtab(global_table);
-   display_functab(function_table);
-   printf("hii");
    }
-   | code
+   | {global_table = init_symtab();}code{
+   display_symtab(global_table);
+   }
    ;
 
 
@@ -73,7 +87,7 @@ include_stmts: include_stmts include_stmt
    ;
 
 
-include_stmt: INCLUDE STRING_LITERAL {printf("hii");}
+include_stmt: INCLUDE STRING_LITERAL 
    ;
 
 
@@ -201,9 +215,7 @@ unary_stmt: identifier UNARY_OP
    ;
 
 
-single_stmt: decl_stmt {
-   display_symtab(global_table);
-   }
+single_stmt: decl_stmt 
    | call_stmt
    | expr_stmt
    | identifier ARROW identifier SEMICOLON
@@ -212,37 +224,30 @@ single_stmt: decl_stmt {
 
 // add id to symbol table, id is class
 decl_stmt: data_type_new id_list SEMICOLON {
-   snode* temp = $2->head;
+   struct snode* temp = $2->head;
    while(temp != NULL){
-       idrec entry;
-       entry.type = $1;
-       entry.arr = false;
-       entry.scope = 0; // we have to change scope according to nested loops
-       entry.name = temp->val;
-       insert_symtab(global_table, &entry);
-       // if (insert_symtab(global_table, entry)) {
-       //     // Variable inserted successfully
-       // } else {
-       //     yyerror("Variable already declared");
-       // }
+      struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
+      entry->type = $1;
+      entry->arr = false;
+      entry->scope = 0; // we have to change scope according to nested loops
+      entry->name = temp->val;
+      insert_symtab(global_table, entry);
+      temp = temp->next;
+       
    }
 
 
    }
    | data_type_pr id_list SEMICOLON{
-   snode* temp = $2->head;
+   struct snode* temp = $2->head;
    while(temp != NULL){
-       idrec entry;
-       entry.type = $1;
-       entry.arr = false;
-       entry.scope = 0; // we have to change scope according to nested loops
-       entry.name = temp->val;
-       insert_symtab(global_table, &entry);
-       // if (insert_symtab(global_table, entry)) {
-       //     // Variable inserted successfully
-       // } else {
-       //     yyerror("Variable already declared");
-       // }
+      struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
+      entry->type = $1;
+      entry->arr = false;
+      entry->scope = 0; // we have to change scope according to nested loops
+      entry->name = temp->val;
+      insert_symtab(global_table, entry);
+      temp = temp->next;
    }   
    }
    | IDENTIFIER id_list SEMICOLON
@@ -277,10 +282,16 @@ dim: dim  LSB nested_expr RSB
 
 
 // idlist, type
-id_list: id_list COMMA IDENTIFIER
+id_list: id_list COMMA IDENTIFIER{
+      insert_slist($1, $3.name);
+      $$ = $1;
+   }
    | IDENTIFIER EQUALS nested_expr
    | id_list COMMA IDENTIFIER EQUALS nested_expr
-   | IDENTIFIER
+   | IDENTIFIER{
+      $$ = init_slist();
+      insert_slist($$, $1.name);   
+   }
    ;
 
 
