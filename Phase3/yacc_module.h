@@ -11,41 +11,60 @@ Type Encodings:
     3: bool
     4: void
     5: list
-    6: function
-    7: struct
-    8: team
-    9: member
-    10: task
-    11: event
-    12: meeting
-    13: document
-    14: calendar
-    15: class
+    6: struct
+    7: team
+    8: member
+    9: task
+    10: event
+    11: meeting
+    12: document
+    13: calendar
+    14: class
 */
 
-struct node
+struct inode
 {
     int val;
-    struct node *next;
+    struct inode *next;
 };
 
-typedef struct node node;
+typedef struct inode inode;
 
 struct ilist
 {
-    node *head;
-    node *tail;
+    inode *head;
+    inode *tail;
 };
 
 typedef struct ilist ilist;
 
-ilist* init_ilist();
+ilist *init_ilist();
 void insert_ilist(ilist *l, int val);
 void display_ilist(ilist *l);
 
+struct snode
+{
+    char *val;
+    struct snode *next;
+};
+
+typedef struct snode snode;
+
+struct slist
+{
+    snode *head;
+    snode *tail;
+};
+
+typedef struct slist slist;
+
+slist *init_slist();
+void insert_slist(slist *l, char *s);
+void display_slist(slist *l);
+
 struct idrec
 {
-    char* name;
+    char *name;
     bool arr;
     int type;
     ilist arr_dims;
@@ -57,21 +76,21 @@ typedef struct idrec idrec;
 
 struct symtab
 {
-    idrec* head;
-    idrec* tail;
+    idrec *head;
+    idrec *tail;
 };
 
 typedef struct symtab symtab;
 
-symtab* init_symtab();
+symtab *init_symtab();
 void insert_symtab(symtab *l, idrec *entry);
 void display_symtab(symtab *l);
 void clear_scope_symtab(symtab *l, int scope);
-idrec* search_symtab(symtab *l, char* name);
+idrec *search_symtab(symtab *l, char *name);
 
 struct funcrec
 {
-    char* name;
+    char *name;
     int type;
     symtab params;
     symtab local_table;
@@ -81,19 +100,20 @@ struct funcrec
 
 typedef struct funcrec funcrec;
 
-struct functab{
-    funcrec* head;
-    funcrec* tail;
+struct functab
+{
+    funcrec *head;
+    funcrec *tail;
 };
 
 typedef struct functab functab;
 
-functab* init_functab();
+functab *init_functab();
 void insert_functab(functab *ft, funcrec *entry);
 void display_functab(functab *ft);
-funcrec* search_functab(functab *ft, char* name);
+funcrec *search_functab(functab *ft, char *name);
 
-idrec* lookup(symtab *global_table, symtab *local_table, char* name)
+idrec *lookup(symtab *global_table, symtab *local_table, char *name)
 {
     idrec *temp = search_symtab(local_table, name);
     if (temp != NULL)
@@ -130,9 +150,9 @@ bool insert(symtab *global_table, symtab *local_table, idrec entry)
 //     int type;
 // };
 
-ilist* init_ilist()
+ilist *init_ilist()
 {
-    ilist *l = (ilist*) malloc(sizeof(ilist));
+    ilist *l = (ilist *)malloc(sizeof(ilist));
     l->head = NULL;
     l->tail = NULL;
     return l;
@@ -140,24 +160,24 @@ ilist* init_ilist()
 
 void insert_ilist(ilist *l, int val)
 {
-    node *temp = (node *)malloc(sizeof(node));
-    temp -> val = val;
-    temp -> next = NULL;
-    if (l -> head == NULL)
+    inode *temp = (inode *)malloc(sizeof(inode));
+    temp->val = val;
+    temp->next = NULL;
+    if (l->head == NULL)
     {
-        l -> head = temp;
-        l -> tail = temp;
+        l->head = temp;
+        l->tail = temp;
     }
     else
     {
-        l -> tail -> next = temp;
-        l -> tail = temp;
+        l->tail->next = temp;
+        l->tail = temp;
     }
 }
 
 void display_ilist(ilist *l)
 {
-    node *temp = l -> head;
+    inode *temp = l->head;
     while (temp != NULL)
     {
         printf("%d ", temp->val);
@@ -166,115 +186,152 @@ void display_ilist(ilist *l)
     printf("\n");
 }
 
-symtab* init_symtab()
+slist *init_slist()
 {
-    symtab *st = (symtab*) malloc(sizeof(symtab));
-    st -> head = NULL;
-    st -> tail = NULL;
+    slist *l = (slist *)malloc(sizeof(slist));
+    l->head = NULL;
+    l->tail = NULL;
+    return l;
+}
+
+void insert_slist(slist *l, char *s)
+{
+    snode *temp = (snode *)malloc(sizeof(snode));
+    temp->val = s;
+    temp->next = NULL;
+    if (l->head == NULL)
+    {
+        l->head = temp;
+        l->tail = temp;
+    }
+    else
+    {
+        l->tail->next = temp;
+        l->tail = temp;
+    }
+}
+
+void display_slist(slist *l)
+{
+    snode *temp = l->head;
+    while (temp != NULL)
+    {
+        printf("%s ", temp->val);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+symtab *init_symtab()
+{
+    symtab *st = (symtab *)malloc(sizeof(symtab));
+    st->head = NULL;
+    st->tail = NULL;
     return st;
 }
 
 void insert_symtab(symtab *st, idrec *entry)
 {
-    if (st -> head == NULL)
+    if (st->head == NULL)
     {
-        st -> head = entry;
-        st -> tail = entry;
+        st->head = entry;
+        st->tail = entry;
     }
     else
     {
-        st -> tail -> next = entry;
-        st -> tail = entry;
+        st->tail->next = entry;
+        st->tail = entry;
     }
     return;
 }
 
 void display_symtab(symtab *st)
 {
-    idrec *temp = st -> head;
+    printf("Khalii");
+    idrec *temp = st->head;
     while (temp != NULL)
     {
-        printf("%s %d\n", temp -> name, temp -> type);
-        temp = temp -> next;
+        printf("%s %d\n", temp->name, temp->type);
+        temp = temp->next;
     }
 }
 
 void clear_scope_symtab(symtab *st, int scope)
 {
-    idrec *temp = st -> head;
+    idrec *temp = st->head;
     while (temp != NULL)
     {
-        if (temp -> scope < scope)
+        if (temp->scope < scope)
             break;
-        temp = temp -> next;
+        temp = temp->next;
     }
     if (temp == NULL)
         return;
-    st -> tail = temp;
-    temp = temp -> next;
+    st->tail = temp;
+    temp = temp->next;
     while (temp != NULL)
     {
         idrec *temp2 = temp;
-        temp = temp -> next;
+        temp = temp->next;
         free(temp2);
     }
     return;
 }
 
-idrec* search_symtab(symtab *st, char* name)
+idrec *search_symtab(symtab *st, char *name)
 {
-    idrec *temp = st -> head;
+    idrec *temp = st->head;
     while (temp != NULL)
     {
-        if (strcmp(temp -> name, name) == 0)
+        if (strcmp(temp->name, name) == 0)
             return temp;
-        temp = temp -> next;
+        temp = temp->next;
     }
     return NULL;
 }
 
-functab* init_functab()
+functab *init_functab()
 {
-    functab *ft = (functab*) malloc(sizeof(functab));
-    ft -> head = NULL;
-    ft -> tail = NULL;
+    functab *ft = (functab *)malloc(sizeof(functab));
+    ft->head = NULL;
+    ft->tail = NULL;
     return ft;
 }
 
 void insert_functab(functab *ft, funcrec *entry)
 {
-    if (ft -> head == NULL)
+    if (ft->head == NULL)
     {
-        ft -> head = entry;
-        ft -> tail = entry;
+        ft->head = entry;
+        ft->tail = entry;
     }
     else
     {
-        ft -> tail -> next = entry;
-        ft -> tail = entry;
+        ft->tail->next = entry;
+        ft->tail = entry;
     }
     return;
 }
 
 void display_functab(functab *ft)
 {
-    funcrec *temp = ft -> head;
+    funcrec *temp = ft->head;
     while (temp != NULL)
     {
-        printf("%s %d\n", temp -> name, temp -> type);
-        temp = temp -> next;
+        printf("%s %d\n", temp->name, temp->type);
+        temp = temp->next;
     }
 }
 
 // support for function overloading
-funcrec* search_functab(functab *ft, char* name)
+funcrec *search_functab(functab *ft, char *name)
 {
-    funcrec *temp = ft -> head;
+    funcrec *temp = ft->head;
     while (temp != NULL)
     {
-        if (strcmp(temp -> name, name) == 0)
+        if (strcmp(temp->name, name) == 0)
             return temp;
-        temp = temp -> next;
+        temp = temp->next;
     }
     return NULL;
 }

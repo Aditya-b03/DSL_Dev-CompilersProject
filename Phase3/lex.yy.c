@@ -1216,20 +1216,14 @@ YY_RULE_SETUP
         return RCB;
     }
     else if(strcmp(yytext,c5)==0){
-        if(list_flag==1){
-          return LSB;
-        }
-        else{
-          print(yytext);
+        if(list_flag!=1){
+          print(yytext);  
         }
         return LSB;
     }
     else if(strcmp(yytext,c6)==0){
-        if(list_flag==1){
-          return RSB;
-        }
-        else{
-          print(yytext);
+        if(list_flag!=1){
+          print(yytext);  
         }
         return RSB;
     }
@@ -1237,7 +1231,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 351 "lex.l"
+#line 345 "lex.l"
 {
   fprintf(tf,"identifier: %s\n", yytext);
   if(list_flag==1){
@@ -1265,7 +1259,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 376 "lex.l"
+#line 370 "lex.l"
 {
   printf("Unrecognized character %s\n", yytext);
   yyterminate();
@@ -1273,10 +1267,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 381 "lex.l"
+#line 375 "lex.l"
 ECHO;
 	YY_BREAK
-#line 1280 "lex.yy.c"
+#line 1274 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2281,5 +2275,5 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 381 "lex.l"
+#line 375 "lex.l"
 

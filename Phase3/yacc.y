@@ -21,6 +21,11 @@
 
 %}
 
+%union{
+    slist *namelist;
+    int type;
+}
+
 %start start
 
 %token NUMBER STRING_LITERAL BOOL_LITERAL
@@ -37,12 +42,17 @@
 %token STRUCT 
 %token INCLUDE TYPEDEF
 
-/* %type <intAttr> INT FLOAT BOOL STRING DOCUMENT TEAM MEMBERS TASK EVENT MEETING CALENDAR */
+%type <type> data_type_new data_type_pr
+%type <namelist> id_list 
 
 %%
 
 
-start: include_stmts code
+start: include_stmts code{
+    display_symtab(global_table);
+    display_functab(function_table);
+    printf("hii");
+    }
     | code
     ;
 
@@ -50,21 +60,15 @@ include_stmts: include_stmts include_stmt
     | include_stmt
     ;
 
-include_stmt: INCLUDE STRING_LITERAL
+include_stmt: INCLUDE STRING_LITERAL {printf("hii");}
     ;
 
 // dimlist
 identifier: IDENTIFIER
-    | IDENTIFIER ARROW identifier {
-
-    }
     | IDENTIFIER DOT identifier {
 
     }
     | IDENTIFIER dim {
-
-    }
-    | IDENTIFIER dim ARROW identifier {
 
     }
     | IDENTIFIER dim DOT identifier {
@@ -81,9 +85,8 @@ code: decl_stmt code
     | class code
     |
     ;
-
+// implement typedef
 struct_code: struct_def  
-    | TYPEDEF struct_def
     ;
 
 struct_def: STRUCT IDENTIFIER LCB struct_body RCB SEMICOLON
@@ -100,22 +103,23 @@ function_dec: data_type_new IDENTIFIER LPB function_params RPB
     | data_type_pr IDENTIFIER LPB function_params RPB
     | IDENTIFIER IDENTIFIER LPB function_params RPB
     | VOID IDENTIFIER LPB function_params RPB
+    | list IDENTIFIER LPB function_params RPB
     ;
 
-data_type_new: DOCUMENT   
-    | TEAM 
-    | MEMBERS   
-    | TASK  
-    | EVENT     
-    | MEETING  
-    | CALENDAR 
+data_type_new: DOCUMENT{ $$ = 12;}
+    | TEAM { $$ = 7;}
+    | MEMBERS { $$ = 8;}
+    | TASK  { $$ = 9;}
+    | EVENT { $$ = 10;}
+    | MEETING  { $$ = 11;}
+    | CALENDAR { $$ = 13;}
     ;
 
 
-data_type_pr:  INT 
-    | STRING 
-    | BOOL  
-    | FLOAT 
+data_type_pr:  INT { $$ = 0;}
+    | STRING { $$ = 2;}
+    | BOOL  { $$ = 3;}
+    | FLOAT { $$ = 1;}
     ;
 
 
@@ -127,6 +131,7 @@ function_params: function_params COMMA function_param
 function_param: data_type_new IDENTIFIER
     | data_type_pr IDENTIFIER
     | IDENTIFIER IDENTIFIER
+    | list IDENTIFIER
     ;
 
 class: class_dec LCB class_stmt RCB
@@ -153,6 +158,7 @@ statement: decl_stmt
     | call_stmt
     | expr_stmt
     | SEMICOLON
+    | identifier ARROW identifier SEMICOLON
     ;
 
 // check id in symbol table
@@ -160,35 +166,47 @@ unary_stmt: identifier UNARY_OP
     | identifier
     ;
 
-single_stmt: decl_stmt
+single_stmt: decl_stmt {
+    display_symtab(global_table);
+    }
     | call_stmt
     | expr_stmt
+    | identifier ARROW identifier SEMICOLON
     ;
 
 // add id to symbol table, id is class
 decl_stmt: data_type_new id_list SEMICOLON {
-        // idrec entry;
-        // entry.type = $1;
-        // entry.arr = false;
-        // entry.scope = 0; // we have to change scope according to nested loops
-        // if (insert_symtab(global_table, $2, &entry)) {
+    snode* temp = $2->head;
+    while(temp != NULL){
+        idrec entry;
+        entry.type = $1;
+        entry.arr = false;
+        entry.scope = 0; // we have to change scope according to nested loops
+        entry.name = temp->val;
+        insert_symtab(global_table, &entry);
+        // if (insert_symtab(global_table, entry)) {
         //     // Variable inserted successfully
         // } else {
         //     yyerror("Variable already declared");
         // }
-        // display_symtab(global_table);
+    }
+
     }
     | data_type_pr id_list SEMICOLON{
-        // idrec entry;
-        // entry.type = $1;
-        // entry.arr = false;
-        // entry.scope = 0; // we have to change scope according to nested loops
-        // if (insert_symtab(global_table, $2, entry)) {
+    snode* temp = $2->head;
+    while(temp != NULL){
+        idrec entry;
+        entry.type = $1;
+        entry.arr = false;
+        entry.scope = 0; // we have to change scope according to nested loops
+        entry.name = temp->val;
+        insert_symtab(global_table, &entry);
+        // if (insert_symtab(global_table, entry)) {
         //     // Variable inserted successfully
         // } else {
         //     yyerror("Variable already declared");
         // }
-        // display_symtab(global_table);   
+    }    
     }
     | IDENTIFIER id_list SEMICOLON
     | list id_list  SEMICOLON
@@ -197,6 +215,7 @@ decl_stmt: data_type_new id_list SEMICOLON {
 // dimlist, type
 list: LIST dim COLON data_type_pr 
     | LIST dim COLON data_type_new 
+    | LIST dim COLON IDENTIFIER
     ;
 
 // dimlist, type
@@ -211,6 +230,8 @@ list_terminal: nested_expr
 // dimlist, type
 dim: dim  LSB nested_expr RSB 
     | LSB nested_expr RSB 
+    | dim LSB RSB
+    | LSB RSB
     ;
 
 // idlist, type

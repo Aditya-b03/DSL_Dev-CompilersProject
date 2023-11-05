@@ -329,20 +329,14 @@ ID [A-Za-z][A-Za-z0-9_]*
         return RCB;
     }
     else if(strcmp(yytext,c5)==0){
-        if(list_flag==1){
-          return LSB;
-        }
-        else{
-          print(yytext);
+        if(list_flag!=1){
+          print(yytext);  
         }
         return LSB;
     }
     else if(strcmp(yytext,c6)==0){
-        if(list_flag==1){
-          return RSB;
-        }
-        else{
-          print(yytext);
+        if(list_flag!=1){
+          print(yytext);  
         }
         return RSB;
     }
