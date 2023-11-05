@@ -20,6 +20,18 @@ Type Encodings:
    12: document
    13: calendar
    14: class
+
+*/
+
+/*
+   Assign op encodings
+   0: +=
+   1: -=
+   2: *=
+   3: /=
+   4: %=
+   5: &=
+   6: |=
 */
 
 struct inode
@@ -130,25 +142,6 @@ bool insert(symtab *global_table, symtab *local_table, idrec entry)
    insert_symtab(local_table, &entry);
    return true;
 }
-
-// // struct for dimlist of identifiers
-// struct dimlist
-// {
-//     vector<int> dims;
-// };
-
-// // struct with dimlist and type
-// struct dimlist_type
-// {
-//     vector<int> dims;
-//     int type;
-// };
-
-// // struct for type
-// struct type
-// {
-//     int type;
-// };
 
 ilist *init_ilist()
 {

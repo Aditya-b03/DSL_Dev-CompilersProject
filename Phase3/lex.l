@@ -295,6 +295,34 @@ ID [A-Za-z][A-Za-z0-9_]*
 {ASSIGN_OP} {
  fprintf(tf,"operator: %s\n", yytext);
  print(yytext);
+ char* c1 = "+=";
+  char* c2 = "-=";
+  char* c3 = "/=";
+  char* c4 = "*=";
+  char* c5 = "%=";
+  char* c6 = "&=";
+  char* c7 = "|=";
+  if(strcmp(yytext,c1)==0){
+    yylval.assignop = 0;
+  }
+  else if(strcmp(yytext,c2)==0){
+    yylval.assignop = 1;
+  }
+  else if(strcmp(yytext,c3)==0){
+    yylval.assignop = 2;
+  }
+  else if(strcmp(yytext,c4)==0){
+    yylval.assignop = 3;
+  }
+  else if(strcmp(yytext,c5)==0){
+    yylval.assignop = 4;
+  }
+  else if(strcmp(yytext,c6)==0){
+    yylval.assignop = 5;
+  }
+  else if(strcmp(yytext,c7)==0){
+    yylval.assignop = 6;
+  }
  return ASSIGN_OP;
 }
 {EQUAL} {

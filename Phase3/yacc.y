@@ -38,6 +38,7 @@
       int type;
       struct ilist *dimlist;
    }list;
+   int assignop;
 }
 
 
@@ -63,7 +64,7 @@
 %type <namelist> id_list
 %type <id> IDENTIFIER
 %type <list> list
-
+%type <assignop> ASSIGN_OP
 
 %%
 
@@ -231,24 +232,33 @@ decl_stmt: data_type_new id_list SEMICOLON {
       entry->arr = false;
       entry->scope = 0; // we have to change scope according to nested loops
       entry->name = temp->val;
-      insert_symtab(global_table, entry);
+      if(lookup(global_table,global_table, entry->name) == NULL){
+         insert_symtab(global_table, entry);
+      }
+      else{
+         printf("Error: Variable %s already declared\n", entry->name);
+      }
       temp = temp->next;
-       
    }
 
 
    }
    | data_type_pr id_list SEMICOLON{
-   struct snode* temp = $2->head;
-   while(temp != NULL){
-      struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
-      entry->type = $1;
-      entry->arr = false;
-      entry->scope = 0; // we have to change scope according to nested loops
-      entry->name = temp->val;
-      insert_symtab(global_table, entry);
-      temp = temp->next;
-   }   
+      struct snode* temp = $2->head;
+      while(temp != NULL){
+         struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
+         entry->type = $1;
+         entry->arr = false;
+         entry->scope = 0; // we have to change scope according to nested loops
+         entry->name = temp->val;
+         if(lookup(global_table, global_table ,entry->name) == NULL){
+            insert_symtab(global_table, entry);
+         }
+         else{
+            printf("Error: Variable %s already declared\n", entry->name);
+         }
+         temp = temp->next;
+      }   
    }
    | IDENTIFIER id_list SEMICOLON
    | list id_list  SEMICOLON

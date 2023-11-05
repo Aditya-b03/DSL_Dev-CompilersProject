@@ -619,14 +619,14 @@ static const yytype_int16 yyrline[] =
      167,   168,   169,   173,   174,   175,   176,   180,   184,   188,
      189,   190,   191,   195,   196,   200,   201,   202,   203,   204,
      205,   206,   207,   208,   213,   214,   218,   219,   220,   221,
-     226,   241,   253,   254,   259,   260,   261,   266,   271,   272,
-     277,   278,   279,   280,   285,   289,   290,   291,   298,   303,
-     304,   305,   310,   311,   312,   313,   314,   315,   316,   317,
-     322,   323,   324,   325,   330,   331,   336,   337,   341,   346,
-     351,   352,   353,   354,   355,   360,   361,   362,   363,   364,
-     365,   370,   371,   372,   373,   374,   380,   381,   382,   383,
-     384,   385,   386,   387,   392,   393,   397,   398,   403,   404,
-     405,   406,   407
+     226,   245,   262,   263,   268,   269,   270,   275,   280,   281,
+     286,   287,   288,   289,   294,   298,   299,   300,   307,   312,
+     313,   314,   319,   320,   321,   322,   323,   324,   325,   326,
+     331,   332,   333,   334,   339,   340,   345,   346,   350,   355,
+     360,   361,   362,   363,   364,   369,   370,   371,   372,   373,
+     374,   379,   380,   381,   382,   383,   389,   390,   391,   392,
+     393,   394,   395,   396,   401,   402,   406,   407,   412,   413,
+     414,   415,   416
 };
 #endif
 
@@ -1639,53 +1639,62 @@ yyreduce:
       entry->arr = false;
       entry->scope = 0; // we have to change scope according to nested loops
       entry->name = temp->val;
-      insert_symtab(global_table, entry);
+      if(lookup(global_table,global_table, entry->name) == NULL){
+         insert_symtab(global_table, entry);
+      }
+      else{
+         printf("Error: Variable %s already declared\n", entry->name);
+      }
       temp = temp->next;
-       
    }
 
 
    }
-#line 1650 "yacc.tab.c"
+#line 1654 "yacc.tab.c"
     break;
 
   case 71: /* decl_stmt: data_type_pr id_list SEMICOLON  */
-#line 241 "yacc.y"
+#line 245 "yacc.y"
                                    {
-   struct snode* temp = (yyvsp[-1].namelist)->head;
-   while(temp != NULL){
-      struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
-      entry->type = (yyvsp[-2].type);
-      entry->arr = false;
-      entry->scope = 0; // we have to change scope according to nested loops
-      entry->name = temp->val;
-      insert_symtab(global_table, entry);
-      temp = temp->next;
-   }   
-   }
-#line 1667 "yacc.tab.c"
-    break;
-
-  case 84: /* id_list: id_list COMMA IDENTIFIER  */
-#line 285 "yacc.y"
-                                 {
-      insert_slist((yyvsp[-2].namelist), (yyvsp[0].id).name);
-      (yyval.namelist) = (yyvsp[-2].namelist);
+      struct snode* temp = (yyvsp[-1].namelist)->head;
+      while(temp != NULL){
+         struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
+         entry->type = (yyvsp[-2].type);
+         entry->arr = false;
+         entry->scope = 0; // we have to change scope according to nested loops
+         entry->name = temp->val;
+         if(lookup(global_table, global_table ,entry->name) == NULL){
+            insert_symtab(global_table, entry);
+         }
+         else{
+            printf("Error: Variable %s already declared\n", entry->name);
+         }
+         temp = temp->next;
+      }   
    }
 #line 1676 "yacc.tab.c"
     break;
 
-  case 87: /* id_list: IDENTIFIER  */
-#line 291 "yacc.y"
-               {
-      (yyval.namelist) = init_slist();
-      insert_slist((yyval.namelist), (yyvsp[0].id).name);   
+  case 84: /* id_list: id_list COMMA IDENTIFIER  */
+#line 294 "yacc.y"
+                                 {
+      insert_slist((yyvsp[-2].namelist), (yyvsp[0].id).name);
+      (yyval.namelist) = (yyvsp[-2].namelist);
    }
 #line 1685 "yacc.tab.c"
     break;
 
+  case 87: /* id_list: IDENTIFIER  */
+#line 300 "yacc.y"
+               {
+      (yyval.namelist) = init_slist();
+      insert_slist((yyval.namelist), (yyvsp[0].id).name);   
+   }
+#line 1694 "yacc.tab.c"
+    break;
 
-#line 1689 "yacc.tab.c"
+
+#line 1698 "yacc.tab.c"
 
       default: break;
     }
@@ -1878,7 +1887,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 411 "yacc.y"
+#line 420 "yacc.y"
 
 
 

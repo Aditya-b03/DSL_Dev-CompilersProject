@@ -20,6 +20,9 @@ punctuation: ;
 datatype: float
 identifier: c
 punctuation: ;
+datatype: float
+identifier: a
+punctuation: ;
 reserved: return
 constant: 0
 punctuation: ;
