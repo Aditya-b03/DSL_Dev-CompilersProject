@@ -68,29 +68,33 @@
 
 /* First part of user prologue.  */
 #line 1 "yacc.y"
-  
-    #include <stdio.h>
-    #include <stdlib.h>
-    #include "yacc_module.h"
-
-    int yylex(void);
-
-    void yyerror(char *);
-    extern char* yytext;
-    extern FILE *yyout;
-    extern FILE *yyin;
-    extern int yylineno;
-    FILE *tf;
-    int for_loop = 0;       //nested loop
-    int nested_call = 0;    // nested call
-    int return_flag = 0;
-    extern FILE *tf;
-
-    symtab *global_table;
-    functab *function_table;
+ 
+   #include <stdio.h>
+   #include <stdlib.h>
+   #include "yacc_module.h"
 
 
-#line 94 "y.tab.c"
+   int yylex(void);
+
+
+   void yyerror(char *);
+   extern char* yytext;
+   extern FILE *yyout;
+   extern FILE *yyin;
+   extern int yylineno;
+   FILE *tf;
+   int for_loop = 0;       //nested loop
+   int nested_call = 0;    // nested call
+   int return_flag = 0;
+   extern FILE *tf;
+
+
+   symtab *global_table;
+   functab *function_table;
+
+
+
+#line 98 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -251,12 +255,12 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 24 "yacc.y"
+#line 29 "yacc.y"
 
-    slist *namelist;
-    int type;
+   slist *namelist;
+   int type;
 
-#line 260 "y.tab.c"
+#line 264 "y.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -764,21 +768,21 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    51,    51,    56,    59,    60,    63,    67,    68,    71,
-      74,    77,    82,    83,    84,    85,    86,    89,    92,    95,
-      96,    99,   102,   103,   104,   105,   106,   109,   110,   111,
-     112,   113,   114,   115,   119,   120,   121,   122,   126,   127,
-     128,   131,   132,   133,   134,   137,   140,   143,   144,   145,
-     146,   149,   150,   153,   154,   155,   156,   157,   158,   159,
-     160,   161,   165,   166,   169,   172,   173,   174,   178,   195,
-     211,   212,   216,   217,   218,   222,   226,   227,   231,   232,
-     233,   234,   238,   239,   240,   241,   244,   248,   249,   250,
-     254,   255,   256,   257,   258,   259,   260,   261,   265,   266,
-     267,   268,   272,   273,   277,   278,   281,   285,   289,   290,
-     291,   292,   293,   297,   298,   299,   300,   301,   302,   306,
-     307,   308,   309,   310,   315,   316,   317,   318,   319,   320,
-     321,   322,   326,   327,   330,   331,   335,   336,   337,   338,
-     339
+       0,    62,    62,    67,    71,    72,    76,    81,    82,    86,
+      90,    94,   100,   101,   102,   103,   104,   107,   111,   115,
+     116,   120,   124,   125,   126,   127,   128,   132,   133,   134,
+     135,   136,   137,   138,   144,   145,   146,   147,   153,   154,
+     155,   159,   160,   161,   162,   166,   170,   174,   175,   176,
+     177,   181,   182,   186,   187,   188,   189,   190,   191,   192,
+     193,   194,   199,   200,   204,   207,   208,   209,   214,   232,
+     248,   249,   254,   255,   256,   261,   266,   267,   272,   273,
+     274,   275,   280,   281,   282,   283,   287,   292,   293,   294,
+     299,   300,   301,   302,   303,   304,   305,   306,   311,   312,
+     313,   314,   319,   320,   325,   326,   330,   335,   340,   341,
+     342,   343,   344,   349,   350,   351,   352,   353,   354,   359,
+     360,   361,   362,   363,   369,   370,   371,   372,   373,   374,
+     375,   376,   381,   382,   386,   387,   392,   393,   394,   395,
+     396
 };
 #endif
 
@@ -1651,172 +1655,176 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* start: include_stmts code  */
-#line 51 "yacc.y"
+#line 62 "yacc.y"
                          {
-    display_symtab(global_table);
-    display_functab(function_table);
-    printf("hii");
-    }
-#line 1661 "y.tab.c"
+   display_symtab(global_table);
+   display_functab(function_table);
+   printf("hii");
+   }
+#line 1665 "y.tab.c"
     break;
 
   case 6: /* include_stmt: INCLUDE STRING_LITERAL  */
-#line 63 "yacc.y"
+#line 76 "yacc.y"
                                      {printf("hii");}
-#line 1667 "y.tab.c"
+#line 1671 "y.tab.c"
     break;
 
   case 8: /* identifier: IDENTIFIER DOT identifier  */
-#line 68 "yacc.y"
-                                {
+#line 82 "yacc.y"
+                               {
 
-    }
-#line 1675 "y.tab.c"
+
+   }
+#line 1680 "y.tab.c"
     break;
 
   case 9: /* identifier: IDENTIFIER dim  */
-#line 71 "yacc.y"
-                     {
+#line 86 "yacc.y"
+                    {
 
-    }
-#line 1683 "y.tab.c"
+
+   }
+#line 1689 "y.tab.c"
     break;
 
   case 10: /* identifier: IDENTIFIER dim DOT identifier  */
-#line 74 "yacc.y"
-                                    {
+#line 90 "yacc.y"
+                                   {
 
-    }
-#line 1691 "y.tab.c"
+
+   }
+#line 1698 "y.tab.c"
     break;
 
   case 11: /* identifier: SELF DOT identifier  */
-#line 77 "yacc.y"
-                          {
-        
-    }
-#line 1699 "y.tab.c"
+#line 94 "yacc.y"
+                         {
+      
+   }
+#line 1706 "y.tab.c"
     break;
 
   case 27: /* data_type_new: DOCUMENT  */
-#line 109 "yacc.y"
+#line 132 "yacc.y"
                        { (yyval.type) = 12;}
-#line 1705 "y.tab.c"
+#line 1712 "y.tab.c"
     break;
 
   case 28: /* data_type_new: TEAM  */
-#line 110 "yacc.y"
-           { (yyval.type) = 7;}
-#line 1711 "y.tab.c"
+#line 133 "yacc.y"
+          { (yyval.type) = 7;}
+#line 1718 "y.tab.c"
     break;
 
   case 29: /* data_type_new: MEMBERS  */
-#line 111 "yacc.y"
-              { (yyval.type) = 8;}
-#line 1717 "y.tab.c"
+#line 134 "yacc.y"
+             { (yyval.type) = 8;}
+#line 1724 "y.tab.c"
     break;
 
   case 30: /* data_type_new: TASK  */
-#line 112 "yacc.y"
-            { (yyval.type) = 9;}
-#line 1723 "y.tab.c"
+#line 135 "yacc.y"
+           { (yyval.type) = 9;}
+#line 1730 "y.tab.c"
     break;
 
   case 31: /* data_type_new: EVENT  */
-#line 113 "yacc.y"
-            { (yyval.type) = 10;}
-#line 1729 "y.tab.c"
+#line 136 "yacc.y"
+           { (yyval.type) = 10;}
+#line 1736 "y.tab.c"
     break;
 
   case 32: /* data_type_new: MEETING  */
-#line 114 "yacc.y"
-               { (yyval.type) = 11;}
-#line 1735 "y.tab.c"
+#line 137 "yacc.y"
+              { (yyval.type) = 11;}
+#line 1742 "y.tab.c"
     break;
 
   case 33: /* data_type_new: CALENDAR  */
-#line 115 "yacc.y"
-               { (yyval.type) = 13;}
-#line 1741 "y.tab.c"
+#line 138 "yacc.y"
+              { (yyval.type) = 13;}
+#line 1748 "y.tab.c"
     break;
 
   case 34: /* data_type_pr: INT  */
-#line 119 "yacc.y"
+#line 144 "yacc.y"
                    { (yyval.type) = 0;}
-#line 1747 "y.tab.c"
+#line 1754 "y.tab.c"
     break;
 
   case 35: /* data_type_pr: STRING  */
-#line 120 "yacc.y"
-             { (yyval.type) = 2;}
-#line 1753 "y.tab.c"
+#line 145 "yacc.y"
+            { (yyval.type) = 2;}
+#line 1760 "y.tab.c"
     break;
 
   case 36: /* data_type_pr: BOOL  */
-#line 121 "yacc.y"
-            { (yyval.type) = 3;}
-#line 1759 "y.tab.c"
+#line 146 "yacc.y"
+           { (yyval.type) = 3;}
+#line 1766 "y.tab.c"
     break;
 
   case 37: /* data_type_pr: FLOAT  */
-#line 122 "yacc.y"
-            { (yyval.type) = 1;}
-#line 1765 "y.tab.c"
+#line 147 "yacc.y"
+           { (yyval.type) = 1;}
+#line 1772 "y.tab.c"
     break;
 
   case 64: /* single_stmt: decl_stmt  */
-#line 169 "yacc.y"
+#line 204 "yacc.y"
                        {
-    display_symtab(global_table);
-    }
-#line 1773 "y.tab.c"
+   display_symtab(global_table);
+   }
+#line 1780 "y.tab.c"
     break;
 
   case 68: /* decl_stmt: data_type_new id_list SEMICOLON  */
-#line 178 "yacc.y"
+#line 214 "yacc.y"
                                            {
-    snode* temp = (yyvsp[-1].namelist)->head;
-    while(temp != NULL){
-        idrec entry;
-        entry.type = (yyvsp[-2].type);
-        entry.arr = false;
-        entry.scope = 0; // we have to change scope according to nested loops
-        entry.name = temp->val;
-        insert_symtab(global_table, &entry);
-        // if (insert_symtab(global_table, entry)) {
-        //     // Variable inserted successfully
-        // } else {
-        //     yyerror("Variable already declared");
-        // }
-    }
+   snode* temp = (yyvsp[-1].namelist)->head;
+   while(temp != NULL){
+       idrec entry;
+       entry.type = (yyvsp[-2].type);
+       entry.arr = false;
+       entry.scope = 0; // we have to change scope according to nested loops
+       entry.name = temp->val;
+       insert_symtab(global_table, &entry);
+       // if (insert_symtab(global_table, entry)) {
+       //     // Variable inserted successfully
+       // } else {
+       //     yyerror("Variable already declared");
+       // }
+   }
 
-    }
-#line 1795 "y.tab.c"
+
+   }
+#line 1803 "y.tab.c"
     break;
 
   case 69: /* decl_stmt: data_type_pr id_list SEMICOLON  */
-#line 195 "yacc.y"
-                                    {
-    snode* temp = (yyvsp[-1].namelist)->head;
-    while(temp != NULL){
-        idrec entry;
-        entry.type = (yyvsp[-2].type);
-        entry.arr = false;
-        entry.scope = 0; // we have to change scope according to nested loops
-        entry.name = temp->val;
-        insert_symtab(global_table, &entry);
-        // if (insert_symtab(global_table, entry)) {
-        //     // Variable inserted successfully
-        // } else {
-        //     yyerror("Variable already declared");
-        // }
-    }    
-    }
-#line 1816 "y.tab.c"
+#line 232 "yacc.y"
+                                   {
+   snode* temp = (yyvsp[-1].namelist)->head;
+   while(temp != NULL){
+       idrec entry;
+       entry.type = (yyvsp[-2].type);
+       entry.arr = false;
+       entry.scope = 0; // we have to change scope according to nested loops
+       entry.name = temp->val;
+       insert_symtab(global_table, &entry);
+       // if (insert_symtab(global_table, entry)) {
+       //     // Variable inserted successfully
+       // } else {
+       //     yyerror("Variable already declared");
+       // }
+   }   
+   }
+#line 1824 "y.tab.c"
     break;
 
 
-#line 1820 "y.tab.c"
+#line 1828 "y.tab.c"
 
       default: break;
     }
@@ -2009,63 +2017,68 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 342 "yacc.y"
+#line 400 "yacc.y"
+
 
 
 // error handling
 void yyerror(char *s) {
-    //fprintf(yyout," : invalid statement");
-    fprintf(stderr, "%s: at line: %d ", s, yylineno);
-    fprintf(stderr,"Unexpected Token: %s\n",yytext);
+   //fprintf(yyout," : invalid statement");
+   fprintf(stderr, "%s: at line: %d ", s, yylineno);
+   fprintf(stderr,"Unexpected Token: %s\n",yytext);
 }
 
+
 int main(int argc, char* argv[]) {
-    
-    //check for input file aurgument
-    
-    if(argc < 2){
-        printf("Missing Argument:./lex_source_program < \"test case path\"");
-        return -1;
-    }
-    else{
-        // InFile and Outfile path and Name Handling
-        yyin = fopen(argv[1],"r");
-        if(!yyin){
-            printf("Error: Input File not found");
-            return -1;
-        }
-        int len = strlen(argv[1]);
-        int i = 0;
-        int filestart=0;
-        while(argv[1][i] != '\0'){
-            if(argv[1][i] == '/'){
-                filestart = i+1;
-            }
-            i++;
-        }
+  
+   //check for input file aurgument
+  
+   if(argc < 2){
+       printf("Missing Argument:./lex_source_program < \"test case path\"");
+       return -1;
+   }
+   else{
+       // InFile and Outfile path and Name Handling
+       yyin = fopen(argv[1],"r");
+       if(!yyin){
+           printf("Error: Input File not found");
+           return -1;
+       }
+       int len = strlen(argv[1]);
+       int i = 0;
+       int filestart=0;
+       while(argv[1][i] != '\0'){
+           if(argv[1][i] == '/'){
+               filestart = i+1;
+           }
+           i++;
+       }
 
-        // get the file Name in suffix
-        char *suffix = (char *)malloc(100*sizeof(char));
-        i = filestart;
-        while(argv[1][i] != '.'){
-            suffix[i-filestart] = argv[1][i];
-            i++;
-        }
 
-        // append suffix to outfile and C_outfile name
-        char *C_outfile = (char *)malloc(100*sizeof(char));
-        sprintf(C_outfile,"../output/%s.cpp",suffix);
-        char *token_file = (char *)malloc(100*sizeof(char));
-        sprintf(token_file,"../output/%s_tokens.txt",suffix);
-        // open the respective files
-        yyout = fopen(C_outfile, "w+");
-        tf = fopen(token_file,"w+");
+       // get the file Name in suffix
+       char *suffix = (char *)malloc(100*sizeof(char));
+       i = filestart;
+       while(argv[1][i] != '.'){
+           suffix[i-filestart] = argv[1][i];
+           i++;
+       }
 
-    }
-    fprintf(yyout,"#include <iostream>\n");
-    fprintf(yyout,"#include <string>\n");
-    fprintf(yyout,"#include <vector>\n");
-    fprintf(yyout,"#include \"teamScribe.h\"\n");
-    yyparse();
-    return 0;
+
+       // append suffix to outfile and C_outfile name
+       char *C_outfile = (char *)malloc(100*sizeof(char));
+       sprintf(C_outfile,"../output/%s.cpp",suffix);
+       char *token_file = (char *)malloc(100*sizeof(char));
+       sprintf(token_file,"../output/%s_tokens.txt",suffix);
+       // open the respective files
+       yyout = fopen(C_outfile, "w+");
+       tf = fopen(token_file,"w+");
+
+
+   }
+   fprintf(yyout,"#include <iostream>\n");
+   fprintf(yyout,"#include <string>\n");
+   fprintf(yyout,"#include <vector>\n");
+   fprintf(yyout,"#include \"teamScribe.h\"\n");
+   yyparse();
+   return 0;
 }
