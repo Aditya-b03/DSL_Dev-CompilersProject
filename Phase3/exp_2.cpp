@@ -106,7 +106,11 @@ int main(){
     t1.insert(v);
     t1.insert(t);
 
-    cout << "here" << endl;
-    t1.show();
+    task tsk = create_task("task1", "task1 description", 0, "task1 status");
+    tsk + v[0];
+    tsk + v[1];
+    cout << tsk.assigned_to() << endl;
+
+    //t1.show();
 
 }

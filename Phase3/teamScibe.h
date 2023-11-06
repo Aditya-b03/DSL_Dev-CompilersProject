@@ -48,6 +48,11 @@ typedef struct date
 
 class calendar;
 
+// maps
+map<string, member *> member_map;
+map<string, team *> team_map;
+map<string, task *> task_map;
+
 //********************Classes*******************
 // class calender
 // {
@@ -79,6 +84,7 @@ public:
     void add_team(team t);
     void remove(task assigned_task);
     void remove(team t);
+    void update_info(map<string,string> info);
 
     vector<task> tasks();
     vector<team> teams();
@@ -132,27 +138,32 @@ public:
 class task
 {
     string task_id;
-    set<member *> assigned_to; // set of pointers to members
+    set<member *> assigned; // set of pointers to members
 
 public:
     // set<member *> assigned_to;
     int priority;
     string title;
     string description;
-    string status;
+    string _status;
     date due_date;
     task(string = "random title", string = "No Description Given", int = 0, string = "To Do", date = date());
     string get_id();
 
+    void assign_to(member);
+    void status(string);
+    void operator+(member m){
+        assign_to(m);
+    }
+    int assigned_to();
+
     friend class member;
+    
+
 };
 
 // ********************Utility features/functions*******************
 
-// maps
-map<string, member *> member_map;
-map<string, team *> team_map;
-map<string, task *> task_map;
 
 void tab(int n){
     for (int i = 0; i < n; i++)
@@ -214,7 +225,7 @@ void member::update(map<string, string> info){
 
 void member::add_task(task assigned_task){
     member_map[this->member_id]->_tasks.insert(task_map[assigned_task.get_id()]);
-    task_map[assigned_task.get_id()]->assigned_to.insert(member_map[this->member_id]);
+    task_map[assigned_task.get_id()]->assigned.insert(member_map[this->member_id]);
 }
 
 void member::add_team(team t){
@@ -224,7 +235,7 @@ void member::add_team(team t){
 
 void member::remove(task assigned_task){
     member_map[this->member_id]->_tasks.erase(task_map[assigned_task.get_id()]);
-    task_map[assigned_task.get_id()]->assigned_to.erase(member_map[this->member_id]);
+    task_map[assigned_task.get_id()]->assigned.erase(member_map[this->member_id]);
 }
 
 void member::remove(team t){
@@ -271,6 +282,14 @@ void member::display(int level){
     {
         tab(level);
         cout << "\t" << t->name << endl;
+    }
+}
+
+void member::update_info(map<string,string> info){
+    for (auto i : info)
+    {
+        member_map[this->member_id]->info[i.first] = i.second;
+        this->info[i.first] = i.second;
     }
 }
 
@@ -337,7 +356,7 @@ void team::insert(vector<team> t){
 
     for (auto teams : t)
     {
-        cout << this->team_id  << endl;
+        //cout << this->team_id  << endl;
         team_map[this->team_id]->sub_teams.insert(team_map[teams.get_id()]);
     }
 }
@@ -408,7 +427,6 @@ void team::show(int level){
     {
         teams->show(level + 1);
     }
-
 }
 
 
@@ -418,7 +436,7 @@ task::task(string title, string description, int priority, string status, date d
     this->title = title;
     this->description = description;
     this->priority = priority;
-    this->status = status;
+    this->_status = status;
     this->due_date = due_date;
     this->task_id = gen_ID();
     task_map[task_id] = this;
@@ -433,3 +451,15 @@ task create_task(string title = "random title", string description = "No Descrip
     return *t;
 }
 
+void task::assign_to(member m){
+    task_map[this->task_id]->assigned.insert(member_map[m.get_id()]);
+    member_map[m.get_id()]->_tasks.insert(task_map[this->task_id]);
+}
+
+void task::status(string status){
+    task_map[this->task_id]->_status = status;
+}
+
+int task::assigned_to(){
+    return task_map[this->task_id]->assigned.size();
+}

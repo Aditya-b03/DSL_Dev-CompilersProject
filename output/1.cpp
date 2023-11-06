@@ -65,8 +65,8 @@ int main(){
     test_task.status = Doing; /* Can only be three options, any other should give error.*/
 
     /* assigning a task to a member */
-    test_task .add_member( test_member);
-    test_member.assign_task(test_task);
+    test_task.add_member( test_member);
+    test_member.add_task(test_task);
 
 
     team team3;
