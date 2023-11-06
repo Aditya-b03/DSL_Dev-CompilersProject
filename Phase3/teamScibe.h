@@ -18,9 +18,7 @@ delete_task(task_id): Delete a task from the task list.
 remove_member(members_id): Remove an members from the database.
 
 
-
-
-
+// DON'T USE LEAD
 
 *********************COMMENTS END*******************/
 
@@ -61,14 +59,14 @@ class calendar;
 //     void display(date d);
 // };
 
+
 class member
 {
     string member_id;
-    set<task *> tasks;
-    set<team *> teams;
+    set<task *> _tasks;
+    set<team *> _teams;
     //calendar *m_calendar;
 public:
-    string name;
     map<string, string> info;
 
     // member member functions
@@ -76,16 +74,28 @@ public:
     string get_id();
     //void add_task(task assigned_task);
 
+    void update(map<string, string> = {});
+    void add_task(task assigned_task);
+    void add_team(team t);
+    void remove(task assigned_task);
+    void remove(team t);
+
+    vector<task> tasks();
+    vector<team> teams();
+
     void display(int = 0);
 
     friend class team;
+    friend class task;
 
 };
+
+
 
 class team
 {
     string team_id;
-    set<member *> members;
+    set<member *> _members;
     set<team *> sub_teams;
     //calendar t_calendar;
 
@@ -95,7 +105,7 @@ public:
     string description;
 
     // team member functions
-    team(string = "random name", member = member(),
+    team(string = "random name", member = member() ,
          string = "No Description Given", vector<member *> = {}, vector<team *> = {});
 
     string get_id();
@@ -109,6 +119,9 @@ public:
     void remove(vector<member> m);
     void remove(team t);
     void remove(vector<team> t);
+
+    vector<member> members();
+    vector<team> teams();
 
     void show(int  = 0);
 
@@ -130,6 +143,8 @@ public:
     date due_date;
     task(string = "random title", string = "No Description Given", int = 0, string = "To Do", date = date());
     string get_id();
+
+    friend class member;
 };
 
 // ********************Utility features/functions*******************
@@ -173,7 +188,7 @@ string gen_ID()
 // ********************Member Class*******************
 
 member::member(string name, string email, string phone){
-    this->name = name;
+    this->info["name"] = name;
     this->info["email"] = email;
     this->info["phone"] = phone;
     this->member_id = gen_ID();
@@ -189,23 +204,70 @@ member create_member(string name = "random name", string email = "NULL", string 
     return *m;
 }
 
+void member::update(map<string, string> info){
+    for (auto i : info)
+    {
+        member_map[this->member_id]->info[i.first] = i.second;
+        this->info[i.first] = i.second;
+    }
+}
+
+void member::add_task(task assigned_task){
+    member_map[this->member_id]->_tasks.insert(task_map[assigned_task.get_id()]);
+    task_map[assigned_task.get_id()]->assigned_to.insert(member_map[this->member_id]);
+}
+
+void member::add_team(team t){
+    member_map[this->member_id]->_teams.insert(team_map[t.get_id()]);
+    team_map[t.get_id()]->_members.insert(member_map[this->member_id]);
+}
+
+void member::remove(task assigned_task){
+    member_map[this->member_id]->_tasks.erase(task_map[assigned_task.get_id()]);
+    task_map[assigned_task.get_id()]->assigned_to.erase(member_map[this->member_id]);
+}
+
+void member::remove(team t){
+    member_map[this->member_id]->_teams.erase(team_map[t.get_id()]);
+    team_map[t.get_id()]->_members.erase(member_map[this->member_id]);
+}
+
+vector<task> member::tasks(){
+    vector<task> v;
+    for (auto t : member_map[this->member_id]->_tasks)
+    {
+        v.push_back(*t);
+    }
+    return v;
+}
+
+vector<team> member::teams(){
+    vector<team> v;
+    for (auto t : member_map[this->member_id]->_teams)
+    {
+        v.push_back(*t);
+    }
+    return v;
+}
+
+
 void member::display(int level){
     tab(level);
-    cout << "Member Name: " << this->name << endl;
+    cout << "Member Name: " << this->info["name"] << endl;
     tab(level);
     cout << "Member Email: " << this->info["email"] << endl;
     tab(level);
     cout << "Member Phone: " << this->info["phone"] << endl;
     tab(level);
     cout << "Member Tasks: " << endl;
-    for (auto t : this->tasks)
+    for (auto t : this->_tasks)
     {
         tab(level);
         cout << "\t" << t->title << endl;
     }
     tab(level);
     cout << "Member Teams: " << endl;
-    for (auto t : this->teams)
+    for (auto t : this->_teams)
     {
         tab(level);
         cout << "\t" << t->name << endl;
@@ -222,12 +284,14 @@ team::team(string name, member lead,
             this->description = moto;
             for (auto m : members)
             {
-                this->members.insert(m);
+                this->_members.insert(m);
             }
             for (auto t : sub_teams)
             {
                 this->sub_teams.insert(t);
             }
+            this->team_id = gen_ID();
+            team_map[this->team_id] = this;
         }
 
 string team::get_id(){
@@ -252,66 +316,95 @@ team create_team(string name = "random name", member lead = member(),
     }
 
 void team::insert(member m){
-    this->members.insert(member_map[m.get_id()]);
-    member_map[m.get_id()]->teams.insert(this);
+    team_map[this->team_id]->_members.insert(member_map[m.get_id()]);
+    member_map[m.get_id()]->_teams.insert(team_map[this->team_id]);
 }
+
 void team::insert(vector<member> m){
     for (auto mem : m)
     {
-        this->members.insert(member_map[mem.get_id()]);
-        member_map[mem.get_id()]->teams.insert(this);
+        //cout << this->team_id  << endl;
+        team_map[this->team_id]->_members.insert(member_map[mem.get_id()]);
+        member_map[mem.get_id()]->_teams.insert(team_map[this->team_id]);
     }
 }
+
 void team::insert(team t){
-    this->sub_teams.insert(team_map[t.get_id()]);
+    team_map[this->team_id]->sub_teams.insert(team_map[t.get_id()]);
 }
+
 void team::insert(vector<team> t){
+
     for (auto teams : t)
     {
-        this->sub_teams.insert(team_map[teams.get_id()]);
+        cout << this->team_id  << endl;
+        team_map[this->team_id]->sub_teams.insert(team_map[teams.get_id()]);
     }
 }
 
 void team::remove(member m){
-    this->members.erase(member_map[m.get_id()]);
-    member_map[m.get_id()]->teams.erase(this);
+    team_map[this->team_id]->_members.erase(member_map[m.get_id()]);
+    member_map[m.get_id()]->_teams.erase(team_map[this->team_id]);
 }
+
 void team::remove(vector<member> m){
     for (auto mem : m)
     {
-        this->members.erase(member_map[mem.get_id()]);
-        member_map[mem.get_id()]->teams.erase(this);
-    }
-}
-void team::remove(team t){
-    this->sub_teams.erase(team_map[t.get_id()]);
-}
-void team::remove(vector<team> t){
-    for (auto teams : t)
-    {
-        this->sub_teams.erase(team_map[teams.get_id()]);
+        team_map[this->team_id]->_members.erase(member_map[mem.get_id()]);
+        member_map[mem.get_id()]->_teams.erase(team_map[this->team_id]);
     }
 }
 
-void team::show(int level = 0){
+void team::remove(team t){
+    team_map[this->team_id]->sub_teams.erase(team_map[t.get_id()]);
+}
+
+void team::remove(vector<team> t){
+    for (auto teams : t)
+    {
+        team_map[this->team_id]->sub_teams.erase(team_map[teams.get_id()]);
+    }
+}
+
+vector<member> team::members(){
+    vector<member> v;
+    for (auto m : team_map[this->team_id]->_members)
+    {
+        v.push_back(*m);
+    }
+    return v;
+}
+
+vector<team> team::teams(){
+    vector<team> v;
+    for (auto t : team_map[this->team_id]->sub_teams)
+    {
+        v.push_back(*t);
+    }
+    return v;
+}
+
+
+void team::show(int level){
+    team *t = team_map[this->team_id];
     tab(level);
-    cout << "Team Name: " << this->name << endl;
+    cout << "Team Name: " << t->name << endl;
     tab(level);
-    cout << "Team ID: " << this->team_id << endl;
+    cout << "Team ID: " << t->team_id << endl;
+    //tab(level);
+    //cout << "Team Lead: " << t->lead->info["name"]<< endl;
     tab(level);
-    cout << "Team Lead: " << this->lead->name << endl;
-    tab(level);
-    cout << "Team Description: " << this->description << endl;
+    cout << "Team Description: " << t->description << endl;
     tab(level);
     cout << "Team Members: " << endl;
-    for (auto mem : this->members)
+    for (auto mem : t->_members)
     {
         tab(level);
-        cout << "\t" << mem->name << endl;
+        cout << "\t" << mem->info["name"] << endl;
     }
     tab(level);
     cout << "Sub Teams: " << endl;
-    for (auto teams : this->sub_teams)
+    for (auto teams : t->sub_teams)
     {
         teams->show(level + 1);
     }

@@ -90,8 +90,23 @@ int main(){
     
     // cout << m1.member_name << endl;
     // cout << t1.members[0]->member_name << endl;
+    team t1 = create_team();
+    cout << "here" << endl;
+    vector<member> v;
+    for(int i = 0; i < 10; i++){
+        v.push_back(create_member("member" + to_string(i)));
+    }
 
-    team t = create_team();
-    cout << t.name << endl;
+    vector<team> t;
+    for(int i = 0; i < 10; i++){
+        t.push_back(create_team("team" + to_string(i)));
+    }
+
+    cout << "here" << endl;
+    t1.insert(v);
+    t1.insert(t);
+
+    cout << "here" << endl;
+    t1.show();
 
 }
