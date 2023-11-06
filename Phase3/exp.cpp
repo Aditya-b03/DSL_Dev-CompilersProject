@@ -5,7 +5,9 @@ int main()
 {
     int a, v, d;
     string b;
+    {
+        int a;
+    }
     float c;
-    float a;
     return 0;
 }

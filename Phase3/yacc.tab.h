@@ -104,7 +104,8 @@ extern int yydebug;
     COLON = 305,                   /* COLON  */
     ARROW = 306,                   /* ARROW  */
     STRUCT = 307,                  /* STRUCT  */
-    INCLUDE = 308                  /* INCLUDE  */
+    INCLUDE = 308,                 /* INCLUDE  */
+    TYPEDEF = 309                  /* TYPEDEF  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -118,15 +119,16 @@ union YYSTYPE
    struct id{
       char* name;
       bool isClass;
-   }id;
+   } id;
    struct slist *namelist;
    int type;
    struct list{
       int type;
       struct ilist *dimlist;
    }list;
+   int assignop;
 
-#line 130 "yacc.tab.h"
+#line 132 "yacc.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

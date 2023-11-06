@@ -31,7 +31,7 @@
    struct id{
       char* name;
       bool isClass;
-   }id;
+   } id;
    struct slist *namelist;
    int type;
    struct list{
@@ -57,7 +57,7 @@
 %token IDENTIFIER SELF
 %token LSB RSB LCB RCB LPB RPB SEMICOLON COMMA DOT COLON ARROW
 %token STRUCT
-%token INCLUDE 
+%token INCLUDE TYPEDEF
 
 
 %type <type> data_type_new data_type_pr
@@ -72,350 +72,356 @@
 
 
 start:{
-   global_table = init_symtab();
- } 
-   include_stmts code{
-   display_symtab(global_table);
-   }
-   | {global_table = init_symtab();}code{
-   display_symtab(global_table);
-   }
-   ;
+        global_table = init_symtab();
+    } 
+    include_stmts code {
+        display_symtab(global_table);
+    }
+    | {
+        global_table = init_symtab();
+    } code {
+        display_symtab(global_table);
+    }
+    ;
 
 
 include_stmts: include_stmts include_stmt
-   | include_stmt
-   ;
+    | include_stmt
+    ;
 
 
 include_stmt: INCLUDE STRING_LITERAL 
-   ;
+    ;
 
 
 // dimlist
 identifier: IDENTIFIER
-   | IDENTIFIER DOT identifier {
+    | IDENTIFIER DOT identifier {
 
 
-   }
-   | IDENTIFIER dim {
+    }
+    | IDENTIFIER dim {
 
 
-   }
-   | IDENTIFIER dim DOT identifier {
+    }
+    | IDENTIFIER dim DOT identifier {
 
 
-   }
-   | SELF DOT identifier {
-      
-   }
-   ;
+    }
+    | SELF DOT identifier {
+        
+    }
+    ;
 
 
 code: decl_stmt code
-   | function code
-   | struct_code code
-   | class code
-   |
-   ;
+    | function code
+    | struct_code code
+    | class code
+    |
+    ;
+
 // implement typedef
 struct_code: struct_def 
-   ;
+    ;
 
 
 struct_def: STRUCT IDENTIFIER LCB struct_body RCB SEMICOLON
-   ;
+    ;
 
 
 struct_body: struct_body decl_stmt
-   |
-   ;
+    |
+    ;
 
 
 function: function_dec LCB statements RCB
-   ;
+    ;
 
 
 function_dec: data_type_new IDENTIFIER LPB function_params RPB
-   | data_type_pr IDENTIFIER LPB function_params RPB
-   | IDENTIFIER IDENTIFIER LPB function_params RPB
-   | VOID IDENTIFIER LPB function_params RPB
-   | list IDENTIFIER LPB function_params RPB
-   ;
+    | data_type_pr IDENTIFIER LPB function_params RPB
+    | IDENTIFIER IDENTIFIER LPB function_params RPB
+    | VOID IDENTIFIER LPB function_params RPB
+    | list IDENTIFIER LPB function_params RPB
+    ;
 
 
 data_type_new: DOCUMENT{ $$ = 12;}
-   | TEAM { $$ = 7;}
-   | MEMBERS { $$ = 8;}
-   | TASK  { $$ = 9;}
-   | EVENT { $$ = 10;}
-   | MEETING  { $$ = 11;}
-   | CALENDAR { $$ = 13;}
-   ;
+    | TEAM { $$ = 7;}
+    | MEMBERS { $$ = 8;}
+    | TASK  { $$ = 9;}
+    | EVENT { $$ = 10;}
+    | MEETING  { $$ = 11;}
+    | CALENDAR { $$ = 13;}
+    ;
 
 
 
 
 data_type_pr:  INT { $$ = 0;}
-   | STRING { $$ = 2;}
-   | BOOL  { $$ = 3;}
-   | FLOAT { $$ = 1;}
-   ;
+    | STRING { $$ = 2;}
+    | BOOL  { $$ = 3;}
+    | FLOAT { $$ = 1;}
+    ;
 
 
 
 
 function_params: function_params COMMA function_param
-   | function_param
-   |
-   ;
+    | function_param
+    |
+    ;
 
 
 function_param: data_type_new IDENTIFIER
-   | data_type_pr IDENTIFIER
-   | IDENTIFIER IDENTIFIER
-   | list IDENTIFIER
-   ;
+    | data_type_pr IDENTIFIER
+    | IDENTIFIER IDENTIFIER
+    | list IDENTIFIER
+    ;
 
 
 class: class_dec LCB class_stmt RCB
-   ;
+    ;
 
 
 class_dec: CLASS IDENTIFIER
-   ;
+    ;
 
 
 class_stmt: function class_stmt
-   | decl_stmt class_stmt
-   | expr_stmt class_stmt
-   |
-   ;
+    | decl_stmt class_stmt
+    | expr_stmt class_stmt
+    |
+    ;
 
 
-statements : statements statement
-   |
-   ;
+statements : statements LCB statements RCB
+    |statements statement
+    |
+    ;
 
 
 statement: decl_stmt
-   | if_stmt
-   | for_stmt
-   | while_stmt
-   | return_stmt
-   | call_stmt
-   | expr_stmt
-   | SEMICOLON
-   | identifier ARROW identifier SEMICOLON
-   ;
+    | if_stmt
+    | for_stmt
+    | while_stmt
+    | return_stmt
+    | call_stmt
+    | expr_stmt
+    | SEMICOLON
+    | identifier ARROW identifier SEMICOLON
+    | TYPEDEF ids IDENTIFIER SEMICOLON
+    ;
 
+ids: ids COMMA IDENTIFIER
+        | IDENTIFIER
+        ;
 
 // check id in symbol table
 unary_stmt: identifier UNARY_OP
-   | identifier
-   ;
+    | identifier
+    ;
 
 
 single_stmt: decl_stmt 
-   | call_stmt
-   | expr_stmt
-   | identifier ARROW identifier SEMICOLON
-   ;
+    | call_stmt
+    | expr_stmt
+    | identifier ARROW identifier SEMICOLON
+    ;
 
 
 // add id to symbol table, id is class
 decl_stmt: data_type_new id_list SEMICOLON {
-   struct snode* temp = $2->head;
-   while(temp != NULL){
-      struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
-      entry->type = $1;
-      entry->arr = false;
-      entry->scope = 0; // we have to change scope according to nested loops
-      entry->name = temp->val;
-      if(lookup(global_table,global_table, entry->name) == NULL){
-         insert_symtab(global_table, entry);
-      }
-      else{
-         printf("Error: Variable %s already declared\n", entry->name);
-      }
-      temp = temp->next;
-   }
-
-
-   }
-   | data_type_pr id_list SEMICOLON{
-      struct snode* temp = $2->head;
-      while(temp != NULL){
-         struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
-         entry->type = $1;
-         entry->arr = false;
-         entry->scope = 0; // we have to change scope according to nested loops
-         entry->name = temp->val;
-         if(lookup(global_table, global_table ,entry->name) == NULL){
+        struct snode* temp = $2->head;
+        while(temp != NULL){
+            struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
+            entry->type = $1;
+            entry->arr = false;
+            entry->scope = 0; // we have to change scope according to nested loops
+            entry->name = temp->val;
+            if(lookup(global_table,global_table, entry->name) == NULL){
+                insert_symtab(global_table, entry);
+            }
+            else{
+                printf("Error: Variable %s already declared\n", entry->name);
+            }
+            temp = temp->next;
+        }
+    }
+    | data_type_pr id_list SEMICOLON{
+        struct snode* temp = $2->head;
+        while(temp != NULL){
+            struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
+            entry->type = $1;
+            entry->arr = false;
+            entry->scope = 0; // we have to change scope according to nested loops
+            entry->name = temp->val;
+            if(lookup(global_table, global_table ,entry->name) == NULL){
             insert_symtab(global_table, entry);
-         }
-         else{
+            }
+            else{
             printf("Error: Variable %s already declared\n", entry->name);
-         }
-         temp = temp->next;
-      }   
-   }
-   | IDENTIFIER id_list SEMICOLON
-   | list id_list  SEMICOLON
-   ;
+            }
+            temp = temp->next;
+        }   
+    }
+    | IDENTIFIER id_list SEMICOLON
+    | list id_list  SEMICOLON
+    ;
 
 
 // dimlist, type
 list: LIST dim COLON data_type_pr
-   | LIST dim COLON data_type_new
-   | LIST dim COLON IDENTIFIER
-   ;
+    | LIST dim COLON data_type_new
+    | LIST dim COLON IDENTIFIER
+    ;
 
 
 // dimlist, type
 list_literal:  LCB list_terminal RCB
-   ;
+    ;
 
 
 // dimlist, type
 list_terminal: nested_expr
-   | list_terminal COMMA nested_expr        
-   ;
+    | list_terminal COMMA nested_expr        
+    ;
 
 
 // dimlist, type
 dim: dim  LSB nested_expr RSB
-   | LSB nested_expr RSB
-   | dim LSB RSB
-   | LSB RSB
-   ;
+    | LSB nested_expr RSB
+    | dim LSB RSB
+    | LSB RSB
+    ;
 
 
 // idlist, type
 id_list: id_list COMMA IDENTIFIER{
-      insert_slist($1, $3.name);
-      $$ = $1;
-   }
-   | IDENTIFIER EQUALS nested_expr
-   | id_list COMMA IDENTIFIER EQUALS nested_expr
-   | IDENTIFIER{
-      $$ = init_slist();
-      insert_slist($$, $1.name);   
-   }
-   ;
+        insert_slist($1, $3.name);
+        $$ = $1;
+    }
+    | IDENTIFIER EQUALS nested_expr
+    | id_list COMMA IDENTIFIER EQUALS nested_expr
+    | IDENTIFIER{
+        $$ = init_slist();
+        insert_slist($$, $1.name);   
+    }
+    ;
 
 
 expr_stmt: expr_stmt_without_semicolon SEMICOLON
-   ;
+    ;
 
 
 // check lhs and rhs, check assignop (seprate assignop)
 expr_stmt_without_semicolon: identifier ASSIGN_OP nested_expr
-   | identifier EQUALS nested_expr
-   | unary_stmt
-   ;
+    | identifier EQUALS nested_expr
+    | unary_stmt
+    ;
 
 
 // nested_expr is bool
 if_stmt: IF LPB nested_expr RPB LCB statements RCB
-   | IF LPB nested_expr RPB single_stmt
-   | IF LPB nested_expr RPB LCB statements RCB ELSE if_stmt
-   | IF LPB nested_expr RPB single_stmt ELSE if_stmt
-   | IF LPB nested_expr RPB LCB statements RCB ELSE LCB statements RCB
-   | IF LPB nested_expr RPB single_stmt ELSE LCB statements RCB
-   | IF LPB nested_expr RPB LCB statements RCB ELSE single_stmt
-   | IF LPB nested_expr RPB single_stmt ELSE single_stmt
-   ;
+    | IF LPB nested_expr RPB single_stmt
+    | IF LPB nested_expr RPB LCB statements RCB ELSE if_stmt
+    | IF LPB nested_expr RPB single_stmt ELSE if_stmt
+    | IF LPB nested_expr RPB LCB statements RCB ELSE LCB statements RCB
+    | IF LPB nested_expr RPB single_stmt ELSE LCB statements RCB
+    | IF LPB nested_expr RPB LCB statements RCB ELSE single_stmt
+    | IF LPB nested_expr RPB single_stmt ELSE single_stmt
+    ;
 
 
 // nested_expr is bool
 for_stmt: FOR LPB decl_stmt  nested_expr SEMICOLON expr_stmt_without_semicolon RPB LCB statements RCB
-   | FOR LPB decl_stmt nested_expr SEMICOLON expr_stmt_without_semicolon RPB single_stmt
-   | FOR LPB expr_stmt nested_expr SEMICOLON expr_stmt_without_semicolon RPB LCB statements RCB
-   | FOR LPB expr_stmt nested_expr SEMICOLON expr_stmt_without_semicolon RPB single_stmt
-   ;
+    | FOR LPB decl_stmt nested_expr SEMICOLON expr_stmt_without_semicolon RPB single_stmt
+    | FOR LPB expr_stmt nested_expr SEMICOLON expr_stmt_without_semicolon RPB LCB statements RCB
+    | FOR LPB expr_stmt nested_expr SEMICOLON expr_stmt_without_semicolon RPB single_stmt
+    ;
 
 
 // nested_expr is bool
 while_stmt: WHILE LPB nested_expr RPB LCB statements RCB
-   | WHILE LPB nested_expr RPB single_stmt
-   ;
+    | WHILE LPB nested_expr RPB single_stmt
+    ;
 
 
 // check return type
 return_stmt: RETURN SEMICOLON
-   | RETURN nested_expr SEMICOLON
-   ;
+    | RETURN nested_expr SEMICOLON
+    ;
 
 
 call_stmt: call SEMICOLON
-   ;
+    ;
 
 
 // check id in function table
 call: identifier LPB call_args RPB
-   ;
+    ;
 
 
 // typelist
 call_args: call_args COMMA nested_expr
-   | nested_expr
-   | call_args COMMA identifier EQUALS nested_expr
-   | identifier EQUALS nested_expr
-   |
-   ;
+    | nested_expr
+    | call_args COMMA identifier EQUALS nested_expr
+    | identifier EQUALS nested_expr
+    |
+    ;
 
 
 // type
 nested_expr: LPB nested_expr RPB
-   | LPB nested_expr RPB conj nested_expr
-   | LPB nested_expr RPB REL_OP nested_expr
-   | LPB nested_expr RPB arith_op nested_expr
-   | LPB nested_expr RPB set_op nested_expr
-   | expr
-   ;
+    | LPB nested_expr RPB conj nested_expr
+    | LPB nested_expr RPB REL_OP nested_expr
+    | LPB nested_expr RPB arith_op nested_expr
+    | LPB nested_expr RPB set_op nested_expr
+    | expr
+    ;
 
 
 // type
 expr: expr_terminal conj nested_expr
-   | expr_terminal REL_OP nested_expr
-   | expr_terminal arith_op nested_expr
-   | expr_terminal set_op nested_expr
-   | expr_terminal
-   ;
+    | expr_terminal REL_OP nested_expr
+    | expr_terminal arith_op nested_expr
+    | expr_terminal set_op nested_expr
+    | expr_terminal
+    ;
 
 
 // type
 // check id in symbol table
 expr_terminal: unary_stmt
-   | NUMBER
-   | STRING_LITERAL
-   | BOOL_LITERAL
-   | call
-   | NOT LPB nested_expr RPB
-   | NOT identifier
-   | list_literal
-   ;
+    | NUMBER
+    | STRING_LITERAL
+    | BOOL_LITERAL
+    | call
+    | NOT LPB nested_expr RPB
+    | NOT identifier
+    | list_literal
+    ;
 
 
 // op
 conj: AND
-   | OR
-   ;
+    | OR
+    ;
 
 
 set_op: INTERSECTION_OP
-   | UNION_OP
-   ;
+    | UNION_OP
+    ;
 
 
 // op
 arith_op: ADD
-   | SUB
-   | MUL
-   | DIV
-   | MOD
-   ;
+    | SUB
+    | MUL
+    | DIV
+    | MOD
+    ;
 
 
 %%

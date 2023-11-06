@@ -17,11 +17,13 @@ punctuation: ;
 datatype: string
 identifier: b
 punctuation: ;
+brackets: {
+datatype: int
+identifier: a
+punctuation: ;
+brackets: }
 datatype: float
 identifier: c
-punctuation: ;
-datatype: float
-identifier: a
 punctuation: ;
 reserved: return
 constant: 0

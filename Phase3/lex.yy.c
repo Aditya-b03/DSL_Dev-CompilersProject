@@ -1152,12 +1152,40 @@ YY_RULE_SETUP
 {
  fprintf(tf,"operator: %s\n", yytext);
  print(yytext);
+ char* c1 = "+=";
+  char* c2 = "-=";
+  char* c3 = "/=";
+  char* c4 = "*=";
+  char* c5 = "%=";
+  char* c6 = "&=";
+  char* c7 = "|=";
+  if(strcmp(yytext,c1)==0){
+    yylval.assignop = 0;
+  }
+  else if(strcmp(yytext,c2)==0){
+    yylval.assignop = 1;
+  }
+  else if(strcmp(yytext,c3)==0){
+    yylval.assignop = 2;
+  }
+  else if(strcmp(yytext,c4)==0){
+    yylval.assignop = 3;
+  }
+  else if(strcmp(yytext,c5)==0){
+    yylval.assignop = 4;
+  }
+  else if(strcmp(yytext,c6)==0){
+    yylval.assignop = 5;
+  }
+  else if(strcmp(yytext,c7)==0){
+    yylval.assignop = 6;
+  }
  return ASSIGN_OP;
 }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 300 "lex.l"
+#line 328 "lex.l"
 {
  fprintf(tf,"operator: %s\n", yytext);
  print(yytext);
@@ -1166,7 +1194,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 307 "lex.l"
+#line 335 "lex.l"
 {
  fprintf(tf,"operator: %s\n", yytext);
  print(yytext);
@@ -1175,7 +1203,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 312 "lex.l"
+#line 340 "lex.l"
 {
  fprintf(tf,"operator: %s\n", yytext);
  print(yytext);
@@ -1184,7 +1212,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 317 "lex.l"
+#line 345 "lex.l"
 {
  print(".add_member(");
  arrow_flag = 1;
@@ -1193,7 +1221,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 322 "lex.l"
+#line 350 "lex.l"
 {
    fprintf(tf,"brackets: %s\n", yytext);
    char* c1 = "(";
@@ -1234,7 +1262,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 361 "lex.l"
+#line 389 "lex.l"
 {
  fprintf(tf,"identifier: %s\n", yytext);
  if(list_flag==1){
@@ -1263,7 +1291,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 388 "lex.l"
+#line 415 "lex.l"
 {
  printf("Unrecognized character %s\n", yytext);
  yyterminate();
@@ -1271,10 +1299,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 394 "lex.l"
+#line 421 "lex.l"
 ECHO;
 	YY_BREAK
-#line 1278 "lex.yy.c"
+#line 1306 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2279,7 +2307,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 394 "lex.l"
+#line 421 "lex.l"
 
 
 

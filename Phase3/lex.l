@@ -412,7 +412,6 @@ ID [A-Za-z][A-Za-z0-9_]*
  return IDENTIFIER;
 }
 
-
 . {
  printf("Unrecognized character %s\n", yytext);
  yyterminate();
