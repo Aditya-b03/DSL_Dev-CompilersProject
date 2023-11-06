@@ -104,8 +104,8 @@ struct funcrec
 {
    char *name;
    int type;
-   symtab params;
-   symtab local_table;
+   symtab *params;
+   symtab *local_table;
    int num_params;
    struct funcrec *next;
 };
@@ -123,7 +123,7 @@ typedef struct functab functab;
 functab *init_functab();
 void insert_functab(functab *ft, funcrec *entry);
 void display_functab(functab *ft);
-funcrec *search_functab(functab *ft, char *name);
+funcrec *search_functab(functab *ft, funcrec *entry);
 
 idrec *lookup(symtab *global_table, symtab *local_table, char *name)
 {
@@ -132,6 +132,14 @@ idrec *lookup(symtab *global_table, symtab *local_table, char *name)
       return temp;
    temp = search_symtab(global_table, name);
    return temp;
+}
+
+funcrec *lookup_functab(functab *func_table, funcrec *entry)
+{
+   funcrec *temp = search_functab(func_table, entry);
+   if (temp != NULL)
+      return temp;
+   return NULL;
 }
 
 bool insert(symtab *global_table, symtab *local_table, idrec entry)
@@ -316,13 +324,29 @@ void display_functab(functab *ft)
 }
 
 // support for function overloading
-funcrec *search_functab(functab *ft, char *name)
+funcrec *search_functab(functab *ft, funcrec *entry)
 {
    funcrec *temp = ft->head;
    while (temp != NULL)
    {
-      if (strcmp(temp->name, name) == 0)
-         return temp;
+      if (strcmp(temp->name, entry->name) == 0)
+      {
+         if (temp->num_params == entry->num_params)
+         {
+            // compare temp->params and entry->params
+            idrec *temp1 = temp->params->head;
+            idrec *temp2 = entry->params->head;
+            while (temp1 != NULL && temp2 != NULL)
+            {
+               if (temp1->type != temp2->type)
+                  break;
+               temp1 = temp1->next;
+               temp2 = temp2->next;
+            }
+            if (temp1 == NULL && temp2 == NULL)
+               return temp;
+         }
+      }
       temp = temp->next;
    }
    return NULL;

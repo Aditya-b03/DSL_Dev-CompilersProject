@@ -4,14 +4,6 @@
 #include "teamScribe.h"
 #include "iostream"
 #include "vector"
+#include "string"
 
-int main()
-{
-    int a, v, d;
-    string b;
-    {
-        int a;
-    }
-    float c;
-    return 0;
-}
+using namespace std

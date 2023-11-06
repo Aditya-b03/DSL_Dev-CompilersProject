@@ -37,6 +37,7 @@ INCLUDE "#include"
 
 DIGIT [0-9]
 NUMBER {DIGIT}+
+DECIMAL {NUMBER}"."{NUMBER}
 STRING \"([^\"\\]*(\\.[^\"\\]*)*)\"
 
 
@@ -141,6 +142,11 @@ ID [A-Za-z][A-Za-z0-9_]*
    print(yytext);
  }
  return NUMBER;
+}
+{DECIMAL} {
+  fprintf(tf,"constant: %s\n", yytext);
+  print(yytext);
+  return DECIMAL;
 }
 {STRING} {
  fprintf(tf,"constant: %s\n", yytext);

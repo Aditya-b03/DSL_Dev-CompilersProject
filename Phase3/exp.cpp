@@ -1,13 +1,18 @@
 #include "iostream"
 #include "vector"
+#include "string"
+
+using namespace std;
 
 int main()
 {
     int a, v, d;
-    string b;
-    {
-        int a;
-    }
-    float c;
+    float c = 0.0;
+    c++;
+    string s;
+    s = "Hello World";
+    s++;
+    cout << c << endl;
+    cout << s << endl;
     return 0;
 }

@@ -57,55 +57,56 @@ extern int yydebug;
     NUMBER = 258,                  /* NUMBER  */
     STRING_LITERAL = 259,          /* STRING_LITERAL  */
     BOOL_LITERAL = 260,            /* BOOL_LITERAL  */
-    CLASS = 261,                   /* CLASS  */
-    RETURN = 262,                  /* RETURN  */
-    INT = 263,                     /* INT  */
-    STRING = 264,                  /* STRING  */
-    BOOL = 265,                    /* BOOL  */
-    FLOAT = 266,                   /* FLOAT  */
-    VOID = 267,                    /* VOID  */
-    LIST = 268,                    /* LIST  */
-    DOCUMENT = 269,                /* DOCUMENT  */
-    TEAM = 270,                    /* TEAM  */
-    MEMBERS = 271,                 /* MEMBERS  */
-    TASK = 272,                    /* TASK  */
-    EVENT = 273,                   /* EVENT  */
-    MEETING = 274,                 /* MEETING  */
-    CALENDAR = 275,                /* CALENDAR  */
-    ADD = 276,                     /* ADD  */
-    SUB = 277,                     /* SUB  */
-    MUL = 278,                     /* MUL  */
-    DIV = 279,                     /* DIV  */
-    MOD = 280,                     /* MOD  */
-    UNARY_OP = 281,                /* UNARY_OP  */
-    ASSIGN_OP = 282,               /* ASSIGN_OP  */
-    REL_OP = 283,                  /* REL_OP  */
-    EQUALS = 284,                  /* EQUALS  */
-    AND = 285,                     /* AND  */
-    OR = 286,                      /* OR  */
-    NOT = 287,                     /* NOT  */
-    INTERSECTION_OP = 288,         /* INTERSECTION_OP  */
-    UNION_OP = 289,                /* UNION_OP  */
-    FOR = 290,                     /* FOR  */
-    WHILE = 291,                   /* WHILE  */
-    IF = 292,                      /* IF  */
-    ELSE = 293,                    /* ELSE  */
-    IDENTIFIER = 294,              /* IDENTIFIER  */
-    SELF = 295,                    /* SELF  */
-    LSB = 296,                     /* LSB  */
-    RSB = 297,                     /* RSB  */
-    LCB = 298,                     /* LCB  */
-    RCB = 299,                     /* RCB  */
-    LPB = 300,                     /* LPB  */
-    RPB = 301,                     /* RPB  */
-    SEMICOLON = 302,               /* SEMICOLON  */
-    COMMA = 303,                   /* COMMA  */
-    DOT = 304,                     /* DOT  */
-    COLON = 305,                   /* COLON  */
-    ARROW = 306,                   /* ARROW  */
-    STRUCT = 307,                  /* STRUCT  */
-    INCLUDE = 308,                 /* INCLUDE  */
-    TYPEDEF = 309                  /* TYPEDEF  */
+    DECIMAL = 261,                 /* DECIMAL  */
+    CLASS = 262,                   /* CLASS  */
+    RETURN = 263,                  /* RETURN  */
+    INT = 264,                     /* INT  */
+    STRING = 265,                  /* STRING  */
+    BOOL = 266,                    /* BOOL  */
+    FLOAT = 267,                   /* FLOAT  */
+    VOID = 268,                    /* VOID  */
+    LIST = 269,                    /* LIST  */
+    DOCUMENT = 270,                /* DOCUMENT  */
+    TEAM = 271,                    /* TEAM  */
+    MEMBERS = 272,                 /* MEMBERS  */
+    TASK = 273,                    /* TASK  */
+    EVENT = 274,                   /* EVENT  */
+    MEETING = 275,                 /* MEETING  */
+    CALENDAR = 276,                /* CALENDAR  */
+    ADD = 277,                     /* ADD  */
+    SUB = 278,                     /* SUB  */
+    MUL = 279,                     /* MUL  */
+    DIV = 280,                     /* DIV  */
+    MOD = 281,                     /* MOD  */
+    UNARY_OP = 282,                /* UNARY_OP  */
+    ASSIGN_OP = 283,               /* ASSIGN_OP  */
+    REL_OP = 284,                  /* REL_OP  */
+    EQUALS = 285,                  /* EQUALS  */
+    AND = 286,                     /* AND  */
+    OR = 287,                      /* OR  */
+    NOT = 288,                     /* NOT  */
+    INTERSECTION_OP = 289,         /* INTERSECTION_OP  */
+    UNION_OP = 290,                /* UNION_OP  */
+    FOR = 291,                     /* FOR  */
+    WHILE = 292,                   /* WHILE  */
+    IF = 293,                      /* IF  */
+    ELSE = 294,                    /* ELSE  */
+    IDENTIFIER = 295,              /* IDENTIFIER  */
+    SELF = 296,                    /* SELF  */
+    LSB = 297,                     /* LSB  */
+    RSB = 298,                     /* RSB  */
+    LCB = 299,                     /* LCB  */
+    RCB = 300,                     /* RCB  */
+    LPB = 301,                     /* LPB  */
+    RPB = 302,                     /* RPB  */
+    SEMICOLON = 303,               /* SEMICOLON  */
+    COMMA = 304,                   /* COMMA  */
+    DOT = 305,                     /* DOT  */
+    COLON = 306,                   /* COLON  */
+    ARROW = 307,                   /* ARROW  */
+    STRUCT = 308,                  /* STRUCT  */
+    INCLUDE = 309,                 /* INCLUDE  */
+    TYPEDEF = 310                  /* TYPEDEF  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -116,19 +117,27 @@ union YYSTYPE
 {
 #line 30 "yacc.y"
 
-   struct id{
-      char* name;
-      bool isClass;
-   } id;
-   struct slist *namelist;
-   int type;
-   struct list{
-      int type;
-      struct ilist *dimlist;
-   }list;
-   int assignop;
+    struct id{
+        char* name;
+        bool isClass;
+    } id;
+    struct slist *namelist;
+    int type;
+    struct list{
+        int type;
+        struct ilist *dimlist;
+    }list;
+    int assignop;
+    struct params{
+        struct symtab *params;
+        int num_params;
+    }params;
+    struct stmt{
+        int type;
+        struct symtab *local_table;
+    }stmt;
 
-#line 132 "yacc.tab.h"
+#line 141 "yacc.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
