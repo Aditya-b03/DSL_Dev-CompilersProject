@@ -127,11 +127,11 @@ funcrec *search_functab(functab *ft, funcrec *entry);
 
 idrec *lookup(symtab *global_table, symtab *local_table, char *name)
 {
-   idrec *temp = search_symtab(local_table, name);
-   if (temp != NULL)
-      return temp;
-   temp = search_symtab(global_table, name);
-   return temp;
+    idrec *temp = search_symtab(local_table, name);
+    if (temp != NULL)
+        return temp;
+    temp = search_symtab(global_table, name);
+    return temp;
 }
 
 funcrec *lookup_functab(functab *func_table, funcrec *entry)
@@ -278,16 +278,16 @@ void clear_scope_symtab(symtab *st, int scope)
    return;
 }
 
-idrec *search_symtab(symtab *st, char *name)
+idrec* search_symtab(symtab *st, char *name)
 {
-   idrec *temp = st->head;
-   while (temp != NULL)
-   {
-      if (strcmp(temp->name, name) == 0)
-         return temp;
-      temp = temp->next;
-   }
-   return NULL;
+    idrec *temp = st -> head;
+    while (temp != NULL)
+    {
+        if (strcmp(temp->name, name) == 0)
+            return temp;
+        temp = temp->next;
+    }
+    return NULL;
 }
 
 functab *init_functab()

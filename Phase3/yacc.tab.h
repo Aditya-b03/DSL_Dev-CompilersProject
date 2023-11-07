@@ -115,7 +115,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 30 "yacc.y"
+#line 28 "yacc.y"
 
     struct id{
         char* name;
@@ -126,18 +126,21 @@ union YYSTYPE
     struct list{
         int type;
         struct ilist *dimlist;
-    }list;
+    } list;
     int assignop;
-    struct params{
+    struct functions{
+        int type;
+        char* name;
         struct symtab *params;
+        struct symtab *local_table;
         int num_params;
-    }params;
+    } functions;
     struct stmt{
         int type;
-        struct symtab *local_table;
-    }stmt;
+        int scope;
+    } stmt;
 
-#line 141 "yacc.tab.h"
+#line 144 "yacc.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

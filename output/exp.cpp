@@ -6,4 +6,10 @@
 #include "vector"
 #include "string"
 
-using namespace std
+
+int main()
+{
+    int a, v, d;
+    float c;
+    string s;
+}
