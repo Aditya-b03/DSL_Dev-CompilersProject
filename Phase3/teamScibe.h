@@ -3,6 +3,9 @@
 #include <map>
 #include <set>
 #include <string.h>
+#include <nlohmann\json.hpp>
+#include <fstream>
+using json = nlohmann::json;
 using namespace std;
 
 /*********************COMMENTS*******************
@@ -115,6 +118,7 @@ public:
          string = "No Description Given", vector<member *> = {}, vector<team *> = {});
 
     string get_id();
+    json to_json();
 
     void insert(member m);
     void insert(vector<member> m);
@@ -317,6 +321,44 @@ string team::get_id(){
     return this->team_id;
 }
 
+json team::to_json() {
+    json teamJson;
+    team teams = *this;
+    teamJson["team_id"] = teams.get_id();
+    teamJson["team_name"] = this->name;
+    teamJson["team_lead"] = this->lead->info["name"];
+
+    json membersJson;
+    for (auto& _member : this->members()) {
+        json memberJson;
+        member *memPointer = &_member;
+        memberJson["name"] = memPointer -> info["name"];
+        memberJson["email"] = memPointer -> info["email"];
+        memberJson["phone_no"] = memPointer -> info["phone"];
+        membersJson.push_back(memberJson);
+    }
+
+    teamJson["team_members"] = membersJson;
+
+    return teamJson;
+}
+
+void updateJsonTeams() {
+    nlohmann::json teamsJson = nlohmann::json::array();
+
+    for (const auto& t : team_map) {
+        teamsJson.push_back(t.second->to_json());
+    }
+
+    nlohmann::json outputJson;
+    outputJson["teams"] = teamsJson;
+
+    
+    std::ofstream outputFile("teams.json");
+    outputFile << outputJson.dump(4);
+    std::cout << "Teams data updated in teams.json" << std::endl;
+}
+
 team create_team(string name = "random name", member lead = member(),
             string moto = "No Description Given", vector<member> members = {}, vector<team> sub_teams = {}){
         vector<member *> m;
@@ -331,12 +373,14 @@ team create_team(string name = "random name", member lead = member(),
             v.push_back(team_map[teams.get_id()]);
         }
         team *t = new team(name, lead, moto, m, v);
+        updateJsonTeams();
         return *t;
     }
 
 void team::insert(member m){
     team_map[this->team_id]->_members.insert(member_map[m.get_id()]);
     member_map[m.get_id()]->_teams.insert(team_map[this->team_id]);
+    updateJsonTeams();
 }
 
 void team::insert(vector<member> m){
@@ -346,10 +390,12 @@ void team::insert(vector<member> m){
         team_map[this->team_id]->_members.insert(member_map[mem.get_id()]);
         member_map[mem.get_id()]->_teams.insert(team_map[this->team_id]);
     }
+    updateJsonTeams();
 }
 
 void team::insert(team t){
     team_map[this->team_id]->sub_teams.insert(team_map[t.get_id()]);
+    updateJsonTeams();
 }
 
 void team::insert(vector<team> t){
@@ -359,11 +405,13 @@ void team::insert(vector<team> t){
         //cout << this->team_id  << endl;
         team_map[this->team_id]->sub_teams.insert(team_map[teams.get_id()]);
     }
+    updateJsonTeams();
 }
 
 void team::remove(member m){
     team_map[this->team_id]->_members.erase(member_map[m.get_id()]);
     member_map[m.get_id()]->_teams.erase(team_map[this->team_id]);
+    updateJsonTeams();
 }
 
 void team::remove(vector<member> m){
@@ -372,10 +420,12 @@ void team::remove(vector<member> m){
         team_map[this->team_id]->_members.erase(member_map[mem.get_id()]);
         member_map[mem.get_id()]->_teams.erase(team_map[this->team_id]);
     }
+    updateJsonTeams();
 }
 
 void team::remove(team t){
     team_map[this->team_id]->sub_teams.erase(team_map[t.get_id()]);
+    updateJsonTeams();
 }
 
 void team::remove(vector<team> t){
@@ -383,6 +433,7 @@ void team::remove(vector<team> t){
     {
         team_map[this->team_id]->sub_teams.erase(team_map[teams.get_id()]);
     }
+    updateJsonTeams();
 }
 
 vector<member> team::members(){
