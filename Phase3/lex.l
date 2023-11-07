@@ -30,7 +30,7 @@ LOOP_FOR "for"
 IF "if"
 ELSE "else"
 LIST "list"
-
+CLASS "class"
 
 INCLUDE "#include"
 
@@ -187,6 +187,11 @@ ID [A-Za-z][A-Za-z0-9_]*
  list_flag = 1;
  list_print_flag=1;
  return LIST;
+}
+{CLASS} {
+ fprintf(tf,"reserved: %s\n", yytext);
+ print(yytext);
+ return CLASS;
 }
 {DATA_TYPE_NEW} {
  fprintf(tf,"datatype: %s\n", yytext);

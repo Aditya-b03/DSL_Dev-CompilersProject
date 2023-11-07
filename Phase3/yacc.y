@@ -22,6 +22,9 @@
     struct symtab *global_table;
     struct functab *function_table;
     struct symtab *local_table;
+    struct classtab *class_table;
+    struct symtab *members;
+    struct functab *methods;
 
 %}
 
@@ -71,29 +74,40 @@
 
 %type <type> data_type_new data_type_pr identifier unary_stmt expr_terminal
 %type <namelist> id_list
-%type <id> IDENTIFIER
+%type <id> IDENTIFIER class_dec
 /* %type <list> list */
 %type <assignop> ASSIGN_OP
-%type <functions> function_params function_param function_dec function
-%type <stmt> statements statement decl_stmt
+%type <functions> function_params function_param function_dec function class_function_dec class_function
+%type <stmt> statements statement decl_stmt class_decl_stmt 
 
-%%
+%% 
 
 // 1. Start code and include statements
 start:{
         global_table = init_symtab();
         function_table = init_functab();
+        class_table = init_classtab();
+        local_table = NULL;
+        members = NULL;
+        methods = NULL;
     } 
     include_stmts code {
         display_symtab(global_table);
         display_functab(function_table);
+        display_classtab(class_table);
     }
     | {
         global_table = init_symtab();
         function_table = init_functab();
+        class_table = init_classtab();
+        local_table = NULL;
+        members = NULL;
+        methods = NULL;
+
     } code {
         display_symtab(global_table);
         display_functab(function_table);
+        display_classtab(class_table);
     }
     ;
 
@@ -162,6 +176,7 @@ function_dec: data_type_new IDENTIFIER LPB function_params RPB {
         {
             // terminate the program
             printf("Error: Function %s already declared\n", entry->name);
+            YYABORT;
         }
         $$.type = $1;
         $$.name = $2.name;
@@ -180,6 +195,7 @@ function_dec: data_type_new IDENTIFIER LPB function_params RPB {
         if(lookup_functab(function_table, entry) != NULL)
         {
             printf("Error: Function %s already declared\n", entry->name);
+            YYABORT;
         }
         $$.type = $1;
         $$.name = $2.name;
@@ -199,6 +215,7 @@ function_dec: data_type_new IDENTIFIER LPB function_params RPB {
         if(lookup_functab(function_table, entry) != NULL)
         {
             printf("Error: Function %s already declared\n", entry->name);
+            YYABORT;
         }
         $$.type = 4;
         $$.name = $2.name;
@@ -241,24 +258,190 @@ function_param: data_type_new IDENTIFIER {
         entry->scope = 1;
         insert_symtab($$.params, entry);
     }
-    | IDENTIFIER IDENTIFIER {} // class implementation
+    | IDENTIFIER IDENTIFIER {
+        if(search_classtab(class_table, $1.name) == NULL)
+        {
+            printf("Error: Class %s not declared\n", $1.name);
+            YYABORT;
+        }
+        struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
+        entry->name = $2.name;
+        entry->type = 14;
+        entry->arr = false;
+        entry->scope = 1;
+        insert_symtab($$.params, entry);
+    } 
     | list IDENTIFIER {} // list implementation
     ;
 
 
 // 4. Class 
-class: class_dec LCB class_stmt RCB
+class: class_dec LCB class_stmt RCB{
+        struct classrec *entry = (struct classrec *)malloc(sizeof(struct classrec));
+        entry->name = $1.name;
+        entry->members = members;
+        entry->methods = methods;
+        entry->next = NULL;
+        if(search_classtab(class_table, entry->name) != NULL)
+        {
+            printf("Error: Class %s already declared\n", entry->name);
+            YYABORT;
+        }
+        insert_classtab(class_table, entry);
+        members = NULL;
+        methods = NULL;
+}
     ;
 
 
-class_dec: CLASS IDENTIFIER
+class_dec: CLASS IDENTIFIER {
+    $$.name = $2.name;
+    members = init_symtab();
+    methods = init_functab();
+}
     ;
 
 
-class_stmt: function class_stmt
-    | decl_stmt class_stmt
-    | expr_stmt class_stmt
+class_stmt: class_function class_stmt 
+    | class_decl_stmt class_stmt
     |
+    ;
+
+class_function:class_function_dec {
+            local_table = $1.local_table;
+        } LCB statements RCB {
+        struct funcrec *entry = (struct funcrec*) malloc(sizeof(struct funcrec));
+        entry->name = $1.name;
+        entry->type = $1.type;
+        entry->params = $1.params;
+        entry->num_params = $1.num_params;
+        entry->next = NULL;
+        entry->local_table = $1.local_table;
+        insert_functab(methods, entry);
+        local_table = NULL;
+    }
+    ;
+
+
+class_function_dec: data_type_new IDENTIFIER LPB function_params RPB {
+        struct funcrec *entry = (struct funcrec*) malloc(sizeof(struct funcrec));
+        entry->name = $2.name;
+        entry->type = $1;
+        entry->params = $4.params;
+        entry->num_params = $4.num_params;
+        entry->next = NULL;
+        entry->local_table = init_symtab();
+        if(lookup_functab(methods, entry) != NULL)
+        {
+            // terminate the program
+            printf("Error: Function %s already declared\n", entry->name);
+            YYABORT;
+        }
+        $$.type = $1;
+        $$.name = $2.name;
+        $$.params = $4.params;
+        $$.num_params = $4.num_params;
+        $$.local_table = init_symtab();
+    }
+    | data_type_pr IDENTIFIER LPB function_params RPB {
+        struct funcrec *entry = (struct funcrec *)malloc(sizeof(struct funcrec));
+        entry->name = $2.name;
+        entry->type = $1;
+        entry->params = $4.params;
+        entry->num_params = $4.num_params;
+        entry->next = NULL;
+        entry->local_table = init_symtab();
+        if(lookup_functab(methods, entry) != NULL)
+        {
+            printf("Error: Function %s already declared\n", entry->name);
+            YYABORT;
+        }
+        $$.type = $1;
+        $$.name = $2.name;
+        $$.params = $4.params;
+        $$.num_params = $4.num_params;
+        $$.local_table = init_symtab();
+    }
+    | IDENTIFIER IDENTIFIER LPB function_params RPB // class implementation
+    | VOID IDENTIFIER LPB function_params RPB {
+        struct funcrec *entry = (struct funcrec *)malloc(sizeof(struct funcrec));
+        entry->name = $2.name;
+        entry->type = 4;
+        entry->params = $4.params;
+        entry->num_params = $4.num_params;
+        entry->next = NULL;
+        entry->local_table = init_symtab();
+        if(lookup_functab(methods, entry) != NULL)
+        {
+            printf("Error: Function %s already declared\n", entry->name);
+            YYABORT;
+        }
+        $$.type = 4;
+        $$.name = $2.name;
+        $$.params = $4.params;
+        $$.num_params = $4.num_params;
+        $$.local_table = init_symtab();
+    }
+    | list IDENTIFIER LPB function_params RPB // list implementation
+    ;
+
+
+class_decl_stmt: data_type_new id_list SEMICOLON {
+        struct snode* temp = $2->head;
+        while(temp != NULL){
+            struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
+            entry->type = $1;
+            entry->arr = false;
+            entry->scope = 1; // we have to change scope according to nested loops
+            entry->name = temp->val;
+            if(lookup(members, members, entry->name) == NULL){
+                insert_symtab(members, entry);
+            }
+            else{
+                printf("Error: Variable %s already declared\n", entry->name);
+                YYABORT;
+            }
+            temp = temp->next;
+        }
+    }
+    | data_type_pr id_list SEMICOLON{
+        
+        struct snode* temp = $2->head;
+        while(temp != NULL){
+            struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
+            entry->type = $1;
+            entry->arr = false;
+            entry->scope = 1; // we have to change scope according to nested loops
+            entry->name = temp->val;
+            if(lookup(members, members ,entry->name) == NULL){
+                insert_symtab(members, entry);
+            }
+            else{
+                printf("Error: Variable %s already declared\n", entry->name);
+                YYABORT;
+            }
+            temp = temp->next;
+        } 
+    }
+    | IDENTIFIER id_list SEMICOLON{
+        struct snode* temp = $2->head;
+        while(temp != NULL){
+            struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
+            entry->type = 14;
+            entry->arr = false;
+            entry->scope = 1; // we have to change scope according to nested loops
+            entry->name = temp->val;
+            if(lookup(members, members ,entry->name) == NULL){
+                insert_symtab(members, entry);
+            }
+            else{
+                printf("Error: Variable %s already declared\n", entry->name);
+                YYABORT;
+            }
+            temp = temp->next;
+        }
+    }
+    | list id_list  SEMICOLON
     ;
 
 
@@ -315,6 +498,7 @@ unary_stmt: identifier UNARY_OP {
         // check id in symbol table
         if($1 != 0 || $1 != 1){
             printf("Error: Unary operator not defined for this type\n"); //Why?
+            YYABORT;
         }
         $$ = $1;
     }
@@ -343,6 +527,7 @@ decl_stmt: data_type_new id_list SEMICOLON {
             }
             else{
                 printf("Error: Variable %s already declared\n", entry->name);
+                YYABORT;
             }
             temp = temp->next;
         }
@@ -360,6 +545,7 @@ decl_stmt: data_type_new id_list SEMICOLON {
             }
             else{
                 printf("Error: Variable %s already declared\n", entry->name);
+                YYABORT;
             }
             temp = temp->next;
         } 
@@ -428,7 +614,7 @@ expr_terminal: unary_stmt {
         $$ = 3;
     }
     | call 
-    | NOT LPB nested_expr RPB
+    | NOT LPB nested_expr RPB 
     | NOT identifier
     | identifier
     | list_literal
@@ -511,6 +697,7 @@ identifier: IDENTIFIER{
         struct idrec *entry = lookup(global_table, global_table, $1.name);
         if(entry == NULL){
             printf("Error: Variable %s not declared\n", $1.name);
+            YYABORT;
         }
         $$ = entry->type;
     }

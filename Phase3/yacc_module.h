@@ -127,11 +127,11 @@ funcrec *search_functab(functab *ft, funcrec *entry);
 
 idrec *lookup(symtab *global_table, symtab *local_table, char *name)
 {
-    idrec *temp = search_symtab(local_table, name);
-    if (temp != NULL)
-        return temp;
-    temp = search_symtab(global_table, name);
-    return temp;
+   idrec *temp = search_symtab(local_table, name);
+   if (temp != NULL)
+      return temp;
+   temp = search_symtab(global_table, name);
+   return temp;
 }
 
 funcrec *lookup_functab(functab *func_table, funcrec *entry)
@@ -278,16 +278,16 @@ void clear_scope_symtab(symtab *st, int scope)
    return;
 }
 
-idrec* search_symtab(symtab *st, char *name)
+idrec *search_symtab(symtab *st, char *name)
 {
-    idrec *temp = st -> head;
-    while (temp != NULL)
-    {
-        if (strcmp(temp->name, name) == 0)
-            return temp;
-        temp = temp->next;
-    }
-    return NULL;
+   idrec *temp = st->head;
+   while (temp != NULL)
+   {
+      if (strcmp(temp->name, name) == 0)
+         return temp;
+      temp = temp->next;
+   }
+   return NULL;
 }
 
 functab *init_functab()
@@ -347,6 +347,74 @@ funcrec *search_functab(functab *ft, funcrec *entry)
                return temp;
          }
       }
+      temp = temp->next;
+   }
+   return NULL;
+}
+
+struct classrec
+{
+   char *name;
+   symtab *members;
+   functab *methods;
+   struct classrec *next;
+};
+
+typedef struct classrec classrec;
+
+struct classtab
+{
+   classrec *head;
+   classrec *tail;
+};
+
+typedef struct classtab classtab;
+
+classtab *init_classtab();
+void insert_classtab(classtab *ct, classrec *entry);
+void display_classtab(classtab *ct);
+classrec *search_classtab(classtab *ct, char *name);
+
+classtab *init_classtab()
+{
+   classtab *ct = (classtab *)malloc(sizeof(classtab));
+   ct->head = NULL;
+   ct->tail = NULL;
+   return ct;
+}
+
+void insert_classtab(classtab *ct, classrec *entry)
+{
+   if (ct->head == NULL)
+   {
+      ct->head = entry;
+      ct->tail = entry;
+   }
+   else
+   {
+      ct->tail->next = entry;
+      ct->tail = entry;
+   }
+   return;
+}
+
+void display_classtab(classtab *ct)
+{
+   classrec *temp = ct->head;
+   while (temp != NULL)
+   {
+      printf("%s\n", temp->name);
+      temp = temp->next;
+   }
+}
+
+classrec *search_classtab(classtab *ct, char *name)
+{
+   classrec *temp = ct->head;
+   while (temp != NULL)
+   {
+      if (strcmp(temp->name, name) == 0)
+         return temp;
       temp = temp->next;
    }
    return NULL;
