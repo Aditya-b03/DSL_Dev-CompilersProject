@@ -3,7 +3,7 @@
 #include <map>
 #include <set>
 #include <string.h>
-#include <nlohmann\json.hpp>
+#include "json.hpp"
 #include <fstream>
 using json = nlohmann::json;
 using namespace std;
@@ -114,7 +114,7 @@ public:
     string description;
 
     // team member functions
-    team(string = "random name", member = member() ,
+    team(string = "random name",/* member = member() ,*/
          string = "No Description Given", vector<member *> = {}, vector<team *> = {});
 
     string get_id();
@@ -159,7 +159,7 @@ public:
     void operator+(member m){
         assign_to(m);
     }
-    int assigned_to();
+    vector<member> assigned_to();
 
     friend class member;
     
@@ -196,6 +196,89 @@ string gen_ID()
         s += character_string[rand() % 62];
     }
     return s;
+}
+
+json makeJson(member _m)
+{
+    member *m = member_map[_m.get_id()];
+    json j;
+    j["member_name"] = m->info["name"];
+    j["member_email"] = m->info["email"];
+    j["member_phone"] = m->info["phone"];
+    j["member_tasks"] = json::array();
+    for (auto t : m->tasks())
+    {
+        j["member_tasks"].push_back(t.title);
+    }
+    j["member_teams"] = json::array();
+    for (auto t : m->teams())
+    {
+        j["member_teams"].push_back(t.name);
+    }
+    return j;
+}
+
+json makeJson(team _t)
+{
+    team *t = team_map[_t.get_id()];
+    json j;
+    j["team_name"] = t->name;
+    //j["team_lead"] = t->lead->info["name"];
+    j["team_description"] = t->description;
+    j["members"] = json::array();
+
+    for (auto mem : t->members())
+    {
+        j["members"].push_back(makeJson(mem));
+    }
+
+    j["sub_teams"] = json::array();
+    for (auto sub : t->teams())
+    {
+        j["sub_teams"].push_back(makeJson(sub));
+    }
+    return j;
+}
+
+json makeJson(task _t)
+{
+    task *t = task_map[_t.get_id()];
+    json j;
+    j["task_title"] = t->title;
+    j["task_description"] = t->description;
+    j["task_priority"] = t->priority;
+    j["task_status"] = t->_status;
+    j["task_due_date"] = dateToString(t->due_date);
+    j["task_assigned_to"] = json::array();
+    for (auto mem : t->assigned_to())
+    {
+        j["task_assigned_to"].push_back(mem.info["name"]);
+    }
+    return j;
+}
+
+void jsonOutput(team _t)
+{
+    json j;
+    j["team"] = makeJson(_t);
+    ofstream outputFile("teams.json");
+    outputFile << j.dump(4);
+}
+
+void jsonOutput(member _m)
+{
+    json j;
+    j["member"] = makeJson(_m);
+    ofstream outputFile("member.json");
+    outputFile << j.dump(4);
+}
+
+void jsonOutput(task _t)
+{
+    json j;
+    j["task"] = makeJson(_t);
+    ofstream outputFile("task.json");
+    outputFile << j.dump(4);
 }
 
 //********************Calender Class*******************
@@ -300,10 +383,10 @@ void member::update_info(map<string,string> info){
 
 // ********************Team Class*******************
 
-team::team(string name, member lead,
+team::team(string name, /*member lead,*/
            string moto, vector<member *> members, vector<team *> sub_teams){
             this->name = name;
-            this->lead = member_map[lead.get_id()];
+            //this->lead = member_map[lead.get_id()];
             this->description = moto;
             for (auto m : members)
             {
@@ -326,7 +409,7 @@ json team::to_json() {
     team teams = *this;
     teamJson["team_id"] = teams.get_id();
     teamJson["team_name"] = this->name;
-    teamJson["team_lead"] = this->lead->info["name"];
+    //teamJson["team_lead"] = this->lead->info["name"];
 
     json membersJson;
     for (auto& _member : this->members()) {
@@ -359,7 +442,9 @@ void updateJsonTeams() {
     std::cout << "Teams data updated in teams.json" << std::endl;
 }
 
-team create_team(string name = "random name", member lead = member(),
+
+
+team create_team(string name = "random name", /*member lead = member(),*/
             string moto = "No Description Given", vector<member> members = {}, vector<team> sub_teams = {}){
         vector<member *> m;
         for (auto mem : members)
@@ -372,7 +457,7 @@ team create_team(string name = "random name", member lead = member(),
         {
             v.push_back(team_map[teams.get_id()]);
         }
-        team *t = new team(name, lead, moto, m, v);
+        team *t = new team(name, moto, m, v);
         updateJsonTeams();
         return *t;
     }
@@ -511,6 +596,11 @@ void task::status(string status){
     task_map[this->task_id]->_status = status;
 }
 
-int task::assigned_to(){
-    return task_map[this->task_id]->assigned.size();
+vector<member> task::assigned_to(){
+    vector<member> v;
+    for (auto m : task_map[this->task_id]->assigned)
+    {
+        v.push_back(*m);
+    }
+    return v;
 }

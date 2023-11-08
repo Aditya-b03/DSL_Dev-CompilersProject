@@ -1,0 +1,61 @@
+{
+    "team": {
+        "members": [
+            {
+                "member_email": "NULL",
+                "member_name": "member0",
+                "member_phone": "NULL",
+                "member_tasks": [],
+                "member_teams": [
+                    "random name"
+                ]
+            },
+            {
+                "member_email": "NULL",
+                "member_name": "member2",
+                "member_phone": "NULL",
+                "member_tasks": [],
+                "member_teams": [
+                    "random name"
+                ]
+            },
+            {
+                "member_email": "NULL",
+                "member_name": "member1",
+                "member_phone": "NULL",
+                "member_tasks": [],
+                "member_teams": [
+                    "random name"
+                ]
+            }
+        ],
+        "sub_teams": [
+            {
+                "members": [],
+                "sub_teams": [],
+                "team_description": "No Description Given",
+                "team_name": "team3"
+            },
+            {
+                "members": [],
+                "sub_teams": [],
+                "team_description": "No Description Given",
+                "team_name": "team0"
+            },
+            {
+                "members": [],
+                "sub_teams": [],
+                "team_description": "No Description Given",
+                "team_name": "team2"
+            },
+            {
+                "members": [],
+                "sub_teams": [],
+                "team_description": "No Description Given",
+                "team_name": "team1"
+            }
+        ],
+        "team_description": "No Description Given",
+        "team_name": "random name"
+    }
+}
