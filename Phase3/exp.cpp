@@ -2,8 +2,14 @@
 #include "vector"
 #include "string"
 
-int main()
+class ABC
+{
+    int x;
+}
+
+int
+main()
 {
     ABC obj;
-    obj.x.y.z++;
+    int y = obj.x;
 }

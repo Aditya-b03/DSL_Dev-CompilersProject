@@ -8,16 +8,12 @@
 
 class ABC
 {
-    int a;
-    int ABC;
+    int x;
 }
 
 int
 main()
 {
-    int ABC;
-    int a, v, d;
-    float c;
+    ABC obj;
+    int y = obj.x;
 }
-
-int main()
