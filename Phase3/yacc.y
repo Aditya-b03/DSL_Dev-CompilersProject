@@ -31,7 +31,8 @@
 %union{
     struct id{
         char* name;
-        bool isClass;
+        int type;
+        char *class_name;
     } id;
     struct slist *namelist;
     int type;
@@ -51,6 +52,10 @@
         int type;
         int scope;
     } stmt;
+    struct class_id{
+        int type;
+        struct slist *namelist;
+    } class_id;
 }
 
 
@@ -72,13 +77,14 @@
 %token INCLUDE TYPEDEF
 
 
-%type <type> data_type_new data_type_pr identifier unary_stmt expr_terminal
-%type <namelist> id_list
+%type <type> data_type_new data_type_pr unary_stmt expr_terminal
+%type <namelist> id_list identifier
 %type <id> IDENTIFIER class_dec
 /* %type <list> list */
 %type <assignop> ASSIGN_OP
 %type <functions> function_params function_param function_dec function class_function_dec class_function
 %type <stmt> statements statement decl_stmt class_decl_stmt 
+/* %type <class_id> identifier */
 
 %% 
 
@@ -203,7 +209,30 @@ function_dec: data_type_new IDENTIFIER LPB function_params RPB {
         $$.num_params = $4.num_params;
         $$.local_table = init_symtab();
     }
-    | IDENTIFIER IDENTIFIER LPB function_params RPB // class implementation
+    | IDENTIFIER IDENTIFIER LPB function_params RPB {
+        if(search_classtab(class_table, $1.name) == NULL)
+        {
+            printf("Error: Class %s not declared\n", $1.name);
+            YYABORT;
+        }
+        struct funcrec *entry = (struct funcrec *)malloc(sizeof(struct funcrec));
+        entry->name = $2.name;
+        entry->type = 14;
+        entry->params = $4.params;
+        entry->num_params = $4.num_params;
+        entry->next = NULL;
+        entry->local_table = init_symtab();
+        if(lookup_functab(function_table, entry) != NULL)
+        {
+            printf("Error: Function %s already declared\n", entry->name);
+            YYABORT;
+        }
+        $$.type = 14;
+        $$.name = $2.name;
+        $$.params = $4.params;
+        $$.num_params = $4.num_params;
+        $$.local_table = init_symtab();
+    }
     | VOID IDENTIFIER LPB function_params RPB {
         struct funcrec *entry = (struct funcrec *)malloc(sizeof(struct funcrec));
         entry->name = $2.name;
@@ -248,6 +277,8 @@ function_param: data_type_new IDENTIFIER {
         entry->type = $1;
         entry->arr = false;
         entry->scope = 1;
+        entry->next = NULL;
+        entry->class_name = NULL;
         insert_symtab($$.params, entry);
     }
     | data_type_pr IDENTIFIER {
@@ -256,6 +287,8 @@ function_param: data_type_new IDENTIFIER {
         entry->type = $1;
         entry->arr = false;
         entry->scope = 1;
+        entry->next = NULL;
+        entry->class_name = NULL;
         insert_symtab($$.params, entry);
     }
     | IDENTIFIER IDENTIFIER {
@@ -269,6 +302,8 @@ function_param: data_type_new IDENTIFIER {
         entry->type = 14;
         entry->arr = false;
         entry->scope = 1;
+        entry->next = NULL;
+        entry->class_name = $1.name;
         insert_symtab($$.params, entry);
     } 
     | list IDENTIFIER {} // list implementation
@@ -290,15 +325,16 @@ class: class_dec LCB class_stmt RCB{
         insert_classtab(class_table, entry);
         members = NULL;
         methods = NULL;
-}
+    }
     ;
 
 
 class_dec: CLASS IDENTIFIER {
-    $$.name = $2.name;
-    members = init_symtab();
-    methods = init_functab();
-}
+        $$.name = $2.name;
+        $2.type = 14;
+        members = init_symtab();
+        methods = init_functab();
+    }
     ;
 
 
@@ -362,7 +398,30 @@ class_function_dec: data_type_new IDENTIFIER LPB function_params RPB {
         $$.num_params = $4.num_params;
         $$.local_table = init_symtab();
     }
-    | IDENTIFIER IDENTIFIER LPB function_params RPB // class implementation
+    | IDENTIFIER IDENTIFIER LPB function_params RPB {
+        if(search_classtab(class_table, $1.name) == NULL)
+        {
+            printf("Error: Class %s not declared\n", $1.name);
+            YYABORT;
+        }
+        struct funcrec *entry = (struct funcrec *)malloc(sizeof(struct funcrec));
+        entry->name = $2.name;
+        entry->type = 14;
+        entry->params = $4.params;
+        entry->num_params = $4.num_params;
+        entry->next = NULL;
+        entry->local_table = init_symtab();
+        if(lookup_functab(methods, entry) != NULL)
+        {
+            printf("Error: Function %s already declared\n", entry->name);
+            YYABORT;
+        }
+        $$.type = 14;
+        $$.name = $2.name;
+        $$.params = $4.params;
+        $$.num_params = $4.num_params;
+        $$.local_table = init_symtab();
+    }
     | VOID IDENTIFIER LPB function_params RPB {
         struct funcrec *entry = (struct funcrec *)malloc(sizeof(struct funcrec));
         entry->name = $2.name;
@@ -454,8 +513,7 @@ statements : statements LCB statements RCB {
         $1.scope = $$.scope;
         $2.scope = $$.scope;
     }
-    | {
-    }
+    |
     ;
 
 
@@ -497,7 +555,7 @@ ids: ids COMMA IDENTIFIER
 unary_stmt: identifier UNARY_OP {
         // check id in symbol table
         if($1 != 0 || $1 != 1){
-            printf("Error: Unary operator not defined for this type\n"); //Why?
+            printf("Error: Unary operator not defined for this type\n"); 
             YYABORT;
         }
         $$ = $1;
@@ -522,8 +580,10 @@ decl_stmt: data_type_new id_list SEMICOLON {
             entry->arr = false;
             entry->scope = $$.scope; // we have to change scope according to nested loops
             entry->name = temp->val;
+            entry->class_name = NULL;
+            entry->next = NULL;
             if(lookup(global_table, local_table, entry->name) == NULL){
-                insert_symtab(global_table, entry);
+                insert_symtab(local_table, entry);
             }
             else{
                 printf("Error: Variable %s already declared\n", entry->name);
@@ -538,10 +598,12 @@ decl_stmt: data_type_new id_list SEMICOLON {
             struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
             entry->type = $1;
             entry->arr = false;
-            entry->scope = 0; // we have to change scope according to nested loops
+            entry->scope = $$.scope; // we have to change scope according to nested loops
             entry->name = temp->val;
+            entry->class_name = NULL;
+            entry->next = NULL;
             if(lookup(global_table, local_table ,entry->name) == NULL){
-                insert_symtab(global_table, entry);
+                insert_symtab(local_table, entry);
             }
             else{
                 printf("Error: Variable %s already declared\n", entry->name);
@@ -550,7 +612,31 @@ decl_stmt: data_type_new id_list SEMICOLON {
             temp = temp->next;
         } 
     }
-    | IDENTIFIER id_list SEMICOLON // class implementation
+    | IDENTIFIER id_list SEMICOLON {
+        struct snode* temp = $2->head;
+        if($1.type != 14)
+        {
+            printf("Error: Class %s not declared\n", $1.name);
+            YYABORT;
+        }
+        while(temp != NULL){
+            struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
+            entry->type = 14;
+            entry->arr = false;
+            entry->scope = $$.scope; 
+            entry->name = temp->val;
+            entry->class_name = $1.name;
+            entry->next = NULL;
+            if(lookup(global_table, local_table ,entry->name) == NULL){
+                insert_symtab(local_table, entry);
+            }
+            else{
+                printf("Error: Variable %s already declared\n", entry->name);
+                YYABORT;
+            }
+            temp = temp->next;
+        }
+    }
     | list id_list  SEMICOLON
     ;
 
@@ -693,7 +779,7 @@ dim: dim  LSB nested_expr RSB
     ;
 
 // dimlist
-identifier: IDENTIFIER{
+identifier: IDENTIFIER {
         struct idrec *entry = lookup(global_table, global_table, $1.name);
         if(entry == NULL){
             printf("Error: Variable %s not declared\n", $1.name);
@@ -701,16 +787,28 @@ identifier: IDENTIFIER{
         }
         $$ = entry->type;
     }
-    | IDENTIFIER DOT identifier {
-        // IDENTIFIER is object ; identifier is member // check it in class implementation
-
-    }
     | IDENTIFIER dim {
 
-
+    }
+    | IDENTIFIER DOT identifier {
+        // IDENTIFIER is object ; identifier is member // check it in class implementation
+        struct idrec *entry = lookup(global_table, global_table, $1.name);
+        if(entry == NULL){
+            printf("Error: Variable %s not declared\n", $1.name);
+            YYABORT;
+        }
+        if(entry->type != 14){
+            printf("Error: Variable %s is not an object\n", $1.name);
+            YYABORT;
+        }
+        struct classrec *class_entry = search_classtab(class_table, entry->class_name);
+        if(class_entry == NULL){
+            printf("Error: Class %s not declared\n", entry->name);
+            YYABORT;
+        }
+        // check if identifier is member of class
     }
     | IDENTIFIER dim DOT identifier {
-
 
     }
     | SELF DOT identifier {
