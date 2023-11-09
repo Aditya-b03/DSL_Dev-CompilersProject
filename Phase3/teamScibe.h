@@ -3,6 +3,8 @@
 #include <map>
 #include <set>
 #include <string.h>
+#include <cstdlib>
+#include <time.h>
 #include "json.hpp"
 #include <fstream>
 using json = nlohmann::json;
@@ -220,8 +222,8 @@ string dateToString(date d)
 // generate random ID - done
 string character_string = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 string gen_ID()
-{   
-    
+{
+    srand(time(0));
     string s = "";
     for (int i = 0; i < 10; i++)
     {
@@ -546,9 +548,9 @@ void updateJsonTeams() {
     outputJson["teams"] = teamsJson;
 
     
-    std::ofstream outputFile("teams.json");
-    outputFile << outputJson.dump(4);
-    std::cout << "Teams data updated in teams.json" << std::endl;
+    // std::ofstream outputFile("teams.json");
+    // outputFile << outputJson.dump(4);
+    //std::cout << "Teams data updated in teams.json" << std::endl;
 }
 
 
@@ -729,4 +731,79 @@ string event::get_id(){
 event create_event(string title = "random title", string description = "No Description Given", date event_date = date()){
     event *e = new event(title, description, event_date);
     return *e;
+}
+// ******************** DataBase System *******************
+
+json teamtoDocument(team _t){
+    team *t = team_map[_t.get_id()];
+    json j;
+    j["team_name"] = t->name;
+    //j["team_lead"] = t->lead->info["name"];
+    j["team_description"] = t->description;
+    j["members"] = json::array();
+    for(member m : t->members()){
+        j["members"].push_back(m.get_id());
+    }
+    j["sub_teams"] = json::array();
+    for(team sub : t->teams()){
+        j["sub_teams"].push_back(sub.get_id());
+    }
+    return j;
+}
+
+json membertoDocument(member _m){
+    member *m = member_map[_m.get_id()];
+    json j;
+    for (auto i : m->info)
+    {
+        j[i.first] = i.second;
+    }
+    j["member_tasks"] = json::array();
+    for(task t : m->tasks()){
+        j["member_tasks"].push_back(t.get_id());
+    }
+    j["member_teams"] = json::array();
+    for(team t : m->teams()){
+        j["member_teams"].push_back(t.get_id());
+    }
+    return j;
+}
+
+json tasktoDocument(task _t){
+    task *t = task_map[_t.get_id()];
+    json j;
+    j["task_title"] = t->title;
+    j["task_description"] = t->description;
+    j["task_priority"] = t->priority;
+    j["task_status"] = t->_status;
+    j["task_due_date"] = dateToString(t->due_date);
+    j["task_assigned_to"] = json::array();
+    for(member m : t->assigned_to()){
+        j["task_assigned_to"].push_back(m.get_id());
+    }
+    return j;
+}
+
+void savetoDocument(string filename = "database"){
+    json j;
+    j["teams"] = json::array();
+    for(auto t : team_map){
+        json teamJson;
+        teamJson[t.first] = teamtoDocument(*t.second);
+        j["teams"].push_back(teamJson);
+    }
+    j["members"] = json::array();
+    for(auto m : member_map){
+        json memberJson;
+        memberJson[m.first] = membertoDocument(*m.second);
+        j["members"].push_back(memberJson);
+    }
+    j["tasks"] = json::array();
+    for(auto t : task_map){
+        json taskJson;
+        taskJson[t.first] = tasktoDocument(*t.second);
+        j["tasks"].push_back(taskJson);
+    }
+    ofstream outputFile(filename+".json");
+    outputFile << j.dump(4);
 }

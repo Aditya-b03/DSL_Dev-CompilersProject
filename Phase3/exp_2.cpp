@@ -114,14 +114,17 @@ int main(){
     cout << "here" << endl;
     jsonOutput(t1);
     showCalendar(t1);
+    
 
     cout << team_map.size() << endl;
     cout << member_map.size() << endl;
     cout << task_map.size() << endl;
 
+    member m1 = create_member("member100");
+    t1.insert(m1);
+    jsonOutput(m1);
+    jsonOutput(t1);
 
     
-
-    //t1.show();
 
 }
