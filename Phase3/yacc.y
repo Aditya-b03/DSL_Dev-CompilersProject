@@ -78,13 +78,13 @@
 
 
 %type <type> data_type_new data_type_pr unary_stmt expr_terminal
-%type <namelist> id_list identifier
+%type <namelist> id_list 
 %type <id> IDENTIFIER class_dec
 /* %type <list> list */
 %type <assignop> ASSIGN_OP
 %type <functions> function_params function_param function_dec function class_function_dec class_function
 %type <stmt> statements statement decl_stmt class_decl_stmt 
-/* %type <class_id> identifier */
+%type <class_id> identifier class_identifier
 
 %% 
 
@@ -542,6 +542,9 @@ statement: decl_stmt {
 
     }
     | identifier ARROW identifier SEMICOLON
+    | identifier ARROW class_identifier SEMICOLON 
+    | class_identifier ARROW identifier SEMICOLON
+    | class_identifier ARROW class_identifier SEMICOLON
     | TYPEDEF ids IDENTIFIER SEMICOLON
     ;
 
@@ -554,11 +557,11 @@ ids: ids COMMA IDENTIFIER
 // 6. Unary statements
 unary_stmt: identifier UNARY_OP {
         // check id in symbol table
-        if($1 != 0 || $1 != 1){
+        if($1.type != 0 || $1.type != 1){
             printf("Error: Unary operator not defined for this type\n"); 
             YYABORT;
         }
-        $$ = $1;
+        $$ = $1.type;
     }
     ;
 
@@ -567,6 +570,9 @@ single_stmt: decl_stmt
     | call_stmt
     | expr_stmt
     | identifier ARROW identifier SEMICOLON
+    | identifier ARROW class_identifier SEMICOLON 
+    | class_identifier ARROW identifier SEMICOLON
+    | class_identifier ARROW class_identifier SEMICOLON 
     ;
 
 
@@ -594,6 +600,7 @@ decl_stmt: data_type_new id_list SEMICOLON {
     }
     | data_type_pr id_list SEMICOLON{
         struct snode* temp = $2->head;
+        
         while(temp != NULL){
             struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
             entry->type = $1;
@@ -611,10 +618,12 @@ decl_stmt: data_type_new id_list SEMICOLON {
             }
             temp = temp->next;
         } 
+        printf("hi\n");
     }
     | IDENTIFIER id_list SEMICOLON {
+         
         struct snode* temp = $2->head;
-        if($1.type != 14)
+        if(search_classtab(class_table, $1.name) == NULL)
         {
             printf("Error: Class %s not declared\n", $1.name);
             YYABORT;
@@ -636,6 +645,7 @@ decl_stmt: data_type_new id_list SEMICOLON {
             }
             temp = temp->next;
         }
+        
     }
     | list id_list  SEMICOLON
     ;
@@ -645,8 +655,14 @@ id_list: id_list COMMA IDENTIFIER{
         insert_slist($1, $3.name);
         $$ = $1;
     }
-    | IDENTIFIER EQUALS nested_expr
-    | id_list COMMA IDENTIFIER EQUALS nested_expr
+    | IDENTIFIER EQUALS nested_expr{
+        $$ = init_slist();
+        insert_slist($$, $1.name);
+    }
+    | id_list COMMA IDENTIFIER EQUALS nested_expr{
+        $$ = init_slist();
+        insert_slist($$, $3.name);
+    }
     | IDENTIFIER{
         $$ = init_slist();
         insert_slist($$, $1.name);   
@@ -659,8 +675,10 @@ expr_stmt: expr_stmt_without_semicolon SEMICOLON
     ;
 
 // check lhs and rhs, check assignop (seprate assignop)
-expr_stmt_without_semicolon: identifier ASSIGN_OP nested_expr
-    | identifier EQUALS nested_expr
+expr_stmt_without_semicolon: identifier ASSIGN_OP nested_expr 
+    | class_identifier ASSIGN_OP nested_expr
+    | identifier EQUALS nested_expr 
+    | class_identifier EQUALS nested_expr
     | unary_stmt
     ;
 
@@ -701,8 +719,15 @@ expr_terminal: unary_stmt {
     }
     | call 
     | NOT LPB nested_expr RPB 
-    | NOT identifier
-    | identifier
+    | NOT identifier 
+    | NOT class_identifier
+    | identifier {
+       
+    }
+    | class_identifier{
+        // check using member/ method table
+        
+    }
     | list_literal
     ;
 
@@ -780,40 +805,58 @@ dim: dim  LSB nested_expr RSB
 
 // dimlist
 identifier: IDENTIFIER {
+
         struct idrec *entry = lookup(global_table, global_table, $1.name);
         if(entry == NULL){
             printf("Error: Variable %s not declared\n", $1.name);
             YYABORT;
         }
-        $$ = entry->type;
+        $$.type = entry->type;
     }
     | IDENTIFIER dim {
-
-    }
-    | IDENTIFIER DOT identifier {
-        // IDENTIFIER is object ; identifier is member // check it in class implementation
-        struct idrec *entry = lookup(global_table, global_table, $1.name);
-        if(entry == NULL){
-            printf("Error: Variable %s not declared\n", $1.name);
-            YYABORT;
-        }
-        if(entry->type != 14){
-            printf("Error: Variable %s is not an object\n", $1.name);
-            YYABORT;
-        }
-        struct classrec *class_entry = search_classtab(class_table, entry->class_name);
-        if(class_entry == NULL){
-            printf("Error: Class %s not declared\n", entry->name);
-            YYABORT;
-        }
-        // check if identifier is member of class
-    }
-    | IDENTIFIER dim DOT identifier {
-
-    }
-    | SELF DOT identifier {
         
     }
+    ;
+
+class_identifier: IDENTIFIER DOT IDENTIFIER  {
+        $$.namelist = init_slist();
+        insert_slist($$.namelist, $1.name);
+        insert_slist($$.namelist, $3.name);   
+    }
+    | IDENTIFIER DOT IDENTIFIER dim {
+        
+    }
+    | IDENTIFIER DOT class_identifier {
+        struct snode* temp = (struct snode*)malloc(sizeof(struct snode));
+        temp -> val = $1.name;
+        temp -> next = $3.namelist -> head;
+        $3.namelist -> head = temp;
+        $$.namelist = $3.namelist;               
+    }
+    | IDENTIFIER dim DOT IDENTIFIER {
+
+    }
+    | IDENTIFIER dim DOT IDENTIFIER dim {
+
+    }
+    | SELF DOT IDENTIFIER {
+        if(members == NULL)
+        {
+            printf("Error: self must be used inside class\n");
+            YYABORT;
+        }
+        struct idrec *entry = lookup(members, members, $3.name);
+        if(entry == NULL)
+        {
+            printf("Error: Variable %s not declared\n", $3.name);
+            YYABORT;
+        }
+        $$.type = entry->type;
+    }
+    | SELF DOT IDENTIFIER dim {
+        
+    }
+
     ;
 
 

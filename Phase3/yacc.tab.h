@@ -119,7 +119,8 @@ union YYSTYPE
 
     struct id{
         char* name;
-        bool isClass;
+        int type;
+        char *class_name;
     } id;
     struct slist *namelist;
     int type;
@@ -139,8 +140,12 @@ union YYSTYPE
         int type;
         int scope;
     } stmt;
+    struct class_id{
+        int type;
+        struct slist *namelist;
+    } class_id;
 
-#line 144 "yacc.tab.h"
+#line 149 "yacc.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
