@@ -106,11 +106,14 @@ int main(){
     t1.insert(v);
     t1.insert(t);
 
-    // task tsk = create_task("task1", "task1 description", 0, "task1 status");
+    task tsk = create_task("task1", "task1 description", 0, "task1 status", date(1, 2, 3));
     // tsk + v[0];
     // tsk + v[1];
+    tsk.assign_to(v[0]);
+    tsk.assign_to(v[1]);
     cout << "here" << endl;
     jsonOutput(t1);
+    showCalendar(t1);
 
     cout << team_map.size() << endl;
     cout << member_map.size() << endl;

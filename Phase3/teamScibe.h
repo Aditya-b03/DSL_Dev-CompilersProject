@@ -55,11 +55,12 @@ class calendar;
 map<string, member *> member_map;
 map<string, team *> team_map;
 map<string, task *> task_map;
+vector<event *> all_events;
 
 //********************Classes*******************
-// class calender
+// class calendar
 // {
-//     map<string, set<task *>> calender_map;
+//     map<string, set<task *>> calendar_map;
 
 // public:
 //     void add_task(task &t, date d);
@@ -99,7 +100,26 @@ public:
 
 };
 
+/*class calendar 
+{
+    string calendar_id;
+    set<member *> _members;
+    set<team *> _teams;
 
+public:
+    string name;
+    calendar(string = "name", vector <member *> = {}, vector <team *> = {});
+
+    void insert(task t);
+    void insert(vector<task> t);
+    void remove (task t);
+    void remove (vector<task> t);
+    json show();
+
+    vector <member> members();
+    vector <team> teams();
+
+};*/
 
 class team
 {
@@ -164,6 +184,18 @@ public:
     friend class member;
     
 
+};
+
+class event
+{
+    string event_id;
+
+public:
+    string title;
+    string description;
+    date event_date;
+    event(string = "random title", string = "No Description Given", date = date());
+    string get_id();
 };
 
 // ********************Utility features/functions*******************
@@ -281,7 +313,84 @@ void jsonOutput(task _t)
     outputFile << j.dump(4);
 }
 
-//********************Calender Class*******************
+
+json makeCalendar(member _m){
+    member *m = member_map[_m.get_id()];
+    json j; 
+
+    int month = m->tasks()[0].due_date.month;
+    int year = m->tasks()[0].due_date.year;
+    cout << "Month: "<<month << "Year: "<<year << "Date: "<<dateToString(date(1, month, year))<<endl;
+    for (int i = 1; i < 31; i++){
+        string due_date = dateToString(date(i, month, year));
+        cout << "Date: " << due_date << endl;
+        // j[due_date] = json::array();
+        j[due_date] = "You're free today!";
+    }
+    cout << "Pushed!" << endl;
+    for (auto t : m->tasks())
+    {
+        string due_date = dateToString(t.due_date);
+        string information = "Title: " + t.title + "\nStatus: " + t._status + "Priority: " + to_string(t.priority);
+        
+        if (j[due_date] == "You're free today!"){
+            j[due_date] = json::array();
+            j[due_date].push_back(t.title);
+            
+        }
+        else{
+            j[due_date].push_back(t.title);
+        }
+    }
+    for (auto ev : all_events)
+    {
+        event e = &ev;
+        string due_date = dateToString(e.event_date);
+        string information = "Title: " + e.title;
+        
+        if (j[due_date] == "You're free today!"){
+            j[due_date] = json::array();
+            j[due_date].push_back(e.title);
+            
+        }
+        else{
+            j[due_date].push_back(e.title);
+        }
+    }
+    
+    return j;
+}
+json makeCalendar (team _t){
+    team *t = team_map[_t.get_id()];
+    json j;
+    for (auto mem : t->members())
+    {
+        j.update(makeCalendar(mem));
+        cout << j["3-2-3"] << endl;
+    }
+
+    j["sub_teams"] = json::array();
+    for (auto sub : t->teams())
+    {
+        j["sub_teams"].update(makeJson(sub));
+    }
+    return j;
+}
+void showCalendar(member _m){
+    json j;
+    j["member"] = makeCalendar(_m);
+    ofstream outputFile("memberCalendar.json");
+    outputFile << j.dump(4);
+}
+void showCalendar(team _t){ 
+    cout << "Show Calendar of Team" << endl;
+    json j;
+    j["team"] = makeCalendar(_t);
+    ofstream outputFile("teamCalendar.json");
+    outputFile << j.dump(4);
+}
+
+
 
 // ********************Member Class*******************
 
@@ -603,4 +712,21 @@ vector<member> task::assigned_to(){
         v.push_back(*m);
     }
     return v;
+}
+
+//  ********************Event Class*******************
+event::event(string title, string description, date event_date){
+    this->title = title;
+    this->description = description;
+    this->event_date = event_date;
+    all_events.push_back(this);
+}
+
+string event::get_id(){
+    return this->event_id;
+}
+
+event create_event(string title = "random title", string description = "No Description Given", date event_date = date()){
+    event *e = new event(title, description, event_date);
+    return *e;
 }
