@@ -104,9 +104,8 @@ extern int yydebug;
     DOT = 305,                     /* DOT  */
     COLON = 306,                   /* COLON  */
     ARROW = 307,                   /* ARROW  */
-    STRUCT = 308,                  /* STRUCT  */
-    INCLUDE = 309,                 /* INCLUDE  */
-    TYPEDEF = 310                  /* TYPEDEF  */
+    INCLUDE = 308,                 /* INCLUDE  */
+    TYPEDEF = 309                  /* TYPEDEF  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -115,7 +114,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 31 "yacc.y"
+#line 32 "yacc.y"
 
     struct id{
         char* name;
@@ -145,7 +144,7 @@ union YYSTYPE
         struct slist *namelist;
     } class_id;
 
-#line 149 "yacc.tab.h"
+#line 148 "yacc.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

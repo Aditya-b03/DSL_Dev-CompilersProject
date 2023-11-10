@@ -421,16 +421,27 @@ classrec *search_classtab(classtab *ct, char *name)
    return NULL;
 }
 
-void check_member_method(char *m1, snode *m2, classtab *class_table, classrec *class_entry)
+bool check_member_method(char *m1, snode *m2, classtab *class_table, classrec *class_entry, symtab* params, int num_params)
 {
    if (m2 == NULL)
    {
-      // check member/method
-      idrec *entry = search_symtab(class_entry->members, m1);
-      if (entry == NULL)
+      if(num_params != -1)
       {
-         printf("Error: %s is not a member of class %s\n", m1, class_entry->name);
-         exit(1);
+         funcrec* entry = (funcrec*)malloc(sizeof(funcrec));
+         entry->name = m1;
+         entry->params = params;
+         entry->num_params = 0;
+      }
+      else
+      {
+         // for member checking num_params = -1
+         idrec *entry = search_symtab(class_entry->members, m1);
+         if (entry == NULL)
+         {
+            printf("Error: %s is not a member of class %s\n", m1, class_entry->name);
+            return false;
+         }
+         return true;
       }
    }
    else
@@ -440,33 +451,33 @@ void check_member_method(char *m1, snode *m2, classtab *class_table, classrec *c
       if (entry == NULL)
       {
          printf("Error: %s is not a member of class %s\n", m1, class_entry->name);
-         exit(1);
+         return false;
       }
-      if (entry->type != 14)
+      if (entry -> type != 14)
       {
          printf("Error: %s is not of type class\n", m1);
-         exit(1);
+         return false;
       }
       struct classrec *class_entry = search_classtab(class_table, entry->class_name);
-      check_member_method(m2->val, m2->next, class_table, class_entry);
+      return check_member_method(m2->val, m2->next, class_table, class_entry, params, num_params);
    }
 }
 
-void check_namelist(slist *namelist, symtab *global_table, symtab *local_table, classtab *class_table)
+bool check_namelist(slist *namelist, symtab *global_table, symtab *local_table, classtab *class_table, symtab* params, int num_params)
 {
    snode *temp = namelist->head;
    idrec *entry = lookup(global_table, local_table, temp->val);
    if (entry == NULL)
    {
       printf("Error: %s has not been declared\n", temp->val);
-      exit(1);
+      return false;
    }
    if (entry->type != 14)
    {
       printf("Error: %s is not of type class\n", temp->val);
-      exit(1);
+      return false;
    }
    struct classrec *class_entry = search_classtab(class_table, entry->class_name);
    struct symtab *members = class_entry->members;
-   check_member_method(temp->val, temp->next, class_table, class_entry);
+   return check_member_method(temp->val, temp->next, class_table, class_entry, params, num_params);
 }

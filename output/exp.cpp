@@ -7,13 +7,11 @@
 #include "string"
 
 class ABC
-{
+{   
     int x;
 }
 
-int
-main()
+int main()
 {
-    ABC obj;
-    int y = obj.x;
-}
+    int a = 8, b = 0;
+    return 0;
