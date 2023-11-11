@@ -10,21 +10,39 @@ brackets: {
 datatype: int
 identifier: x
 punctuation: ;
+datatype: int
+identifier: y
+punctuation: ;
 brackets: }
+comment: $ int sum(int a, int b)
+{
+   return 3;
+} $
 datatype: int
 identifier: main
 brackets: (
 brackets: )
 brackets: {
-datatype: int
+datatype: bool
 identifier: a
 operator: =
 constant: 8
-punctuation: ,
+punctuation: ;
+datatype: int
 identifier: b
 operator: =
-constant: 0
+constant: 4
 punctuation: ;
+reserved: while
+brackets: (
+identifier: a
+brackets: )
+brackets: {
 reserved: return
 constant: 0
 punctuation: ;
+brackets: }
+reserved: return
+constant: 5
+punctuation: ;
+brackets: }

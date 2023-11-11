@@ -25,7 +25,11 @@
     struct symtab *members;
     struct functab *methods;
 
+    char* map_type[] = {"int", "float", "string", "bool", "void", "list", "struct", "team", "member", "task", "event", "meeting", "document", "calendar", "class"};
+
     int scope;
+    bool rflag;
+    int return_type;
 
 %}
 
@@ -99,9 +103,9 @@ start:{
         scope = 0;
     } 
     include_stmts code {
-        display_symtab(global_table);
-        display_functab(function_table);
-        display_classtab(class_table);
+        free_symtab(global_table);
+        free_functab(function_table);
+        free_classtab(class_table);
     }
     | {
         global_table = init_symtab();
@@ -111,16 +115,15 @@ start:{
         members = NULL;
         methods = NULL;
         scope = 0;
-
     } code {
-        display_symtab(global_table);
-        display_functab(function_table);
-        display_classtab(class_table);
+        free_symtab(global_table);
+        free_functab(function_table);
+        free_classtab(class_table);
     }
     ;
 
 
-include_stmts: include_stmts include_stmt
+include_stmts: include_stmts include_stmt 
     | include_stmt
     ;
 
@@ -139,7 +142,14 @@ code: decl_stmt code
 // 2. Functions
 function: function_dec {
             local_table = $1.local_table;
+            rflag = false;
+            return_type = $1.type;
         } LCB {scope++;} statements RCB {
+        if(!rflag)
+        {
+            printf("Error: Function doesn't return a value on all control paths\n");
+            YYABORT;
+        }
         struct funcrec *entry = (struct funcrec*) malloc(sizeof(struct funcrec));
         entry->name = $1.name;
         entry->type = $1.type;
@@ -164,7 +174,6 @@ function_dec: data_type_new IDENTIFIER LPB function_params RPB {
         entry->local_table = init_symtab();
         if(lookup_functab(function_table, entry) != NULL)
         {
-            // terminate the program
             printf("Error: Function %s already declared\n", entry->name);
             YYABORT;
         }
@@ -175,6 +184,7 @@ function_dec: data_type_new IDENTIFIER LPB function_params RPB {
         $$.local_table = init_symtab();
     }
     | data_type_pr IDENTIFIER LPB function_params RPB {
+        
         struct funcrec *entry = (struct funcrec *)malloc(sizeof(struct funcrec));
         entry->name = $2.name;
         entry->type = $1;
@@ -380,7 +390,14 @@ class_stmt: class_function class_stmt
 
 class_function: class_function_dec {
             local_table = $1.local_table;
+            rflag = true;
+            return_type = $1.type;
         } LCB {scope++;} statements RCB {
+        if(!rflag)
+        {
+            printf("Error: Function doesn't return a value on all control paths\n");
+            YYABORT;
+        }
         struct funcrec *entry = (struct funcrec*) malloc(sizeof(struct funcrec));
         entry->name = $1.name;
         entry->type = $1.type;
@@ -405,7 +422,6 @@ class_function_dec: data_type_new IDENTIFIER LPB function_params RPB {
         entry->local_table = init_symtab();
         if(lookup_functab(methods, entry) != NULL)
         {
-            // terminate the program
             printf("Error: Function %s already declared\n", entry->name);
             YYABORT;
         }
@@ -508,6 +524,8 @@ class_decl_stmt: data_type_new id_list SEMICOLON {
             entry->arr = false;
             entry->scope = 1; 
             entry->name = temp->val;
+            entry -> class_name = NULL;
+            entry -> arr_dims = init_ilist();
             if(lookup(members, members, entry->name) == NULL){
                 insert_symtab(members, entry);
             }
@@ -523,11 +541,14 @@ class_decl_stmt: data_type_new id_list SEMICOLON {
         struct snode* temp = $2->head;
         while(temp != NULL){
             struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
-            entry->type = $1;
-            entry->arr = false;
-            entry->scope = 1; 
-            entry->name = temp->val;
-            if(lookup(members, members ,entry->name) == NULL){
+            entry -> type = $1;
+            entry -> arr = false;
+            entry -> scope = 1; 
+            entry -> name = temp->val;
+            entry -> next = NULL;
+            entry -> class_name = NULL;
+            entry -> arr_dims = init_ilist();
+            if(lookup(members, members ,entry -> name) == NULL){
                 insert_symtab(members, entry);
             }
             else{
@@ -541,15 +562,18 @@ class_decl_stmt: data_type_new id_list SEMICOLON {
         struct snode* temp = $2->head;
         while(temp != NULL){
             struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
-            entry->type = 14;
-            entry->arr = false;
-            entry->scope = 1; 
-            entry->name = temp->val;
-            if(lookup(members, members ,entry->name) == NULL){
+            entry -> type = 14;
+            entry -> arr = false;
+            entry -> scope = 1; 
+            entry -> name = temp->val;
+            entry -> next = NULL;
+            entry -> class_name = $1.name;
+            entry -> arr_dims = init_ilist();
+            if(lookup(members, members ,entry -> name) == NULL){
                 insert_symtab(members, entry);
             }
             else{
-                printf("Error: Variable %s already declared\n", entry->name);
+                printf("Error: Variable %s already declared\n", entry -> name);
                 YYABORT;
             }
             temp = temp->next;
@@ -560,16 +584,18 @@ class_decl_stmt: data_type_new id_list SEMICOLON {
         struct snode* temp = $2->head;
         while(temp != NULL){
             struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
-            entry->type = $1.type;
-            entry->arr = true;
-            entry->scope = 1; 
-            entry->name = temp->val;
+            entry -> type = $1.type;
+            entry -> arr = true;
+            entry -> scope = 1; 
+            entry -> name = temp->val;
+            entry -> class_name = NULL;
+            entry -> next = NULL;
             //arr_dimlist
-            if(lookup(members, members ,entry->name) == NULL){
+            if(lookup(members, members ,entry -> name) == NULL){
                 insert_symtab(members, entry);
             }
             else{
-                printf("Error: Variable %s already declared\n", entry->name);
+                printf("Error: Variable %s already declared\n", entry -> name);
                 YYABORT;
             }
             temp = temp->next;
@@ -632,13 +658,13 @@ single_stmt: decl_stmt
 decl_stmt: data_type_new id_list SEMICOLON {
         struct snode* temp = $2->head;
         while(temp != NULL){
-            struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
+            struct idrec *entry = (struct idrec*) malloc(sizeof(struct idrec));
             entry -> type = $1;
             entry -> arr = false;
             entry -> scope = scope; 
             entry -> name = temp->val;
             entry -> class_name = NULL;
-            //arr_dimlist
+            entry -> arr_dims = init_ilist();
             entry -> next = NULL;
             if(lookup(global_table, local_table, entry->name) == NULL){
                 insert_symtab(local_table, entry);
@@ -653,13 +679,13 @@ decl_stmt: data_type_new id_list SEMICOLON {
     | data_type_pr id_list SEMICOLON{
         struct snode* temp = $2->head;
         while(temp != NULL){
-            struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
+            struct idrec *entry = (struct idrec*) malloc(sizeof(struct idrec));
             entry -> type = $1;
             entry -> arr = false;
             entry -> scope = scope; 
             entry -> name = temp->val;
             entry -> class_name = NULL;
-            //arr_dimlist
+            entry -> arr_dims = init_ilist();
             entry -> next = NULL;
             if(lookup(global_table, local_table ,entry->name) == NULL){
                 insert_symtab(local_table, entry);
@@ -679,13 +705,13 @@ decl_stmt: data_type_new id_list SEMICOLON {
             YYABORT;
         }
         while(temp != NULL){
-            struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
+            struct idrec *entry = (struct idrec*) malloc(sizeof(struct idrec));
             entry -> type = 14;
             entry -> arr = false;
             entry -> scope = scope; 
             entry -> name = temp->val;
             entry -> class_name = $1.name;
-            //arr_dimlist
+            entry -> arr_dims = init_ilist();
             entry -> next = NULL;
             if(lookup(global_table, local_table ,entry -> name) == NULL){
                 insert_symtab(local_table, entry);
@@ -701,7 +727,7 @@ decl_stmt: data_type_new id_list SEMICOLON {
     | list id_list SEMICOLON {
         struct snode* temp = $2->head;
         while(temp != NULL){
-            struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
+            struct idrec *entry = (struct idrec*) malloc(sizeof(struct idrec));
             entry -> type = 5;
             entry -> arr = true;
             entry -> scope = scope; 
@@ -727,6 +753,7 @@ id_list: id_list COMMA IDENTIFIER{
         $$ = $1;
     }
     | IDENTIFIER EQUALS nested_expr{
+        // check nested expr type
         $$ = init_slist();
         insert_slist($$, $1.name);
     }
@@ -849,26 +876,14 @@ expr_terminal: unary_stmt {
         {
             YYABORT;
         }
-        if($2.type != 3){
-            printf("Error: Not operator not defined for this type\n"); 
-            YYABORT;
-        }
         $$ = 3;
     }
     | identifier {
-       if($1.type != 3){
-            printf("Error: Not operator not defined for this type\n"); 
-            YYABORT;
-        }
-        $$ = 3;
+        $$ = $1.type;
     }
     | class_identifier{
         if(check_namelist($1.namelist, global_table, local_table, class_table, NULL, -1) == false)
         {
-            YYABORT;
-        }
-        if($1.type != 3){
-            printf("Error: Not operator not defined for this type\n"); 
             YYABORT;
         }
         $$ = 3;
@@ -881,15 +896,14 @@ expr_terminal: unary_stmt {
 
 
 // 8. Conditional statements
-// scope
-if_stmt: if_expr LCB statements RCB
-    | if_expr single_stmt
-    | if_expr LCB statements RCB ELSE if_stmt
-    | if_expr single_stmt ELSE if_stmt
-    | if_expr LCB statements RCB ELSE LCB statements RCB
-    | if_expr single_stmt ELSE LCB statements RCB
-    | if_expr LCB statements RCB ELSE single_stmt
-    | if_expr single_stmt ELSE single_stmt
+if_stmt: if_expr LCB statements RCB {rflag = false;}
+    | if_expr single_stmt {rflag = false;}
+    | if_expr LCB statements RCB ELSE if_stmt {rflag = false;}
+    | if_expr single_stmt ELSE if_stmt {rflag = false;}
+    | if_expr LCB statements RCB ELSE LCB statements RCB {rflag = false;}
+    | if_expr single_stmt ELSE LCB statements RCB {rflag = false;}
+    | if_expr LCB statements RCB ELSE single_stmt {rflag = false;}
+    | if_expr single_stmt ELSE single_stmt {rflag = false;}
     ;
 
 
@@ -898,14 +912,14 @@ if_expr: IF LPB nested_expr RPB {
             printf("Error: If condition must be bool\n");
             YYABORT;
         }
+        rflag = false;
     }
     ;
 
 
 // 9. Loops
-// code
-for_stmt: for_exp expr_stmt_without_semicolon RPB LCB {scope++;} statements RCB {scope--;}
-    | for_exp expr_stmt_without_semicolon RPB single_stmt
+for_stmt: for_exp expr_stmt_without_semicolon RPB LCB {scope++;} statements RCB {scope--;rflag = false;}
+    | for_exp expr_stmt_without_semicolon RPB single_stmt {rflag = false;}
     ;
 
 
@@ -924,8 +938,8 @@ for_exp: FOR LPB decl_stmt nested_expr SEMICOLON {
     ;
 
 
-while_stmt: while_exp LCB {scope++;} statements RCB {scope--;}
-    | while_exp single_stmt
+while_stmt: while_exp LCB {scope++;} statements RCB {scope--;rflag = false;}
+    | while_exp single_stmt {rflag = false;}
     ;
 
 
@@ -998,23 +1012,22 @@ call_args: call_args COMMA nested_expr {
 
 // code
 return_stmt: RETURN SEMICOLON {
-        if(return_flag == 0)
+        if(return_type != 4)
         {
-            printf("Error: Return statement not allowed\n");
+            printf("Error: Mismatch in return type\n");
+            printf("Returned void while function returns %s\n", map_type[return_type]);
             YYABORT;
         }
+        rflag = true;
     }
     | RETURN nested_expr SEMICOLON {
-        if(return_flag == 0)
+        if(return_type != $2)
         {
-            printf("Error: Return statement not allowed\n");
+            printf("Error: Mismatch in return type\n");
+            printf("Returned %s while function returns %s\n", map_type[$2], map_type[return_type]);
             YYABORT;
         }
-        if($2 != 0 && $2 != 1 && $2 != 2 && $2 != 3)
-        {
-            printf("Error: Return type mismatch\n");
-            YYABORT;
-        }
+        rflag = true;
     }
     ;
 
@@ -1082,7 +1095,7 @@ dim: dim  LSB nested_expr RSB {
 
 
 identifier: IDENTIFIER {
-        struct idrec *entry = lookup(global_table, global_table, $1.name);
+        struct idrec *entry = lookup(global_table, local_table, $1.name);
         if(entry == NULL){
             printf("Error: Variable %s not declared\n", $1.name);
             YYABORT;
@@ -1091,7 +1104,7 @@ identifier: IDENTIFIER {
     }
     // code
     | IDENTIFIER dim {
-        struct idrec *entry = lookup(global_table, global_table, $1.name);
+        struct idrec *entry = lookup(global_table, local_table, $1.name);
         if(entry == NULL){
             printf("Error: Variable %s not declared\n", $1.name);
             YYABORT;
