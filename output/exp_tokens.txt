@@ -14,35 +14,16 @@ datatype: int
 identifier: y
 punctuation: ;
 brackets: }
-comment: $ int sum(int a, int b)
-{
-   return 3;
-} $
 datatype: int
-identifier: main
+identifier: sum
 brackets: (
-brackets: )
-brackets: {
-datatype: bool
+datatype: int
 identifier: a
-operator: =
-constant: 8
-punctuation: ;
+punctuation: ,
 datatype: int
 identifier: b
-operator: =
-constant: 4
-punctuation: ;
-reserved: while
-brackets: (
-identifier: a
 brackets: )
 brackets: {
 reserved: return
-constant: 0
-punctuation: ;
-brackets: }
-reserved: return
-constant: 5
-punctuation: ;
-brackets: }
+identifier: a
+operator: +

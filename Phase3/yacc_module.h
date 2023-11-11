@@ -421,13 +421,13 @@ classrec *search_classtab(classtab *ct, char *name)
    return NULL;
 }
 
-bool check_member_method(char *m1, snode *m2, classtab *class_table, classrec *class_entry, symtab* params, int num_params)
+bool check_member_method(char *m1, snode *m2, classtab *class_table, classrec *class_entry, symtab *params, int num_params)
 {
    if (m2 == NULL)
    {
-      if(num_params != -1)
+      if (num_params != -1)
       {
-         funcrec* entry = (funcrec*)malloc(sizeof(funcrec));
+         funcrec *entry = (funcrec *)malloc(sizeof(funcrec));
          entry->name = m1;
          entry->params = params;
          entry->num_params = 0;
@@ -453,7 +453,7 @@ bool check_member_method(char *m1, snode *m2, classtab *class_table, classrec *c
          printf("Error: %s is not a member of class %s\n", m1, class_entry->name);
          return false;
       }
-      if (entry -> type != 14)
+      if (entry->type != 14)
       {
          printf("Error: %s is not of type class\n", m1);
          return false;
@@ -463,7 +463,7 @@ bool check_member_method(char *m1, snode *m2, classtab *class_table, classrec *c
    }
 }
 
-bool check_namelist(slist *namelist, symtab *global_table, symtab *local_table, classtab *class_table, symtab* params, int num_params)
+bool check_namelist(slist *namelist, symtab *global_table, symtab *local_table, classtab *class_table, symtab *params, int num_params)
 {
    snode *temp = namelist->head;
    idrec *entry = lookup(global_table, local_table, temp->val);
@@ -484,10 +484,10 @@ bool check_namelist(slist *namelist, symtab *global_table, symtab *local_table, 
 
 void free_ilist(ilist *l)
 {
-   inode *temp = l -> head, *current = temp;
-   while(current != NULL)
+   inode *temp = l->head, *current = temp;
+   while (current != NULL)
    {
-      current = current -> next;
+      current = current->next;
       free(temp);
       temp = current;
    }
@@ -495,10 +495,10 @@ void free_ilist(ilist *l)
 
 void free_slist(slist *l)
 {
-   snode *temp = l -> head, *current = temp;
-   while(current != NULL)
+   snode *temp = l->head, *current = temp;
+   while (current != NULL)
    {
-      current = current -> next;
+      current = current->next;
       free(temp);
       temp = current;
    }
@@ -506,11 +506,11 @@ void free_slist(slist *l)
 
 void free_symtab(symtab *table)
 {
-   idrec *temp = table -> head, *current = temp;
-   while(temp != NULL)
+   idrec *temp = table->head, *current = temp;
+   while (temp != NULL)
    {
-      current = current -> next;
-      free_ilist(temp -> arr_dims);
+      current = current->next;
+      free_ilist(temp->arr_dims);
       free(temp);
       temp = current;
    }
@@ -518,12 +518,12 @@ void free_symtab(symtab *table)
 
 void free_functab(functab *table)
 {
-   funcrec *temp = table -> head, *current = temp;
-   while(temp != NULL)
+   funcrec *temp = table->head, *current = temp;
+   while (temp != NULL)
    {
-      current = current -> next;
-      free_symtab(temp -> params);
-      free_symtab(temp -> local_table);
+      current = current->next;
+      free_symtab(temp->params);
+      free_symtab(temp->local_table);
       free(temp);
       temp = current;
    }
@@ -531,12 +531,12 @@ void free_functab(functab *table)
 
 void free_classtab(classtab *table)
 {
-   classrec *temp = table -> head, *current = temp;
-   while(temp != NULL)
+   classrec *temp = table->head, *current = temp;
+   while (temp != NULL)
    {
-      current = current -> next;
-      free_symtab(temp -> members);
-      free_functab(temp -> methods);
+      current = current->next;
+      free_symtab(temp->members);
+      free_functab(temp->methods);
       free(temp);
       temp = current;
    }

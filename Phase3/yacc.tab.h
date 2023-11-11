@@ -143,8 +143,9 @@ union YYSTYPE
         int type;
         struct slist *namelist;
     } class_id;
+    struct idrec *param;
 
-#line 148 "yacc.tab.h"
+#line 149 "yacc.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
