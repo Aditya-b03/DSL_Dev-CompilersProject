@@ -360,15 +360,23 @@ funcrec *search_functab(functab *ft, funcrec *entry)
             // compare temp->params and entry->params
             idrec *temp1 = temp->params->head;
             idrec *temp2 = entry->params->head;
+            int i = 1;
             while (temp1 != NULL && temp2 != NULL)
             {
                if (temp1->type != temp2->type)
-                  break;
+               {
+                  printf("Error: Function %s argument %i mismatch \n", entry->name, i);
+                  return NULL;
+               }
                temp1 = temp1->next;
                temp2 = temp2->next;
+               i++;
             }
-            if (temp1 == NULL && temp2 == NULL)
-               return temp;
+            return temp;
+         }
+         else
+         {
+            printf("Error: Function %s has been called with wrong number of arguments\n", entry->name);
          }
       }
       temp = temp->next;
@@ -431,6 +439,13 @@ bool check_member_method(char *m1, snode *m2, classtab *class_table, classrec *c
          entry->name = m1;
          entry->params = params;
          entry->num_params = 0;
+         funcrec *temp = lookup_functab(class_entry->methods, entry);
+         if (temp == NULL)
+         {
+            printf("Error: %s is not a method of class %s\n", m1, class_entry->name);
+            return false;
+         }
+         return true;
       }
       else
       {

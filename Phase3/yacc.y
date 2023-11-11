@@ -302,7 +302,7 @@ function_param: data_type_new IDENTIFIER {
         $$ = entry;
     }
     | data_type_pr IDENTIFIER {
-        struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
+        struct idrec *entry = (struct idrec*) malloc(sizeof(struct idrec));
         entry->name = $2.name;
         entry->type = $1;
         entry->arr = false;
@@ -658,18 +658,16 @@ decl_stmt: data_type_new id_list SEMICOLON {
             entry -> class_name = NULL;
             entry -> arr_dims = init_ilist();
             entry -> next = NULL;
-            if(lookup(global_table, local_table, entry->name) == NULL){
-                entry = lookup(params, params, $1.name);
-                if(entry == NULL){
-                    printf("Error: Variable %s not declared\n", $1.name);
-                    YYABORT;
-                }
-                insert_symtab(local_table, entry);
-            }
-            else{
-                printf("Error: Variable %s already declared\n", entry->name);
+            if(lookup(global_table, local_table, entry->name) != NULL){
+                printf("Error: Variable %s already declared\n", temp -> val);
                 YYABORT;
             }
+            else if(lookup(params, params, temp -> val) != NULL){
+                printf("Error: Variable %s already declared\n", temp -> val);
+                YYABORT;
+            }
+            else
+                insert_symtab(global_table, entry);
             temp = temp->next;
         }
     }
@@ -684,20 +682,18 @@ decl_stmt: data_type_new id_list SEMICOLON {
             entry -> class_name = NULL;
             entry -> arr_dims = init_ilist();
             entry -> next = NULL;
-            if(lookup(global_table, local_table ,entry->name) == NULL){
-                entry = lookup(params, params, $1.name);
-                if(entry == NULL){
-                    printf("Error: Variable %s not declared\n", $1.name);
-                    YYABORT;
-                }
-                insert_symtab(local_table, entry);
-            }
-            else{
-                printf("Error: Variable %s already declared\n", entry->name);
+            if(lookup(global_table, local_table, entry->name) != NULL){
+                printf("Error: Variable %s already declared\n", temp -> val);
                 YYABORT;
             }
+            else if(lookup(params, params, temp -> val) != NULL){
+                printf("Error: Variable %s already declared\n", temp -> val);
+                YYABORT;
+            }
+            else
+                insert_symtab(global_table, entry);
             temp = temp->next;
-        } 
+        }
     }
     | IDENTIFIER id_list SEMICOLON {
         struct snode* temp = $2->head;
@@ -715,18 +711,16 @@ decl_stmt: data_type_new id_list SEMICOLON {
             entry -> class_name = $1.name;
             entry -> arr_dims = init_ilist();
             entry -> next = NULL;
-            if(lookup(global_table, local_table ,entry -> name) == NULL){
-                entry = lookup(params, params, $1.name);
-                if(entry == NULL){
-                    printf("Error: Variable %s not declared\n", $1.name);
-                    YYABORT;
-                }
-                insert_symtab(local_table, entry);
-            }
-            else{
-                printf("Error: Variable %s already declared\n", entry->name);
+            if(lookup(global_table, local_table, entry->name) != NULL){
+                printf("Error: Variable %s already declared\n", temp -> val);
                 YYABORT;
             }
+            else if(lookup(params, params, temp -> val) != NULL){
+                printf("Error: Variable %s already declared\n", temp -> val);
+                YYABORT;
+            }
+            else
+                insert_symtab(global_table, entry);
             temp = temp->next;
         }
     }
@@ -742,18 +736,16 @@ decl_stmt: data_type_new id_list SEMICOLON {
             entry -> class_name = NULL;
             //arr_dimlist
             entry -> next = NULL;
-            if(lookup(global_table, local_table ,entry->name) == NULL){
-                entry = lookup(params, params, $1.name);
-                if(entry == NULL){
-                    printf("Error: Variable %s not declared\n", $1.name);
-                    YYABORT;
-                }
-                insert_symtab(local_table, entry);
-            }
-            else{
-                printf("Error: Variable %s already declared\n", entry->name);
+            if(lookup(global_table, local_table, entry->name) != NULL){
+                printf("Error: Variable %s already declared\n", temp -> val);
                 YYABORT;
             }
+            else if(lookup(params, params, temp -> val) != NULL){
+                printf("Error: Variable %s already declared\n", temp -> val);
+                YYABORT;
+            }
+            else
+                insert_symtab(global_table, entry);
             temp = temp->next;
         }
     }
@@ -981,7 +973,6 @@ call: IDENTIFIER LPB call_args RPB {
         struct funcrec *func = search_functab(function_table, entry);
         if(func == NULL)
         {
-            printf("Error: Function %s not declared\n", entry->name);
             YYABORT;
         }
         $$ = func -> type;
