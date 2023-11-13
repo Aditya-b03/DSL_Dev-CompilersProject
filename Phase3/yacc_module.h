@@ -124,7 +124,7 @@ typedef struct functab functab;
 functab *init_functab();
 void insert_functab(functab *ft, funcrec *entry);
 void display_functab(functab *ft);
-funcrec *search_functab(functab *ft, funcrec *entry);
+funcrec *search_functab(functab *ft, funcrec *entry, bool call);
 
 struct classrec
 {
@@ -160,7 +160,7 @@ idrec *lookup(symtab *global_table, symtab *local_table, char *name)
 
 funcrec *lookup_functab(functab *func_table, funcrec *entry)
 {
-   funcrec *temp = search_functab(func_table, entry);
+   funcrec *temp = search_functab(func_table, entry, 0);
    if (temp != NULL)
       return temp;
    return NULL;
@@ -348,13 +348,15 @@ void display_functab(functab *ft)
 }
 
 // support for function overloading
-funcrec *search_functab(functab *ft, funcrec *entry)
+funcrec *search_functab(functab *ft, funcrec *entry, bool call)
 {
    funcrec *temp = ft->head;
+   int Not_found = 1;
    while (temp != NULL)
    {
       if (strcmp(temp->name, entry->name) == 0)
       {
+         Not_found = 0;
          if (temp->num_params == entry->num_params)
          {
             // compare temp->params and entry->params
@@ -377,10 +379,12 @@ funcrec *search_functab(functab *ft, funcrec *entry)
          else
          {
             printf("Error: Function %s has been called with wrong number of arguments\n", entry->name);
+            return NULL;
          }
       }
       temp = temp->next;
    }
+   if(Not_found && call) printf("Error: Function %s has not been declared\n", entry->name);
    return NULL;
 }
 

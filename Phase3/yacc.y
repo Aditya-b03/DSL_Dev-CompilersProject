@@ -970,7 +970,7 @@ call: IDENTIFIER LPB call_args RPB {
         entry -> name = $1.name;
         entry -> params = $3.params;
         entry -> num_params = $3.num_params;
-        struct funcrec *func = search_functab(function_table, entry);
+        struct funcrec *func = search_functab(function_table, entry, 1);
         if(func == NULL)
         {
             YYABORT;
@@ -986,7 +986,7 @@ call: IDENTIFIER LPB call_args RPB {
         entry -> name = $1.namelist->tail->val;
         entry -> params = $3.params;
         entry -> num_params = $3.num_params;
-        struct funcrec *func = search_functab(methods, entry);
+        struct funcrec *func = search_functab(methods, entry,1);
         if(func == NULL)
         {
             printf("Error: Method %s not declared\n", entry->name);
