@@ -13,6 +13,13 @@ int main()
     string x = "hello";
     int y;
     y = x;
+    list[][][]: string names;
+    list[][]: string vals;
+    names = vals;
     return 0;
 }
 
+// list index in int
+// proper splicing and type check
+// index in bounds
+// {1}

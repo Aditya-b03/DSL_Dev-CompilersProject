@@ -158,14 +158,6 @@ idrec *lookup(symtab *global_table, symtab *local_table, char *name)
    return temp;
 }
 
-funcrec *lookup_functab(functab *func_table, funcrec *entry)
-{
-   funcrec *temp = search_functab(func_table, entry, 0);
-   if (temp != NULL)
-      return temp;
-   return NULL;
-}
-
 bool insert(symtab *global_table, symtab *local_table, idrec entry)
 {
    idrec *temp = lookup(global_table, local_table, entry.name);

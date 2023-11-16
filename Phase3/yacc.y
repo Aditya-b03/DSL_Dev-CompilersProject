@@ -44,6 +44,7 @@
     int type;
     struct list{
         int type;
+        int dim;
         struct ilist *dimlist;
     } list;
     int assignop;
@@ -63,6 +64,11 @@
         struct slist *namelist;
     } class_id;
     struct idrec *param;
+    struct exprs{
+        int type;
+        int inner_type;
+        int dim;
+    } exprs;
 }
 
 
@@ -86,7 +92,7 @@
 %type <type> data_type_new data_type_pr unary_stmt nested_expr expr expr_terminal call
 %type <namelist> id_list 
 %type <id> IDENTIFIER class_dec
-%type <list> list dim list_literal list_terminal
+%type <list> list dim list_literal list_terminal empty_dim
 %type <assignop> ASSIGN_OP
 %type <functions> function_params function_dec function class_function_dec class_function call_args
 %type <stmt> statements decl_stmt class_decl_stmt 
@@ -177,7 +183,7 @@ function_dec: data_type_new IDENTIFIER LPB function_params RPB {
         entry->type = $1;
         entry->params = $4.params;
         entry->num_params = $4.num_params;
-        if(lookup_functab(function_table, entry) != NULL)
+        if(search_functab(function_table, entry) != NULL)
         {
             printf("Error: Function %s already declared\n", entry->name);
             YYABORT;
@@ -195,7 +201,7 @@ function_dec: data_type_new IDENTIFIER LPB function_params RPB {
         entry->type = $1;
         entry->params = $4.params;
         entry->num_params = $4.num_params;
-        if(lookup_functab(function_table, entry) != NULL)
+        if(search_functab(function_table, entry, 0) != NULL)
         {
             printf("Error: Function %s already declared\n", entry->name);
             YYABORT;
@@ -217,7 +223,7 @@ function_dec: data_type_new IDENTIFIER LPB function_params RPB {
         entry->type = 14;
         entry->params = $4.params;
         entry->num_params = $4.num_params;
-        if(lookup_functab(function_table, entry) != NULL)
+        if(search_functab(function_table, entry, 0) != NULL)
         {
             printf("Error: Function %s already declared\n", entry->name);
             YYABORT;
@@ -234,7 +240,7 @@ function_dec: data_type_new IDENTIFIER LPB function_params RPB {
         entry->type = 4;
         entry->params = $4.params;
         entry->num_params = $4.num_params;
-        if(lookup_functab(function_table, entry) != NULL)
+        if(search_functab(function_table, entry, 0) != NULL)
         {
             printf("Error: Function %s already declared\n", entry->name);
             YYABORT;
@@ -254,7 +260,7 @@ function_dec: data_type_new IDENTIFIER LPB function_params RPB {
         entry->num_params = $4.num_params;
         entry->next = NULL;
         entry->local_table = init_symtab();
-        if(lookup_functab(function_table, entry) != NULL)
+        if(search_functab(function_table, entry, 0) != NULL)
         {
             printf("Error: Function %s already declared\n", entry->name);
             YYABORT;
@@ -411,7 +417,7 @@ class_function_dec: data_type_new IDENTIFIER LPB function_params RPB {
         entry->num_params = $4.num_params;
         entry->next = NULL;
         entry->local_table = init_symtab();
-        if(lookup_functab(methods, entry) != NULL)
+        if(search_functab(methods, entry, 0) != NULL)
         {
             printf("Error: Function %s already declared\n", entry->name);
             YYABORT;
@@ -430,7 +436,7 @@ class_function_dec: data_type_new IDENTIFIER LPB function_params RPB {
         entry->num_params = $4.num_params;
         entry->next = NULL;
         entry->local_table = init_symtab();
-        if(lookup_functab(methods, entry) != NULL)
+        if(search_functab(methods, entry, 0) != NULL)
         {
             printf("Error: Function %s already declared\n", entry->name);
             YYABORT;
@@ -454,7 +460,7 @@ class_function_dec: data_type_new IDENTIFIER LPB function_params RPB {
         entry->num_params = $4.num_params;
         entry->next = NULL;
         entry->local_table = init_symtab();
-        if(lookup_functab(methods, entry) != NULL)
+        if(search_functab(methods, entry, 0) != NULL)
         {
             printf("Error: Function %s already declared\n", entry->name);
             YYABORT;
@@ -473,7 +479,7 @@ class_function_dec: data_type_new IDENTIFIER LPB function_params RPB {
         entry->num_params = $4.num_params;
         entry->next = NULL;
         entry->local_table = init_symtab();
-        if(lookup_functab(methods, entry) != NULL)
+        if(search_functab(methods, entry, 0) != NULL)
         {
             printf("Error: Function %s already declared\n", entry->name);
             YYABORT;
@@ -493,7 +499,7 @@ class_function_dec: data_type_new IDENTIFIER LPB function_params RPB {
         entry->num_params = $4.num_params;
         entry->next = NULL;
         entry->local_table = init_symtab();
-        if(lookup_functab(methods, entry) != NULL)
+        if(search_functab(methods, entry, 0) != NULL)
         {
             printf("Error: Function %s already declared\n", entry->name);
             YYABORT;
@@ -1042,11 +1048,11 @@ return_stmt: RETURN SEMICOLON {
 // 11. Identifiers and Lists
 list: LIST dim COLON data_type_pr {
         $$.type = $4;
-        $$.dimlist = $2.dimlist;
+        $$.dim = $2.dim;
     }
     | LIST dim COLON data_type_new {
         $$.type = $4;
-        $$.dimlist = $2.dimlist;
+        $$.dim = $2.dim;
     }
     | LIST dim COLON IDENTIFIER {
         if(search_classtab(class_table, $4.name) == NULL)
@@ -1055,13 +1061,13 @@ list: LIST dim COLON data_type_pr {
             YYABORT;
         }
         $$.type = 14;
-        $$.dimlist = $2.dimlist;
+        $$.dim = $2.dim;
     }
     ;
 
 //code
 list_literal:  LCB list_terminal RCB {
-        $$.type = $2.type;
+        $$.type = 5;
     }
     ;
 
@@ -1070,36 +1076,42 @@ list_terminal: nested_expr {
         $$.type = $1;
     }
     | list_terminal COMMA nested_expr {
-        $$.type = 5;
+        if($1 != $3){
+            printf("Error: Type mismatch in list terminal\n");
+            YYABORT;
+        }
+        $$.type = $1;
     }
     ;
 
 
 // code
-dim: dim  LSB nested_expr RSB {
+dim: LSB nested_expr RSB dim {
         if($3 != 0){
-            printf("Error: Array size must be int\n");
+            printf("Error: Array size must be an integer\n");
             YYABORT;
         }
-        insert_ilist($1.dimlist, $3);
-        $$.dimlist = $1.dimlist;
+        $$.dim = $4.dim + 1;
     }
     | LSB nested_expr RSB {
         if($2 != 0){
-            printf("Error: Array size must be int\n");
+            printf("Error: Array size must be an integer\n");
             YYABORT;
         }
-        $$.dimlist = init_ilist();
-        insert_ilist($$.dimlist, $2);
+        $$.dim = 0;
     }
-    | dim LSB RSB {
-        $$.dimlist = $1.dimlist;
-    }
-    | LSB RSB {
-        $$.dimlist = init_ilist();
+    | empty_dim {
+        $$.dim = $1.dim;
     }
     ;
 
+empty_dim: empty_dim LSB RSB {
+        $$.dim = $1.dim + 1;
+    }
+    | LSB RSB {
+        $$.dim = 0;
+    }
+    ;
 
 identifier: IDENTIFIER {
         struct idrec *entry = lookup(global_table, local_table, $1.name);
