@@ -43,9 +43,9 @@
     struct slist *namelist;
     int type;
     struct list{
+        char* class_name;
         int type;
         int dim;
-        struct ilist *dimlist;
     } list;
     int assignop;
     struct functions{
@@ -61,6 +61,7 @@
     } stmt;
     struct class_id{
         int type;
+        int dim;
         struct slist *namelist;
     } class_id;
     struct idrec *param;
@@ -89,10 +90,10 @@
 %token INCLUDE TYPEDEF
 
 
-%type <type> data_type_new data_type_pr unary_stmt nested_expr expr expr_terminal call
+%type <type> data_type_new data_type_pr unary_stmt call
 %type <namelist> id_list 
 %type <id> IDENTIFIER class_dec
-%type <list> list dim list_literal list_terminal empty_dim
+%type <list> list dim list_literal list_terminal empty_dim nested_expr expr expr_terminal
 %type <assignop> ASSIGN_OP
 %type <functions> function_params function_dec function class_function_dec class_function call_args
 %type <stmt> statements decl_stmt class_decl_stmt 
@@ -183,7 +184,7 @@ function_dec: data_type_new IDENTIFIER LPB function_params RPB {
         entry->type = $1;
         entry->params = $4.params;
         entry->num_params = $4.num_params;
-        if(search_functab(function_table, entry) != NULL)
+        if(search_functab(function_table, entry,0) != NULL)
         {
             printf("Error: Function %s already declared\n", entry->name);
             YYABORT;
@@ -301,7 +302,7 @@ function_param: data_type_new IDENTIFIER {
         entry->name = $2.name;
         entry->type = $1;
         entry->arr = false;
-        entry->arr_dims = init_ilist();
+        entry->dim = 0;
         entry->scope = 1;
         entry->next = NULL;
         entry->class_name = NULL;       
@@ -312,7 +313,7 @@ function_param: data_type_new IDENTIFIER {
         entry->name = $2.name;
         entry->type = $1;
         entry->arr = false;
-        entry->arr_dims = init_ilist();
+        entry->dim = 0;
         entry->scope = 1;
         entry->next = NULL;
         entry->class_name = NULL;       
@@ -331,7 +332,7 @@ function_param: data_type_new IDENTIFIER {
         entry->scope = 1;
         entry->next = NULL;
         entry->class_name = $1.name;
-        entry->arr_dims = init_ilist();
+        entry->dim = 0;
         $$ = entry;
     } 
     // code
@@ -343,8 +344,7 @@ function_param: data_type_new IDENTIFIER {
         entry->scope = 1;
         entry->next = NULL;
         entry->class_name = NULL;
-        entry->arr_dims = init_ilist();
-        //arr_dimlist
+        entry->dim = $1.dim;
         $$ = entry;
     }
     ;
@@ -522,7 +522,7 @@ class_decl_stmt: data_type_new id_list SEMICOLON {
             entry->scope = 1; 
             entry->name = temp->val;
             entry -> class_name = NULL;
-            entry -> arr_dims = init_ilist();
+            entry -> dim = 0;
             if(lookup(members, members, entry->name) == NULL){
                 insert_symtab(members, entry);
             }
@@ -544,7 +544,7 @@ class_decl_stmt: data_type_new id_list SEMICOLON {
             entry -> name = temp->val;
             entry -> next = NULL;
             entry -> class_name = NULL;
-            entry -> arr_dims = init_ilist();
+            entry -> dim = 0;
             if(lookup(members, members ,entry -> name) == NULL){
                 insert_symtab(members, entry);
             }
@@ -556,7 +556,11 @@ class_decl_stmt: data_type_new id_list SEMICOLON {
         } 
     }
     | IDENTIFIER id_list SEMICOLON{
-        // check if class exists
+        if(search_classtab(class_table, $1.name) == NULL)
+        {
+            printf("Error: Class %s not declared\n", $1.name);
+            YYABORT;
+        }
         struct snode* temp = $2->head;
         while(temp != NULL){
             struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
@@ -566,7 +570,7 @@ class_decl_stmt: data_type_new id_list SEMICOLON {
             entry -> name = temp->val;
             entry -> next = NULL;
             entry -> class_name = $1.name;
-            entry -> arr_dims = init_ilist();
+            entry -> dim = 0;
             if(lookup(members, members ,entry -> name) == NULL){
                 insert_symtab(members, entry);
             }
@@ -586,9 +590,9 @@ class_decl_stmt: data_type_new id_list SEMICOLON {
             entry -> arr = true;
             entry -> scope = 1; 
             entry -> name = temp->val;
-            entry -> class_name = NULL;
+            entry->class_name = $1.class_name;
             entry -> next = NULL;
-            //arr_dimlist
+            entry -> dim = $1.dim;
             if(lookup(members, members ,entry -> name) == NULL){
                 insert_symtab(members, entry);
             }
@@ -662,7 +666,7 @@ decl_stmt: data_type_new id_list SEMICOLON {
             entry -> scope = scope; 
             entry -> name = temp->val;
             entry -> class_name = NULL;
-            entry -> arr_dims = init_ilist();
+            entry -> dim = 0;
             entry -> next = NULL;
             if(lookup(global_table, local_table, entry->name) != NULL){
                 printf("Error: Variable %s already declared\n", temp -> val);
@@ -686,7 +690,7 @@ decl_stmt: data_type_new id_list SEMICOLON {
             entry -> scope = scope; 
             entry -> name = temp->val;
             entry -> class_name = NULL;
-            entry -> arr_dims = init_ilist();
+            entry -> dim = 0;
             entry -> next = NULL;
             if(lookup(global_table, local_table, entry->name) != NULL){
                 printf("Error: Variable %s already declared\n", temp -> val);
@@ -715,7 +719,7 @@ decl_stmt: data_type_new id_list SEMICOLON {
             entry -> scope = scope; 
             entry -> name = temp->val;
             entry -> class_name = $1.name;
-            entry -> arr_dims = init_ilist();
+            entry -> dim = 0;
             entry -> next = NULL;
             if(lookup(global_table, local_table, entry->name) != NULL){
                 printf("Error: Variable %s already declared\n", temp -> val);
@@ -739,9 +743,9 @@ decl_stmt: data_type_new id_list SEMICOLON {
             entry -> arr = true;
             entry -> scope = scope; 
             entry -> name = temp->val;
-            entry -> class_name = NULL;
-            //arr_dimlist
+            entry -> class_name = $1.class_name;
             entry -> next = NULL;
+            entry -> dim = $1.dim;
             if(lookup(global_table, local_table, entry->name) != NULL){
                 printf("Error: Variable %s already declared\n", temp -> val);
                 YYABORT;
@@ -786,7 +790,7 @@ expr_stmt: expr_stmt_without_semicolon SEMICOLON
 expr_stmt_without_semicolon: identifier ASSIGN_OP nested_expr 
     | class_identifier ASSIGN_OP nested_expr
     | identifier EQUALS nested_expr {
-        if($1.type != $3){
+        if($1.type != $3.type){
             printf("Error: Type mismatch\n");
             YYABORT;
         }
@@ -796,116 +800,136 @@ expr_stmt_without_semicolon: identifier ASSIGN_OP nested_expr
     ;
 
 // code
-nested_expr: LPB nested_expr RPB {$$ = $2;}
+nested_expr: LPB nested_expr RPB {
+        $$.type = $2.type;
+        $$.dim = $2.dim;
+    }
     | LPB nested_expr RPB conj nested_expr {
-        if($5 != 3 || $2 != 3){
+        if($5.type != 3 || $2.type != 3){
             printf("Error: Type mismatch\n");
             YYABORT;
         }
-        $$ = $2;
+        $$.type = $2.type;
+        $$.dim = 0;
     }
     | LPB nested_expr RPB REL_OP nested_expr {
-        $$ = 3;
+        $$.type = 3;
+        $$.dim = 0;
     }
     | LPB nested_expr RPB arith_op nested_expr {
-        $$ = $2;
+        $$.type = $2.type; // check this again
+        $$.dim = 0;
     }
     | LPB nested_expr RPB set_op nested_expr {
-        $$ = $2;
+        $$.type = $2.type; // check this again
     }
     | expr {
-        $$ = $1;
+        $$.type = $1.type;
+        $$.dim = $1.dim; 
     }
     ;
 
 
 expr: expr_terminal conj nested_expr {
-        if($1 != $3){
+        if($1.type != $3.type){
             printf("Error: Type mismatch\n");
             YYABORT;
         }
-        $$ = 3;
+        $$.type = 3;
+        $$.dim = 0;
     }
     | expr_terminal REL_OP nested_expr {
-        if($1 != $3){
+        if($1.type != $3.type){
             printf("Error: Type mismatch\n");
             YYABORT;
         }
-        $$ = 3;
+        $$.type = 3;
+        $$.dim = 0;
     }
     | expr_terminal arith_op nested_expr {
-        if($1 != $3){
+        if($1.type != $3.type){
             printf("Error: Type mismatch\n");
             YYABORT;
         }
-        $$ = $1;
+        $$.type = $1.type;
+        $$.dim = 0;    // check this again
     }
     | expr_terminal set_op nested_expr {
-        if($1 != $3){
+        if($1.type != $3.type){
             printf("Error: Type mismatch\n");
             YYABORT;
         }
-        $$ = $1;
+        $$.type = $1.type;
+        $$.dim = 0;    // check this again
     }
     | expr_terminal {
-        $$ = $1;
+        $$.type = $1.type;
+        $$.dim = $1.dim;
     }
     ;
 
 
 expr_terminal: unary_stmt {
-        $$ = $1;
+        $$.type = $1;
+        $$.dim = 0;
     }
     | NUMBER{
-        $$ = 0;
+        $$.type = 0;
+        $$.dim = 0;
     }
     | DECIMAL{ 
-        $$ = 1;
+        $$.type = 1;
+        $$.dim = 0;
     }
     | STRING_LITERAL{
-        $$ = 2;    
+        $$.type = 2;   
+        $$.dim = 0; 
     }
     | BOOL_LITERAL{
-        $$ = 3;
+        $$.type = 3;
+        $$.dim = 0;
     }
     | call {
-        $$ = $1;
+        $$.type = $1;
     }
 // code
     | NOT LPB nested_expr RPB {
-        if($3 != 3){
+        if($3.type != 3){
             printf("Error: Not operator not defined for this type\n"); 
             YYABORT;
         }
-        $$ = 3;
+        $$.type = 3;
     }
     | NOT identifier {
         if($2.type != 3){
             printf("Error: Not operator not defined for this type\n"); 
             YYABORT;
         }
-        $$ = 3;
+        $$.type = 3;
     }
     | NOT class_identifier {
         if(check_namelist($2.namelist, global_table, local_table, class_table, NULL, -1) == false)
         {
             YYABORT;
         }
-        $$ = 3;
+        $$.type = 3;
     }
     | identifier {
-        $$ = $1.type;
+        $$.type = $1.type;
+
     }
     | class_identifier{
         if(check_namelist($1.namelist, global_table, local_table, class_table, NULL, -1) == false)
         {
             YYABORT;
         }
-        $$ = 3;
+        $$.type = 3;
+        $$.dim = 0;
     }
     // code
     | list_literal {
-        $$ = 5;
+        $$.type = 5;
+        $$.dim = $1.dim;
     }
     ;
 
@@ -923,7 +947,7 @@ if_stmt: if_expr LCB statements RCB {rflag = false;}
 
 
 if_expr: IF LPB nested_expr RPB {
-        if($3 != 3){
+        if($3.type != 3){
             printf("Error: If condition must be bool\n");
             YYABORT;
         }
@@ -939,13 +963,13 @@ for_stmt: for_exp expr_stmt_without_semicolon RPB LCB {scope++;} statements RCB 
 
 
 for_exp: FOR LPB decl_stmt nested_expr SEMICOLON {
-        if($4 != 3){
+        if($4.type != 3){
             printf("Error: For condition must be bool\n");
             YYABORT;
         }
     }
     | FOR LPB expr_stmt nested_expr SEMICOLON {
-        if($4 != 3){
+        if($4.type != 3){
             printf("Error: For condition must be bool\n");
             YYABORT;
         }
@@ -959,7 +983,7 @@ while_stmt: while_exp LCB {scope++;} statements RCB {scope--;rflag = false;}
 
 
 while_exp: WHILE LPB nested_expr RPB {
-        if($3 != 3){
+        if($3.type != 3){
             printf("Error: While condition must be bool\n");
             YYABORT;
         }
@@ -1007,14 +1031,14 @@ call: IDENTIFIER LPB call_args RPB {
 call_args: call_args COMMA nested_expr {
         $$.params = $1.params;
         struct idrec *entry = (struct idrec*) malloc(sizeof(struct idrec));
-        entry -> type = $3;
+        entry -> type = $3.type;
         insert_symtab($$.params, entry);
         $$.num_params = $1.num_params + 1;
     }
     | nested_expr {
         $$.params = init_symtab();
         struct idrec *entry = (struct idrec*) malloc(sizeof(struct idrec));
-        entry -> type = $1;
+        entry -> type = $1.type;
         insert_symtab($$.params, entry);
         $$.num_params = 1;
     }
@@ -1034,10 +1058,10 @@ return_stmt: RETURN SEMICOLON {
         rflag = true;
     }
     | RETURN nested_expr SEMICOLON {
-        if(return_type != $2)
+        if(return_type != $2.type)
         {
             printf("Error: Mismatch in return type\n");
-            printf("Returned %s while function returns %s\n", map_type[$2], map_type[return_type]);
+            printf("Returned %s while function returns %s\n", map_type[$2.type], map_type[return_type]);
             YYABORT;
         }
         rflag = true;
@@ -1049,10 +1073,12 @@ return_stmt: RETURN SEMICOLON {
 list: LIST dim COLON data_type_pr {
         $$.type = $4;
         $$.dim = $2.dim;
+        $$.class_name = NULL;
     }
     | LIST dim COLON data_type_new {
         $$.type = $4;
         $$.dim = $2.dim;
+        $$.class_name = NULL;
     }
     | LIST dim COLON IDENTIFIER {
         if(search_classtab(class_table, $4.name) == NULL)
@@ -1061,6 +1087,7 @@ list: LIST dim COLON data_type_pr {
             YYABORT;
         }
         $$.type = 14;
+        $$.class_name = $4.name;
         $$.dim = $2.dim;
     }
     ;
@@ -1068,33 +1095,41 @@ list: LIST dim COLON data_type_pr {
 //code
 list_literal:  LCB list_terminal RCB {
         $$.type = 5;
+        $$.dim = $2.dim+1;
     }
     ;
 
 //code 
 list_terminal: nested_expr {
-        $$.type = $1;
+        $$.type = $1.type;
+        if($1.type == 5){
+            $$.dim = $1.dim;
+        }
+        else{
+            $$.dim = 0;
+        }
     }
     | list_terminal COMMA nested_expr {
-        if($1 != $3){
+        if($1.type != $3.type){
             printf("Error: Type mismatch in list terminal\n");
             YYABORT;
         }
-        $$.type = $1;
+        $$.type = $1.type;
+        $$.dim = $1.dim;
     }
     ;
 
 
 // code
 dim: LSB nested_expr RSB dim {
-        if($3 != 0){
+        if($2.type != 0){
             printf("Error: Array size must be an integer\n");
             YYABORT;
         }
         $$.dim = $4.dim + 1;
     }
     | LSB nested_expr RSB {
-        if($2 != 0){
+        if($2.type != 0){
             printf("Error: Array size must be an integer\n");
             YYABORT;
         }
@@ -1123,6 +1158,7 @@ identifier: IDENTIFIER {
             }
         }
         $$.type = entry -> type;
+        $$.dim = entry -> dim;
     }
     // code
     | IDENTIFIER dim {
@@ -1137,6 +1173,7 @@ identifier: IDENTIFIER {
             YYABORT;
         }
         $$.type = entry->type;
+        $$.dim = entry->dim - $2.dim;
     }
     ;
 
@@ -1153,6 +1190,7 @@ class_identifier: IDENTIFIER DOT IDENTIFIER  {
         $$.namelist = $3.namelist;               
     }
     //code
+    // we are not doing the semantics of list in class (might implement if time permits)
     | IDENTIFIER DOT IDENTIFIER dim {
         $$.namelist = init_slist();
         insert_slist($$.namelist, $1.name);

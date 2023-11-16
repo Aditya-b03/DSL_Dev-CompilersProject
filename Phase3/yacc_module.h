@@ -79,7 +79,7 @@ struct idrec
    char *name;
    bool arr;
    int type;
-   ilist *arr_dims;
+   int dim;
    int scope;
    char *class_name;
    struct idrec *next;
@@ -376,7 +376,8 @@ funcrec *search_functab(functab *ft, funcrec *entry, bool call)
       }
       temp = temp->next;
    }
-   if(Not_found && call) printf("Error: Function %s has not been declared\n", entry->name);
+   if (Not_found && call)
+      printf("Error: Function %s has not been declared\n", entry->name);
    return NULL;
 }
 
@@ -435,7 +436,7 @@ bool check_member_method(char *m1, snode *m2, classtab *class_table, classrec *c
          entry->name = m1;
          entry->params = params;
          entry->num_params = 0;
-         funcrec *temp = lookup_functab(class_entry->methods, entry);
+         funcrec *temp = search_functab(class_entry->methods, entry, 0);
          if (temp == NULL)
          {
             printf("Error: %s is not a method of class %s\n", m1, class_entry->name);
@@ -521,7 +522,6 @@ void free_symtab(symtab *table)
    while (temp != NULL)
    {
       current = current->next;
-      free_ilist(temp->arr_dims);
       free(temp);
       temp = current;
    }

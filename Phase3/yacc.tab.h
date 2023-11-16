@@ -125,7 +125,7 @@ union YYSTYPE
     int type;
     struct list{
         int type;
-        struct ilist *dimlist;
+        int dim;
     } list;
     int assignop;
     struct functions{
@@ -141,11 +141,17 @@ union YYSTYPE
     } stmt;
     struct class_id{
         int type;
+        int dim;
         struct slist *namelist;
     } class_id;
     struct idrec *param;
+    struct exprs{
+        int type;
+        int inner_type;
+        int dim;
+    } exprs;
 
-#line 149 "yacc.tab.h"
+#line 155 "yacc.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

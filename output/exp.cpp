@@ -14,6 +14,6 @@ int sum(int A, int B)
 
 int main()
 {   
-   string x = "hello";
-   int y;
-   y = x;
+    string x = "hello";
+    int y;
+    y = x;
