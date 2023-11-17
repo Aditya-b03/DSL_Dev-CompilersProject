@@ -27,8 +27,7 @@ gcc lex.yy.c yacc.tab.c -o a.out
 
 # Check if the execution was successful
 if [ $? -eq 0 ]; then
-    #echo "Execution completed successfully."
-    echo ""
+    echo "Execution completed successfully."
 else
     echo "Execution encountered an error."
 fi

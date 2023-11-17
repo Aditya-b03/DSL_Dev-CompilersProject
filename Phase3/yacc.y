@@ -42,6 +42,7 @@
     } id;
     struct slist *namelist;
     int type;
+    int op_type;
     struct list{
         char* class_name;
         int type;
@@ -50,6 +51,7 @@
     int assignop;
     struct functions{
         int type;
+        int dim;
         char* name;
         struct symtab *params;
         struct symtab *local_table;
@@ -67,7 +69,6 @@
     struct idrec *param;
     struct exprs{
         int type;
-        int inner_type;
         int dim;
     } exprs;
 }
@@ -90,15 +91,17 @@
 %token INCLUDE TYPEDEF
 
 
-%type <type> data_type_new data_type_pr unary_stmt call
+%type <type> data_type_new data_type_pr unary_stmt 
 %type <namelist> id_list 
 %type <id> IDENTIFIER class_dec
-%type <list> list dim list_literal list_terminal empty_dim nested_expr expr expr_terminal
+%type <list> list dim list_literal list_terminal empty_dim 
 %type <assignop> ASSIGN_OP
 %type <functions> function_params function_dec function class_function_dec class_function call_args
 %type <stmt> statements decl_stmt class_decl_stmt 
 %type <class_id> identifier class_identifier
 %type <param> function_param
+%type <op_type> arith_op 
+%type <exprs> nested_expr expr expr_terminal call
 
 %% 
 
@@ -164,12 +167,13 @@ function: function_dec {
             YYABORT;
         }
         struct funcrec *entry = (struct funcrec*) malloc(sizeof(struct funcrec));
-        entry->name = $1.name;
-        entry->type = $1.type;
-        entry->params = $1.params;
-        entry->num_params = $1.num_params;
-        entry->next = NULL;
-        entry->local_table = $1.local_table;
+        entry -> name = $1.name;
+        entry -> type = $1.type;
+        entry -> dim = $1.dim;
+        entry -> params = $1.params;
+        entry -> num_params = $1.num_params;
+        entry -> next = NULL;
+        entry -> local_table = $1.local_table;
         insert_functab(function_table, entry);
         local_table = NULL;
         params = NULL;
@@ -180,16 +184,18 @@ function: function_dec {
 
 function_dec: data_type_new IDENTIFIER LPB function_params RPB {
         struct funcrec *entry = (struct funcrec*) malloc(sizeof(struct funcrec));
-        entry->name = $2.name;
-        entry->type = $1;
-        entry->params = $4.params;
-        entry->num_params = $4.num_params;
+        entry -> name = $2.name;
+        entry -> type = $1;
+        entry -> dim = 0;
+        entry -> params = $4.params;
+        entry -> num_params = $4.num_params;
         if(search_functab(function_table, entry,0) != NULL)
         {
-            printf("Error: Function %s already declared\n", entry->name);
+            printf("Error: Function %s already declared\n", entry -> name);
             YYABORT;
         }
         $$.type = $1;
+        $$.dim = 0;
         $$.name = $2.name;
         $$.params = $4.params;
         $$.num_params = $4.num_params;
@@ -198,16 +204,18 @@ function_dec: data_type_new IDENTIFIER LPB function_params RPB {
     | data_type_pr IDENTIFIER LPB function_params RPB {
         
         struct funcrec *entry = (struct funcrec *)malloc(sizeof(struct funcrec));
-        entry->name = $2.name;
-        entry->type = $1;
-        entry->params = $4.params;
-        entry->num_params = $4.num_params;
+        entry -> name = $2.name;
+        entry -> type = $1;
+        entry -> params = $4.params;
+        entry -> dim = 0;
+        entry -> num_params = $4.num_params;
         if(search_functab(function_table, entry, 0) != NULL)
         {
-            printf("Error: Function %s already declared\n", entry->name);
+            printf("Error: Function %s already declared\n", entry -> name);
             YYABORT;
         }
         $$.type = $1;
+        $$.dim = 0;
         $$.name = $2.name;
         $$.params = $4.params;
         $$.num_params = $4.num_params;
@@ -220,16 +228,18 @@ function_dec: data_type_new IDENTIFIER LPB function_params RPB {
             YYABORT;
         }
         struct funcrec *entry = (struct funcrec *)malloc(sizeof(struct funcrec));
-        entry->name = $2.name;
-        entry->type = 14;
-        entry->params = $4.params;
-        entry->num_params = $4.num_params;
+        entry -> name = $2.name;
+        entry -> type = 14;
+        entry -> dim = 0;
+        entry -> params = $4.params;
+        entry -> num_params = $4.num_params;
         if(search_functab(function_table, entry, 0) != NULL)
         {
-            printf("Error: Function %s already declared\n", entry->name);
+            printf("Error: Function %s already declared\n", entry -> name);
             YYABORT;
         }
         $$.type = 14;
+        $$.dim = 0;
         $$.name = $2.name;
         $$.params = $4.params;
         $$.num_params = $4.num_params;
@@ -237,16 +247,18 @@ function_dec: data_type_new IDENTIFIER LPB function_params RPB {
     }
     | VOID IDENTIFIER LPB function_params RPB {
         struct funcrec *entry = (struct funcrec *)malloc(sizeof(struct funcrec));
-        entry->name = $2.name;
-        entry->type = 4;
-        entry->params = $4.params;
-        entry->num_params = $4.num_params;
+        entry -> name = $2.name;
+        entry -> type = 4;
+        entry -> dim = 0;
+        entry -> params = $4.params;
+        entry -> num_params = $4.num_params;
         if(search_functab(function_table, entry, 0) != NULL)
         {
-            printf("Error: Function %s already declared\n", entry->name);
+            printf("Error: Function %s already declared\n", entry -> name);
             YYABORT;
         }
         $$.type = 4;
+        $$.dim = 0;
         $$.name = $2.name;
         $$.params = $4.params;
         $$.num_params = $4.num_params;
@@ -255,18 +267,20 @@ function_dec: data_type_new IDENTIFIER LPB function_params RPB {
     // code
     | list IDENTIFIER LPB function_params RPB {
         struct funcrec *entry = (struct funcrec *)malloc(sizeof(struct funcrec));
-        entry->name = $2.name;
-        entry->type = 5;
-        entry->params = $4.params;
-        entry->num_params = $4.num_params;
-        entry->next = NULL;
-        entry->local_table = init_symtab();
+        entry -> name = $2.name;
+        entry -> type = 5;
+        entry -> dim = $1.dim;
+        entry -> params = $4.params;
+        entry -> num_params = $4.num_params;
+        entry -> next = NULL;
+        entry -> local_table = init_symtab();
         if(search_functab(function_table, entry, 0) != NULL)
         {
-            printf("Error: Function %s already declared\n", entry->name);
+            printf("Error: Function %s already declared\n", entry -> name);
             YYABORT;
         }
         $$.type = $1.type;
+        $$.dim = $1.dim;
         $$.name = $2.name;
         $$.params = $4.params;
         $$.num_params = $4.num_params;
@@ -299,24 +313,24 @@ function_params: function_params COMMA function_param {
 
 function_param: data_type_new IDENTIFIER {
         struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
-        entry->name = $2.name;
-        entry->type = $1;
-        entry->arr = false;
-        entry->dim = 0;
-        entry->scope = 1;
-        entry->next = NULL;
-        entry->class_name = NULL;       
+        entry -> name = $2.name;
+        entry -> type = $1;
+        entry -> arr = false;
+        entry -> dim = 0;
+        entry -> scope = 1;
+        entry -> next = NULL;
+        entry -> class_name = NULL;       
         $$ = entry;
     }
     | data_type_pr IDENTIFIER {
         struct idrec *entry = (struct idrec*) malloc(sizeof(struct idrec));
-        entry->name = $2.name;
-        entry->type = $1;
-        entry->arr = false;
-        entry->dim = 0;
-        entry->scope = 1;
-        entry->next = NULL;
-        entry->class_name = NULL;       
+        entry -> name = $2.name;
+        entry -> type = $1;
+        entry -> arr = false;
+        entry -> dim = 0;
+        entry -> scope = 1;
+        entry -> next = NULL;
+        entry -> class_name = NULL;       
         $$ = entry;
     }
     | IDENTIFIER IDENTIFIER {
@@ -326,25 +340,25 @@ function_param: data_type_new IDENTIFIER {
             YYABORT;
         }
         struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
-        entry->name = $2.name;
-        entry->type = 14;
-        entry->arr = false;
-        entry->scope = 1;
-        entry->next = NULL;
-        entry->class_name = $1.name;
-        entry->dim = 0;
+        entry -> name = $2.name;
+        entry -> type = 14;
+        entry -> arr = false;
+        entry -> scope = 1;
+        entry -> next = NULL;
+        entry -> class_name = $1.name;
+        entry -> dim = 0;
         $$ = entry;
     } 
     // code
     | list IDENTIFIER {
         struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
-        entry->name = $2.name;
-        entry->type = $1.type;
-        entry->arr = true;
-        entry->scope = 1;
-        entry->next = NULL;
-        entry->class_name = NULL;
-        entry->dim = $1.dim;
+        entry -> name = $2.name;
+        entry -> type = $1.type;
+        entry -> arr = true;
+        entry -> scope = 1;
+        entry -> next = NULL;
+        entry -> class_name = NULL;
+        entry -> dim = $1.dim;
         $$ = entry;
     }
     ;
@@ -353,13 +367,13 @@ function_param: data_type_new IDENTIFIER {
 // 3. Class 
 class: class_dec LCB class_stmt RCB{
         struct classrec *entry = (struct classrec *)malloc(sizeof(struct classrec));
-        entry->name = $1.name;
-        entry->members = members;
-        entry->methods = methods;
-        entry->next = NULL;
-        if(search_classtab(class_table, entry->name) != NULL)
+        entry -> name = $1.name;
+        entry -> members = members;
+        entry -> methods = methods;
+        entry -> next = NULL;
+        if(search_classtab(class_table, entry -> name) != NULL)
         {
-            printf("Error: Class %s already declared\n", entry->name);
+            printf("Error: Class %s already declared\n", entry -> name);
             YYABORT;
         }
         insert_classtab(class_table, entry);
@@ -391,16 +405,17 @@ class_function: class_function_dec {
         } LCB {scope++;} statements RCB {
         if(!rflag)
         {
-            printf("Error: Function doesn't return a value on all control paths\n");
+            printf("Error: Method doesn't return a value on all control paths\n");
             YYABORT;
         }
         struct funcrec *entry = (struct funcrec*) malloc(sizeof(struct funcrec));
-        entry->name = $1.name;
-        entry->type = $1.type;
-        entry->params = $1.params;
-        entry->num_params = $1.num_params;
-        entry->next = NULL;
-        entry->local_table = $1.local_table;
+        entry -> name = $1.name;
+        entry -> type = $1.type;
+        entry -> dim = $1.dim;
+        entry -> params = $1.params;
+        entry -> num_params = $1.num_params;
+        entry -> next = NULL;
+        entry -> local_table = $1.local_table;
         insert_functab(methods, entry);
         local_table = NULL;
         params = NULL;
@@ -411,18 +426,20 @@ class_function: class_function_dec {
 
 class_function_dec: data_type_new IDENTIFIER LPB function_params RPB {
         struct funcrec *entry = (struct funcrec*) malloc(sizeof(struct funcrec));
-        entry->name = $2.name;
-        entry->type = $1;
-        entry->params = $4.params;
-        entry->num_params = $4.num_params;
-        entry->next = NULL;
-        entry->local_table = init_symtab();
+        entry -> name = $2.name;
+        entry -> type = $1;
+        entry -> dim = 0;
+        entry -> params = $4.params;
+        entry -> num_params = $4.num_params;
+        entry -> next = NULL;
+        entry -> local_table = init_symtab();
         if(search_functab(methods, entry, 0) != NULL)
         {
-            printf("Error: Function %s already declared\n", entry->name);
+            printf("Error: Method %s already declared\n", entry -> name);
             YYABORT;
         }
         $$.type = $1;
+        $$.dim = 0;
         $$.name = $2.name;
         $$.params = $4.params;
         $$.num_params = $4.num_params;
@@ -430,18 +447,20 @@ class_function_dec: data_type_new IDENTIFIER LPB function_params RPB {
     }
     | data_type_pr IDENTIFIER LPB function_params RPB {
         struct funcrec *entry = (struct funcrec *)malloc(sizeof(struct funcrec));
-        entry->name = $2.name;
-        entry->type = $1;
-        entry->params = $4.params;
-        entry->num_params = $4.num_params;
-        entry->next = NULL;
-        entry->local_table = init_symtab();
+        entry -> name = $2.name;
+        entry -> type = $1;
+        entry -> dim = 0;
+        entry -> params = $4.params;
+        entry -> num_params = $4.num_params;
+        entry -> next = NULL;
+        entry -> local_table = init_symtab();
         if(search_functab(methods, entry, 0) != NULL)
         {
-            printf("Error: Function %s already declared\n", entry->name);
+            printf("Error: Method %s already declared\n", entry -> name);
             YYABORT;
         }
         $$.type = $1;
+        $$.dim = 0;
         $$.name = $2.name;
         $$.params = $4.params;
         $$.num_params = $4.num_params;
@@ -454,18 +473,20 @@ class_function_dec: data_type_new IDENTIFIER LPB function_params RPB {
             YYABORT;
         }
         struct funcrec *entry = (struct funcrec *)malloc(sizeof(struct funcrec));
-        entry->name = $2.name;
-        entry->type = 14;
-        entry->params = $4.params;
-        entry->num_params = $4.num_params;
-        entry->next = NULL;
-        entry->local_table = init_symtab();
+        entry -> name = $2.name;
+        entry -> type = 14;
+        entry -> dim = 0;
+        entry -> params = $4.params;
+        entry -> num_params = $4.num_params;
+        entry -> next = NULL;
+        entry -> local_table = init_symtab();
         if(search_functab(methods, entry, 0) != NULL)
         {
-            printf("Error: Function %s already declared\n", entry->name);
+            printf("Error: Method %s already declared\n", entry -> name);
             YYABORT;
         }
         $$.type = 14;
+        $$.dim = 0;
         $$.name = $2.name;
         $$.params = $4.params;
         $$.num_params = $4.num_params;
@@ -473,18 +494,20 @@ class_function_dec: data_type_new IDENTIFIER LPB function_params RPB {
     }
     | VOID IDENTIFIER LPB function_params RPB {
         struct funcrec *entry = (struct funcrec *)malloc(sizeof(struct funcrec));
-        entry->name = $2.name;
-        entry->type = 4;
-        entry->params = $4.params;
-        entry->num_params = $4.num_params;
-        entry->next = NULL;
-        entry->local_table = init_symtab();
+        entry -> name = $2.name;
+        entry -> type = 4;
+        entry -> dim = 0;
+        entry -> params = $4.params;
+        entry -> num_params = $4.num_params;
+        entry -> next = NULL;
+        entry -> local_table = init_symtab();
         if(search_functab(methods, entry, 0) != NULL)
         {
-            printf("Error: Function %s already declared\n", entry->name);
+            printf("Error: Method %s already declared\n", entry -> name);
             YYABORT;
         }
         $$.type = 4;
+        $$.dim = 0;
         $$.name = $2.name;
         $$.params = $4.params;
         $$.num_params = $4.num_params;
@@ -493,18 +516,20 @@ class_function_dec: data_type_new IDENTIFIER LPB function_params RPB {
     // code
     | list IDENTIFIER LPB function_params RPB {
         struct funcrec *entry = (struct funcrec *)malloc(sizeof(struct funcrec));
-        entry->name = $2.name;
-        entry->type = $1.type;
-        entry->params = $4.params;
-        entry->num_params = $4.num_params;
-        entry->next = NULL;
-        entry->local_table = init_symtab();
+        entry -> name = $2.name;
+        entry -> type = $1.type;
+        entry -> dim = $1.dim;
+        entry -> params = $4.params;
+        entry -> num_params = $4.num_params;
+        entry -> next = NULL;
+        entry -> local_table = init_symtab();
         if(search_functab(methods, entry, 0) != NULL)
         {
-            printf("Error: Function %s already declared\n", entry->name);
+            printf("Error: Method %s already declared\n", entry -> name);
             YYABORT;
         }
         $$.type = $1.type;
+        $$.dim = $1.dim;
         $$.name = $2.name;
         $$.params = $4.params;
         $$.num_params = $4.num_params;
@@ -517,17 +542,17 @@ class_decl_stmt: data_type_new id_list SEMICOLON {
         struct snode* temp = $2->head;
         while(temp != NULL){
             struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
-            entry->type = $1;
-            entry->arr = false;
-            entry->scope = 1; 
-            entry->name = temp->val;
+            entry -> type = $1;
+            entry -> arr = false;
+            entry -> scope = 1; 
+            entry -> name = temp->val;
             entry -> class_name = NULL;
             entry -> dim = 0;
-            if(lookup(members, members, entry->name) == NULL){
+            if(lookup(members, members, entry -> name) == NULL){
                 insert_symtab(members, entry);
             }
             else{
-                printf("Error: Variable %s already declared\n", entry->name);
+                printf("Error: Variable %s already declared\n", entry -> name);
                 YYABORT;
             }
             temp = temp->next;
@@ -549,7 +574,7 @@ class_decl_stmt: data_type_new id_list SEMICOLON {
                 insert_symtab(members, entry);
             }
             else{
-                printf("Error: Variable %s already declared\n", entry->name);
+                printf("Error: Variable %s already declared\n", entry -> name);
                 YYABORT;
             }
             temp = temp->next;
@@ -678,7 +703,7 @@ decl_stmt: data_type_new id_list SEMICOLON {
             }
             else
                 insert_symtab(global_table, entry);
-            temp = temp->next;
+            temp = temp -> next;
         }
     }
     | data_type_pr id_list SEMICOLON{
@@ -702,7 +727,7 @@ decl_stmt: data_type_new id_list SEMICOLON {
             }
             else
                 insert_symtab(global_table, entry);
-            temp = temp->next;
+            temp = temp -> next;
         }
     }
     | IDENTIFIER id_list SEMICOLON {
@@ -731,10 +756,9 @@ decl_stmt: data_type_new id_list SEMICOLON {
             }
             else
                 insert_symtab(global_table, entry);
-            temp = temp->next;
+            temp = temp -> next;
         }
     }
-    // code
     | list id_list SEMICOLON {
         struct snode* temp = $2->head;
         while(temp != NULL){
@@ -756,7 +780,7 @@ decl_stmt: data_type_new id_list SEMICOLON {
             }
             else
                 insert_symtab(global_table, entry);
-            temp = temp->next;
+            temp = temp -> next;
         }
     }
     ;
@@ -787,15 +811,35 @@ expr_stmt: expr_stmt_without_semicolon SEMICOLON
     ;
 
 // check lhs and rhs, check assignop (seprate assignop)
-expr_stmt_without_semicolon: identifier ASSIGN_OP nested_expr 
-    | class_identifier ASSIGN_OP nested_expr
-    | identifier EQUALS nested_expr {
-        if($1.type != $3.type){
-            printf("Error: Type mismatch\n");
+expr_stmt_without_semicolon: identifier ASSIGN_OP nested_expr {
+        if(check_assign_op($1.type, $3.type, $2))
+        {
             YYABORT;
         }
     }
-    | class_identifier EQUALS nested_expr
+    | class_identifier ASSIGN_OP nested_expr {
+        if(check_assign_op($1.type, $3.type, $2))
+        {
+            YYABORT;
+        }
+    }
+    | identifier EQUALS nested_expr {
+        if($1.type == 5 && $3.type == 5){
+            if($1.dim != $3.dim){
+                printf("Error: Dimension mismatch in assignment\n");
+                printf("LHS is of dimension %i and RHS is of dimension %i\n", $1.dim, $3.dim);
+                YYABORT;
+            }
+        }
+        if(check_assign_op($1.type, $3.type, 7)){
+            YYABORT;
+        }
+    }
+    | class_identifier EQUALS nested_expr {
+        if(check_assign_op($1.type, $3.type, 7)){
+            YYABORT;
+        }
+    }
     | unary_stmt
     ;
 
@@ -817,11 +861,20 @@ nested_expr: LPB nested_expr RPB {
         $$.dim = 0;
     }
     | LPB nested_expr RPB arith_op nested_expr {
-        $$.type = $2.type; // check this again
+        $$.type = check_arith_op($2.type, $5.type, $4);
+        if($$.type == -1)
+        {
+            YYABORT;
+        }
         $$.dim = 0;
     }
     | LPB nested_expr RPB set_op nested_expr {
-        $$.type = $2.type; // check this again
+        if($2.type != 7 || $5.type != 7){
+            printf("Error: Invalid operands for \n");
+            YYABORT;
+        }
+        $$.type = $2.type; 
+        $$.dim = 0;
     }
     | expr {
         $$.type = $1.type;
@@ -847,20 +900,20 @@ expr: expr_terminal conj nested_expr {
         $$.dim = 0;
     }
     | expr_terminal arith_op nested_expr {
-        if($1.type != $3.type){
-            printf("Error: Type mismatch\n");
+        $$.type = check_arith_op($1.type, $3.type, $2);
+        if($$.type == -1)
+        {
             YYABORT;
         }
-        $$.type = $1.type;
-        $$.dim = 0;    // check this again
+        $$.dim = 0;
     }
     | expr_terminal set_op nested_expr {
-        if($1.type != $3.type){
-            printf("Error: Type mismatch\n");
+        if($1.type != 7 || $3.type != 7){
+            printf("Error: Invalid operands for \n");
             YYABORT;
         }
         $$.type = $1.type;
-        $$.dim = 0;    // check this again
+        $$.dim = 0;    
     }
     | expr_terminal {
         $$.type = $1.type;
@@ -890,15 +943,16 @@ expr_terminal: unary_stmt {
         $$.dim = 0;
     }
     | call {
-        $$.type = $1;
+        $$.type = $1.type;
+        $$.dim = $1.dim;
     }
-// code
     | NOT LPB nested_expr RPB {
         if($3.type != 3){
             printf("Error: Not operator not defined for this type\n"); 
             YYABORT;
         }
         $$.type = 3;
+        $$.dim = 0;
     }
     | NOT identifier {
         if($2.type != 3){
@@ -906,6 +960,7 @@ expr_terminal: unary_stmt {
             YYABORT;
         }
         $$.type = 3;
+        $$.dim = 0;
     }
     | NOT class_identifier {
         if(check_namelist($2.namelist, global_table, local_table, class_table, NULL, -1) == false)
@@ -913,10 +968,11 @@ expr_terminal: unary_stmt {
             YYABORT;
         }
         $$.type = 3;
+        $$.dim = 0;
     }
     | identifier {
         $$.type = $1.type;
-
+        $$.dim = $1.dim;
     }
     | class_identifier{
         if(check_namelist($1.namelist, global_table, local_table, class_table, NULL, -1) == false)
@@ -1005,7 +1061,8 @@ call: IDENTIFIER LPB call_args RPB {
         {
             YYABORT;
         }
-        $$ = func -> type;
+        $$.type = func -> type;
+        $$.dim = func -> dim;
     }
     | class_identifier LPB call_args RPB {
         if(check_namelist($1.namelist, global_table, local_table, class_table, $3.params, $3.num_params) == false)
@@ -1022,7 +1079,8 @@ call: IDENTIFIER LPB call_args RPB {
             printf("Error: Method %s not declared\n", entry->name);
             YYABORT;
         }
-        $$ = func -> type;
+        $$.type = func -> type;
+        $$.dim = func -> dim;
     }
     ;
 
@@ -1092,14 +1150,14 @@ list: LIST dim COLON data_type_pr {
     }
     ;
 
-//code
+
 list_literal:  LCB list_terminal RCB {
         $$.type = 5;
         $$.dim = $2.dim+1;
     }
     ;
 
-//code 
+
 list_terminal: nested_expr {
         $$.type = $1.type;
         if($1.type == 5){
@@ -1133,7 +1191,7 @@ dim: LSB nested_expr RSB dim {
             printf("Error: Array size must be an integer\n");
             YYABORT;
         }
-        $$.dim = 0;
+        $$.dim = 1;
     }
     | empty_dim {
         $$.dim = $1.dim;
@@ -1144,7 +1202,7 @@ empty_dim: empty_dim LSB RSB {
         $$.dim = $1.dim + 1;
     }
     | LSB RSB {
-        $$.dim = 0;
+        $$.dim = 1;
     }
     ;
 
@@ -1248,11 +1306,11 @@ set_op: INTERSECTION_OP
     ;
 
 
-arith_op: ADD
-    | SUB
-    | MUL
-    | DIV
-    | MOD
+arith_op: ADD {$$ = 0;}
+    | SUB {$$ = 1;}
+    | MUL {$$ = 2;}
+    | DIV {$$ = 3;}
+    | MOD {$$ = 4;}
     ;
 
 

@@ -16,4 +16,6 @@ int main()
 {   
     string x = "hello";
     int y;
-    y = x;
+     string names[;
+     string vals[;
+    names = vals[4][3];

@@ -123,13 +123,16 @@ union YYSTYPE
     } id;
     struct slist *namelist;
     int type;
+    int op_type;
     struct list{
+        char* class_name;
         int type;
         int dim;
     } list;
     int assignop;
     struct functions{
         int type;
+        int dim;
         char* name;
         struct symtab *params;
         struct symtab *local_table;
@@ -147,11 +150,10 @@ union YYSTYPE
     struct idrec *param;
     struct exprs{
         int type;
-        int inner_type;
         int dim;
     } exprs;
 
-#line 155 "yacc.tab.h"
+#line 157 "yacc.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

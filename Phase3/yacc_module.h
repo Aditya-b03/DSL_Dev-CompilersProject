@@ -32,6 +32,7 @@ Type Encodings:
    4: %=
    5: &=
    6: |=
+   7: =
 */
 
 struct inode
@@ -105,6 +106,7 @@ struct funcrec
 {
    char *name;
    int type;
+   int dim;
    symtab *params;
    symtab *local_table;
    int num_params;
@@ -267,7 +269,7 @@ void display_symtab(symtab *st)
    idrec *temp = st->head;
    while (temp != NULL)
    {
-      printf("%s %d\n", temp->name, temp->type);
+      printf("%s %d %d %d %d %s\n", temp->name, temp->arr, temp->type, temp->dim, temp->scope, temp->class_name);
       temp = temp->next;
    }
 }
@@ -339,7 +341,6 @@ void display_functab(functab *ft)
    }
 }
 
-// support for function overloading
 funcrec *search_functab(functab *ft, funcrec *entry, bool call)
 {
    funcrec *temp = ft->head;
@@ -550,5 +551,146 @@ void free_classtab(classtab *table)
       free_functab(temp->methods);
       free(temp);
       temp = current;
+   }
+}
+
+int check_arith_op(int type1, int type2, int op)
+{
+   if(op == 0)
+   {
+      if(type1 == 0 && type2 == 0)
+         return 0;
+      else if(type1 == 1 && type2 == 1)
+         return 1;
+      else if(type1 == 2 && type2 == 2)
+         return 2;
+      else if(type1 == 0 && type2 == 1)
+         return 1;
+      else if(type1 == 1 && type2 == 0)
+         return 1;
+      else
+      {
+         printf("Error: Invalid operands for + operator\n");
+         return -1;
+      }
+   }
+   else if(op == 1 || op == 2 || op == 3)
+   {
+      if(type1 == 0 && type2 == 0)
+         return 0;
+      else if(type1 == 1 && type2 == 1)
+         return 1;
+      else if(type1 == 0 && type2 == 1)
+         return 1;
+      else if(type1 == 1 && type2 == 0)
+         return 1;
+      else
+      {
+         if(op == 1)
+            printf("Error: Invalid operands for - operator\n");
+         else if(op == 2)
+            printf("Error: Invalid operands for * operator\n");
+         else
+            printf("Error: Invalid operands for / operator\n");
+         return -1;
+      }
+   }
+   else if(op == 4)
+   {
+      if(type1 == 0 && type2 == 0)
+         return 0;
+      else
+      {
+         printf("Error: Invalid operands for %% operator\n");
+         return -1;
+      }
+   }
+   return -1;
+}
+
+bool check_assign_op(int lhs, int rhs, int op)
+{
+   if(op == 0)
+   {
+      if(lhs == 0 && rhs == 0)
+         return true;
+      else if(lhs == 1 && rhs == 1)
+         return true;
+      else if(lhs == 0 && rhs == 1)
+         return true;
+      else if(lhs == 1 && rhs == 0)
+         return true;
+      else if(lhs == 2 && rhs == 2)
+         return true;
+      else if(lhs == 7 && rhs == 8)
+         return true;
+      else if(lhs == 8 && rhs == 9)
+         return true;
+      else
+      {
+         printf("Error: Invalid expression for += assignment\n");
+         printf("Error: LHS is of type %i and RHS is of type %i\n", lhs, rhs);
+         return false;
+      }
+   }
+   else if(op == 1 || op == 2 || op == 3)
+   {
+      if(lhs == 0 && rhs == 0)
+         return true;
+      else if(lhs == 1 && rhs == 1)
+         return true;
+      else if(lhs == 0 && rhs == 1)
+         return true;
+      else if(lhs == 1 && rhs == 0)
+         return true;
+      else
+      {
+         if(op == 1)
+         {
+            printf("Error: Invalid expression for -= assignment\n");
+            printf("Error: LHS is of type %i and RHS is of type %i\n", lhs, rhs);
+         }
+         else if(op == 2)
+         {
+            printf("Error: Invalid expression for *= assignment\n");
+            printf("Error: LHS is of type %i and RHS is of type %i\n", lhs, rhs);
+         }
+         else
+         {
+            printf("Error: Invalid expression for /= assignment\n");
+            printf("Error: LHS is of type %i and RHS is of type %i\n", lhs, rhs);
+         }
+         return false;
+      }
+   }
+   else if(op == 4)
+   {
+      if(lhs == 0 && rhs == 0)
+         return true;
+      else
+      {
+         printf("Error: Invalid expression for %%= assignment\n");
+         printf("Error: LHS is of type %i and RHS is of type %i\n", lhs, rhs);
+         return false;
+      }
+   }
+   else if(op == 5 || op == 6)
+   {
+      if(lhs == 7 && rhs == 7)
+         return true;
+      else
+      {
+         if(op == 5)
+         {
+            printf("Error: Invalid expression for &= assignment\n");
+            printf("Error: LHS is of type %i and RHS is of type %i\n", lhs, rhs);
+         }
+         else
+         {
+            printf("Error: Invalid expression for |= assignment\n");
+            printf("Error: LHS is of type %i and RHS is of type %i\n", lhs, rhs);
+         }
+         return false;
+      }
    }
 }

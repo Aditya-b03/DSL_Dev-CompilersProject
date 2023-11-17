@@ -61,7 +61,8 @@
     "iostream": "cpp",
     "string": "cpp",
     "filesystem": "cpp",
-    "iosfwd": "cpp"
+    "iosfwd": "cpp",
+    "map": "cpp"
   },
   "C_Cpp.errorSquiggles": "disabled"
 }
