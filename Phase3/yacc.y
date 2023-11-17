@@ -26,8 +26,6 @@
     struct functab *methods;
     struct symtab *params;
 
-    char* map_type[] = {"int", "float", "string", "bool", "void", "list", "struct", "team", "member", "task", "event", "meeting", "document", "calendar", "class"};
-
     int scope;
     bool rflag;
     int return_type;
@@ -111,12 +109,18 @@ start:{
         function_table = init_functab();
         class_table = init_classtab();
         params = NULL;
-        local_table = NULL;
+        local_table = global_table;
         members = NULL;
         methods = NULL;
         scope = 0;
     } 
     include_stmts code {
+        printf("Global Table : \n\n");
+        display_symtab(global_table);
+        printf("Function Table : \n\n");
+        display_functab(function_table);
+        printf("Class Table : \n\n");
+        display_classtab(class_table);
         free_symtab(global_table);
         free_functab(function_table);
         free_classtab(class_table);
@@ -126,11 +130,17 @@ start:{
         function_table = init_functab();
         class_table = init_classtab();
         params = NULL;
-        local_table = NULL;
+        local_table = global_table;
         members = NULL;
         methods = NULL;
         scope = 0;
     } code {
+        printf("Global Table : \n\n");
+        display_symtab(global_table);
+        printf("Function Table : \n\n");
+        display_functab(function_table);
+        printf("Class Table : \n\n");
+        display_classtab(class_table);
         free_symtab(global_table);
         free_functab(function_table);
         free_classtab(class_table);
@@ -148,9 +158,9 @@ include_stmt: INCLUDE STRING_LITERAL
 
 
 code: decl_stmt code 
-    | function code
+    | function code 
     | class code
-    | 
+    |
     ;
 
 
@@ -161,11 +171,6 @@ function: function_dec {
             rflag = false;
             return_type = $1.type;
         } LCB {scope++;} statements RCB {
-        if(!rflag)
-        {
-            printf("Error: Function doesn't return a value on all control paths\n");
-            YYABORT;
-        }
         struct funcrec *entry = (struct funcrec*) malloc(sizeof(struct funcrec));
         entry -> name = $1.name;
         entry -> type = $1.type;
@@ -174,8 +179,13 @@ function: function_dec {
         entry -> num_params = $1.num_params;
         entry -> next = NULL;
         entry -> local_table = $1.local_table;
+        if(!rflag)
+        {
+            printf("Error: Function %s doesn't return a value on all control paths\n",entry -> name);
+            YYABORT;
+        }
         insert_functab(function_table, entry);
-        local_table = NULL;
+        local_table = global_table;
         params = NULL;
         scope--;
     }
@@ -292,7 +302,7 @@ function_dec: data_type_new IDENTIFIER LPB function_params RPB {
 function_params: function_params COMMA function_param {
         if(lookup($$.params, $$.params, $3->name) != NULL)
         {
-            printf("Error: Argument %s already used\n", $3->name);
+            printf("Error: Parameter %s already used\n", $3->name);
             YYABORT;
         }
         $$.params = $1.params;
@@ -379,6 +389,7 @@ class: class_dec LCB class_stmt RCB{
         insert_classtab(class_table, entry);
         members = NULL;
         methods = NULL;
+        local_table = global_table;
     }
     ;
 
@@ -552,7 +563,7 @@ class_decl_stmt: data_type_new id_list SEMICOLON {
                 insert_symtab(members, entry);
             }
             else{
-                printf("Error: Variable %s already declared\n", entry -> name);
+                printf("Error: Member %s already declared\n", entry -> name);
                 YYABORT;
             }
             temp = temp->next;
@@ -574,7 +585,7 @@ class_decl_stmt: data_type_new id_list SEMICOLON {
                 insert_symtab(members, entry);
             }
             else{
-                printf("Error: Variable %s already declared\n", entry -> name);
+                printf("Error: Member %s already declared\n", entry -> name);
                 YYABORT;
             }
             temp = temp->next;
@@ -600,7 +611,7 @@ class_decl_stmt: data_type_new id_list SEMICOLON {
                 insert_symtab(members, entry);
             }
             else{
-                printf("Error: Variable %s already declared\n", entry -> name);
+                printf("Error: Member %s already declared\n", entry -> name);
                 YYABORT;
             }
             temp = temp->next;
@@ -622,7 +633,7 @@ class_decl_stmt: data_type_new id_list SEMICOLON {
                 insert_symtab(members, entry);
             }
             else{
-                printf("Error: Variable %s already declared\n", entry -> name);
+                printf("Error: Member %s already declared\n", entry -> name);
                 YYABORT;
             }
             temp = temp->next;
@@ -661,8 +672,7 @@ ids: ids COMMA IDENTIFIER
 
 // 5. Unary statements
 unary_stmt: identifier UNARY_OP {
-        // check id in symbol table
-        if($1.type != 0 || $1.type != 1){
+        if($1.type != 0 && $1.type != 1){
             printf("Error: Unary operator not defined for this type\n"); 
             YYABORT;
         }
@@ -702,7 +712,7 @@ decl_stmt: data_type_new id_list SEMICOLON {
                 YYABORT;
             }
             else
-                insert_symtab(global_table, entry);
+                insert_symtab(local_table, entry);
             temp = temp -> next;
         }
     }
@@ -726,7 +736,7 @@ decl_stmt: data_type_new id_list SEMICOLON {
                 YYABORT;
             }
             else
-                insert_symtab(global_table, entry);
+                insert_symtab(local_table, entry);
             temp = temp -> next;
         }
     }
@@ -755,7 +765,7 @@ decl_stmt: data_type_new id_list SEMICOLON {
                 YYABORT;
             }
             else
-                insert_symtab(global_table, entry);
+                insert_symtab(local_table, entry);
             temp = temp -> next;
         }
     }
@@ -779,7 +789,7 @@ decl_stmt: data_type_new id_list SEMICOLON {
                 YYABORT;
             }
             else
-                insert_symtab(global_table, entry);
+                insert_symtab(local_table, entry);
             temp = temp -> next;
         }
     }
@@ -807,19 +817,17 @@ id_list: id_list COMMA IDENTIFIER{
 
 
 // 7. Expression statements
-expr_stmt: expr_stmt_without_semicolon SEMICOLON
+expr_stmt: expr_stmt_without_semicolon SEMICOLON 
     ;
 
 // check lhs and rhs, check assignop (seprate assignop)
 expr_stmt_without_semicolon: identifier ASSIGN_OP nested_expr {
-        if(check_assign_op($1.type, $3.type, $2))
-        {
+        if(!check_assign_op($1.type, $3.type, $2)){
             YYABORT;
         }
     }
     | class_identifier ASSIGN_OP nested_expr {
-        if(check_assign_op($1.type, $3.type, $2))
-        {
+        if(!check_assign_op($1.type, $3.type, $2)){
             YYABORT;
         }
     }
@@ -831,12 +839,19 @@ expr_stmt_without_semicolon: identifier ASSIGN_OP nested_expr {
                 YYABORT;
             }
         }
-        if(check_assign_op($1.type, $3.type, 7)){
+        else if(!check_assign_op($1.type, $3.type, 7)){
             YYABORT;
         }
     }
     | class_identifier EQUALS nested_expr {
-        if(check_assign_op($1.type, $3.type, 7)){
+        if($1.type == 5 && $3.type == 5){
+            if($1.dim != $3.dim){
+                printf("Error: Dimension mismatch in assignment\n");
+                printf("LHS is of dimension %i and RHS is of dimension %i\n", $1.dim, $3.dim);
+                YYABORT;
+            }
+        }
+        else if(!check_assign_op($1.type, $3.type, 7)){
             YYABORT;
         }
     }
@@ -884,7 +899,7 @@ nested_expr: LPB nested_expr RPB {
 
 
 expr: expr_terminal conj nested_expr {
-        if($1.type != $3.type){
+        if($1.type != 3 || $3.type != 3 ){
             printf("Error: Type mismatch\n");
             YYABORT;
         }
@@ -892,6 +907,7 @@ expr: expr_terminal conj nested_expr {
         $$.dim = 0;
     }
     | expr_terminal REL_OP nested_expr {
+        // coercibility
         if($1.type != $3.type){
             printf("Error: Type mismatch\n");
             YYABORT;
@@ -908,6 +924,7 @@ expr: expr_terminal conj nested_expr {
         $$.dim = 0;
     }
     | expr_terminal set_op nested_expr {
+        // coercibility
         if($1.type != 7 || $3.type != 7){
             printf("Error: Invalid operands for \n");
             YYABORT;

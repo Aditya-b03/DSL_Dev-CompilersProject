@@ -35,6 +35,8 @@ Type Encodings:
    7: =
 */
 
+char *map_type[] = {"int", "float", "string", "bool", "void", "list", "struct", "team", "member", "task", "event", "meeting", "document", "calendar", "class"};
+
 struct inode
 {
    int val;
@@ -269,7 +271,8 @@ void display_symtab(symtab *st)
    idrec *temp = st->head;
    while (temp != NULL)
    {
-      printf("%s %d %d %d %d %s\n", temp->name, temp->arr, temp->type, temp->dim, temp->scope, temp->class_name);
+      printf("Identifier record : ");
+      printf("%s %d %s %d %d %s\n", temp->name, temp->arr, map_type[temp->type], temp->dim, temp->scope, temp->class_name);
       temp = temp->next;
    }
 }
@@ -336,7 +339,12 @@ void display_functab(functab *ft)
    funcrec *temp = ft->head;
    while (temp != NULL)
    {
-      printf("%s %d\n", temp->name, temp->type);
+      printf("Function record : ");
+      printf("%s %s %d\n", temp->name, map_type[temp->type], temp->num_params);
+      printf("Parameters : \n");
+      display_symtab(temp->params);
+      printf("Local variables : \n");
+      display_symtab(temp->local_table);
       temp = temp->next;
    }
 }
@@ -360,7 +368,8 @@ funcrec *search_functab(functab *ft, funcrec *entry, bool call)
             {
                if (temp1->type != temp2->type)
                {
-                  printf("Error: Function %s argument %i mismatch \n", entry->name, i);
+                  if (call)
+                     printf("Error: Function %s argument %i mismatch \n", entry->name, i);
                   return NULL;
                }
                temp1 = temp1->next;
@@ -371,7 +380,8 @@ funcrec *search_functab(functab *ft, funcrec *entry, bool call)
          }
          else
          {
-            printf("Error: Function %s has been called with wrong number of arguments\n", entry->name);
+            if (call)
+               printf("Error: Function %s has been called with wrong number of arguments\n", entry->name);
             return NULL;
          }
       }
@@ -410,7 +420,12 @@ void display_classtab(classtab *ct)
    classrec *temp = ct->head;
    while (temp != NULL)
    {
+      printf("Class record : ");
       printf("%s\n", temp->name);
+      printf("Members : \n");
+      display_symtab(temp->members);
+      printf("Methods : \n");
+      display_functab(temp->methods);
       temp = temp->next;
    }
 }
@@ -556,17 +571,17 @@ void free_classtab(classtab *table)
 
 int check_arith_op(int type1, int type2, int op)
 {
-   if(op == 0)
+   if (op == 0)
    {
-      if(type1 == 0 && type2 == 0)
+      if (type1 == 0 && type2 == 0)
          return 0;
-      else if(type1 == 1 && type2 == 1)
+      else if (type1 == 1 && type2 == 1)
          return 1;
-      else if(type1 == 2 && type2 == 2)
+      else if (type1 == 2 && type2 == 2)
          return 2;
-      else if(type1 == 0 && type2 == 1)
+      else if (type1 == 0 && type2 == 1)
          return 1;
-      else if(type1 == 1 && type2 == 0)
+      else if (type1 == 1 && type2 == 0)
          return 1;
       else
       {
@@ -574,30 +589,30 @@ int check_arith_op(int type1, int type2, int op)
          return -1;
       }
    }
-   else if(op == 1 || op == 2 || op == 3)
+   else if (op == 1 || op == 2 || op == 3)
    {
-      if(type1 == 0 && type2 == 0)
+      if (type1 == 0 && type2 == 0)
          return 0;
-      else if(type1 == 1 && type2 == 1)
+      else if (type1 == 1 && type2 == 1)
          return 1;
-      else if(type1 == 0 && type2 == 1)
+      else if (type1 == 0 && type2 == 1)
          return 1;
-      else if(type1 == 1 && type2 == 0)
+      else if (type1 == 1 && type2 == 0)
          return 1;
       else
       {
-         if(op == 1)
+         if (op == 1)
             printf("Error: Invalid operands for - operator\n");
-         else if(op == 2)
+         else if (op == 2)
             printf("Error: Invalid operands for * operator\n");
          else
             printf("Error: Invalid operands for / operator\n");
          return -1;
       }
    }
-   else if(op == 4)
+   else if (op == 4)
    {
-      if(type1 == 0 && type2 == 0)
+      if (type1 == 0 && type2 == 0)
          return 0;
       else
       {
@@ -610,21 +625,21 @@ int check_arith_op(int type1, int type2, int op)
 
 bool check_assign_op(int lhs, int rhs, int op)
 {
-   if(op == 0)
+   if (op == 0)
    {
-      if(lhs == 0 && rhs == 0)
+      if (lhs == 0 && rhs == 0)
          return true;
-      else if(lhs == 1 && rhs == 1)
+      else if (lhs == 1 && rhs == 1)
          return true;
-      else if(lhs == 0 && rhs == 1)
+      else if (lhs == 0 && rhs == 1)
          return true;
-      else if(lhs == 1 && rhs == 0)
+      else if (lhs == 1 && rhs == 0)
          return true;
-      else if(lhs == 2 && rhs == 2)
+      else if (lhs == 2 && rhs == 2)
          return true;
-      else if(lhs == 7 && rhs == 8)
+      else if (lhs == 7 && rhs == 8)
          return true;
-      else if(lhs == 8 && rhs == 9)
+      else if (lhs == 8 && rhs == 9)
          return true;
       else
       {
@@ -633,24 +648,24 @@ bool check_assign_op(int lhs, int rhs, int op)
          return false;
       }
    }
-   else if(op == 1 || op == 2 || op == 3)
+   else if (op == 1 || op == 2 || op == 3)
    {
-      if(lhs == 0 && rhs == 0)
+      if (lhs == 0 && rhs == 0)
          return true;
-      else if(lhs == 1 && rhs == 1)
+      else if (lhs == 1 && rhs == 1)
          return true;
-      else if(lhs == 0 && rhs == 1)
+      else if (lhs == 0 && rhs == 1)
          return true;
-      else if(lhs == 1 && rhs == 0)
+      else if (lhs == 1 && rhs == 0)
          return true;
       else
       {
-         if(op == 1)
+         if (op == 1)
          {
             printf("Error: Invalid expression for -= assignment\n");
             printf("Error: LHS is of type %i and RHS is of type %i\n", lhs, rhs);
          }
-         else if(op == 2)
+         else if (op == 2)
          {
             printf("Error: Invalid expression for *= assignment\n");
             printf("Error: LHS is of type %i and RHS is of type %i\n", lhs, rhs);
@@ -663,9 +678,9 @@ bool check_assign_op(int lhs, int rhs, int op)
          return false;
       }
    }
-   else if(op == 4)
+   else if (op == 4)
    {
-      if(lhs == 0 && rhs == 0)
+      if (lhs == 0 && rhs == 0)
          return true;
       else
       {
@@ -674,13 +689,13 @@ bool check_assign_op(int lhs, int rhs, int op)
          return false;
       }
    }
-   else if(op == 5 || op == 6)
+   else if (op == 5 || op == 6)
    {
-      if(lhs == 7 && rhs == 7)
+      if (lhs == 7 && rhs == 7)
          return true;
       else
       {
-         if(op == 5)
+         if (op == 5)
          {
             printf("Error: Invalid expression for &= assignment\n");
             printf("Error: LHS is of type %i and RHS is of type %i\n", lhs, rhs);
@@ -690,6 +705,29 @@ bool check_assign_op(int lhs, int rhs, int op)
             printf("Error: Invalid expression for |= assignment\n");
             printf("Error: LHS is of type %i and RHS is of type %i\n", lhs, rhs);
          }
+         return false;
+      }
+   }
+   else if (op == 7)
+   {
+      if (lhs == rhs)
+         return true;
+      else if (lhs == 0 && rhs == 3)
+      {
+         return true;
+      }
+      else if (lhs == 0 && rhs == 1)
+      {
+         return true;
+      }
+      else if (lhs == 1 && rhs == 0)
+      {
+         return true;
+      }
+      else
+      {
+         printf("Error: Invalid expression for = assignment\n");
+         printf("Error: LHS is of type %i and RHS is of type %i\n", lhs, rhs);
          return false;
       }
    }

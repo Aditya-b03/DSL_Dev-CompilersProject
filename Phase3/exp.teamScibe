@@ -1,17 +1,60 @@
-
 #include "teamScibe.h"
 
 $checks$
-int sum(int A, int B)
-{   
-    return A + B;
+int sum1 (int d,string s){
+    d++;
+    return d;
 }
 
+int sum2(int A, int B)
+{  
+    int c; 
+    {
+        int a;
+    }
+    if(a is 1){
+        return 0;
+    }
+    return 0;
+}
+
+class abd{
+    int y;
+    int mul(int b){
+        b = b - 1;
+        return b; 
+    }
+}
+
+
+class abc{
+    int x;
+    int diff(int c){
+        return 0;
+    }
+    self.x
+}
+
+abd damn(int x, int y){
+    abc obj;
+    return obj;
+}
 
 int main()
 {   
     string x = "hello";
-    int y;
+    bool y;
+    y = x > x;
+    y = not y;
+    abc obb;
+    list[4]:int obc = {1,2};
+
+    for(int a ; a<1 ; a++){
+
+    }
+    if(not (not y)){
+        return 0;
+    }
     list[][][]: string names;
     list[][][]: string vals;
     names = vals;
