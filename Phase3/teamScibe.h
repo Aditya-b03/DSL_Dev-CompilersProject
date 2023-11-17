@@ -7,27 +7,33 @@
 #include <time.h>
 #include "json.hpp"
 #include <fstream>
+#include "./cpp-dump/dump.hpp"
+
 using json = nlohmann::json;
 using namespace std;
 
+
+
 /*********************COMMENTS*******************
- - add_task(name, description, due_date, priority, assignee_id): Add a new task with specified details. By default, it goes to the “To Do” status
- - move_task(task_id, new_status): Move a task to a new status (e.g., To Do, Doing, Done).
-delete_task(task_id): Delete a task from the task list.
- - view_tasks(team_id, status): View tasks for a specific team or status.
- - create_team(name, parent_team_id, manager_id): Create a new team with the specified name, optional parent team, and manager.
- - add_team_member(team_id, member_ids): Add team members to an existing team.
- - remove_team_member(team_id, member_ids): Remove team members from a team.
- - show_team(team_id): Display information about a specific team.
- - create_member(name, email, department, salary, join_date, contact_info): Create a new members profile.
-remove_member(members_id): Remove an members from the database.
 
-
-// DON'T USE LEAD
+-> LoadfromDocument -- Finish this function
+-> Add Calendar class
+-> Make Test Cases
+-> Add Calendar to Member and Team
+-> Code gen fixes
 
 *********************COMMENTS END*******************/
 
 // definitions
+
+template <typename... Args>
+inline auto print(Args &&...args) -> decltype(cpp_dump::dump(std::forward<Args>(args)...))
+{
+    return cpp_dump::dump(std::forward<Args>(args)...);
+}
+
+
+
 class team;
 class member;
 class task;
@@ -37,7 +43,7 @@ typedef struct date
     int month;
     int year;
 
-    date(int day = 0, int month = 0, int year = 0)
+    date(int day = 1, int month = 1, int year = 1972)
     {
         if (day > 31 || day < 1 || month > 12 || month < 1 || year < 0)
         {
@@ -50,7 +56,7 @@ typedef struct date
     }
 
 } date;
-
+class event;
 class calendar;
 
 // maps
@@ -97,6 +103,25 @@ public:
 
     void display(int = 0);
 
+    // // Operator Overloading
+    // void operator+=(task t)
+    // {
+    //     add_task(t);
+    // }
+    // void operator+=(team t)
+    // {
+    //     add_team(t);
+    // }
+    // void operator-=(task t)
+    // {
+    //     remove(t);
+    // }
+    // void operator-=(team t)
+    // {
+    //     remove(t);
+    // }
+
+
     friend class team;
     friend class task;
 
@@ -134,7 +159,6 @@ public:
     string name;
     member *lead;
     string description;
-
     // team member functions
     team(string = "random name",/* member = member() ,*/
          string = "No Description Given", vector<member *> = {}, vector<team *> = {});
@@ -155,11 +179,48 @@ public:
     vector<member> members();
     vector<team> teams();
 
+    // // Operator Overloading
+    // void operator+=(member m)
+    // {
+    //     insert(m);
+    // }
+    // void operator+=(vector<member> m)
+    // {
+    //     insert(m);
+    // }
+    // void operator+=(team t)
+    // {
+    //     insert(t);
+    // }
+    // void operator+=(vector<team> t)
+    // {
+    //     insert(t);
+    // }
+    // void operator-=(member m)
+    // {
+    //     remove(m);
+    // }
+    // void operator-=(vector<member> m)
+    // {
+    //     remove(m);
+    // }
+    // void operator-=(team t)
+    // {
+    //     remove(t);
+    // }
+    // void operator-=(vector<team> t)
+    // {
+    //     remove(t);
+    // }
+
+
     void show(int  = 0);
 
 
     friend class member;
 };
+
+
 
 class task
 {
@@ -181,11 +242,11 @@ public:
     void operator+(member m){
         assign_to(m);
     }
+    // update status function implement karna hai
     vector<member> assigned_to();
 
     friend class member;
     
-
 };
 
 class event
@@ -223,7 +284,7 @@ string dateToString(date d)
 string character_string = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 string gen_ID()
 {
-    srand(time(0));
+    //srand(time(0));
     string s = "";
     for (int i = 0; i < 10; i++)
     {
@@ -257,6 +318,7 @@ json makeJson(team _t)
     team *t = team_map[_t.get_id()];
     json j;
     j["team_name"] = t->name;
+    
     //j["team_lead"] = t->lead->info["name"];
     j["team_description"] = t->description;
     j["members"] = json::array();
@@ -268,9 +330,12 @@ json makeJson(team _t)
 
     j["sub_teams"] = json::array();
     for (auto sub : t->teams())
-    {
-        j["sub_teams"].push_back(makeJson(sub));
+    {   
+        cout<< t->name<< "->" << sub.name << endl;
+
+        j["sub_teams"].push_back(makeJson(*team_map[sub.get_id()]));
     }
+
     return j;
 }
 
@@ -346,7 +411,7 @@ json makeCalendar(member _m){
     }
     for (auto ev : all_events)
     {
-        event e = &ev;
+        event e = *ev;
         string due_date = dateToString(e.event_date);
         string information = "Title: " + e.title;
         
@@ -359,7 +424,7 @@ json makeCalendar(member _m){
             j[due_date].push_back(e.title);
         }
     }
-    
+    cout << "Pushed!" << endl;
     return j;
 }
 json makeCalendar (team _t){
@@ -508,6 +573,7 @@ team::team(string name, /*member lead,*/
                 this->sub_teams.insert(t);
             }
             this->team_id = gen_ID();
+            cout << this->team_id << endl;
             team_map[this->team_id] = this;
         }
 
@@ -569,14 +635,14 @@ team create_team(string name = "random name", /*member lead = member(),*/
             v.push_back(team_map[teams.get_id()]);
         }
         team *t = new team(name, moto, m, v);
-        updateJsonTeams();
+        //updateJsonTeams();
         return *t;
     }
 
 void team::insert(member m){
     team_map[this->team_id]->_members.insert(member_map[m.get_id()]);
     member_map[m.get_id()]->_teams.insert(team_map[this->team_id]);
-    updateJsonTeams();
+    //updateJsonTeams();
 }
 
 void team::insert(vector<member> m){
@@ -586,12 +652,12 @@ void team::insert(vector<member> m){
         team_map[this->team_id]->_members.insert(member_map[mem.get_id()]);
         member_map[mem.get_id()]->_teams.insert(team_map[this->team_id]);
     }
-    updateJsonTeams();
+    //updateJsonTeams();
 }
 
 void team::insert(team t){
     team_map[this->team_id]->sub_teams.insert(team_map[t.get_id()]);
-    updateJsonTeams();
+    //updateJsonTeams();
 }
 
 void team::insert(vector<team> t){
@@ -601,13 +667,13 @@ void team::insert(vector<team> t){
         //cout << this->team_id  << endl;
         team_map[this->team_id]->sub_teams.insert(team_map[teams.get_id()]);
     }
-    updateJsonTeams();
+    //updateJsonTeams();
 }
 
 void team::remove(member m){
     team_map[this->team_id]->_members.erase(member_map[m.get_id()]);
     member_map[m.get_id()]->_teams.erase(team_map[this->team_id]);
-    updateJsonTeams();
+    //updateJsonTeams();
 }
 
 void team::remove(vector<member> m){
@@ -616,12 +682,12 @@ void team::remove(vector<member> m){
         team_map[this->team_id]->_members.erase(member_map[mem.get_id()]);
         member_map[mem.get_id()]->_teams.erase(team_map[this->team_id]);
     }
-    updateJsonTeams();
+    //updateJsonTeams();
 }
 
 void team::remove(team t){
     team_map[this->team_id]->sub_teams.erase(team_map[t.get_id()]);
-    updateJsonTeams();
+    //updateJsonTeams();
 }
 
 void team::remove(vector<team> t){
@@ -629,7 +695,7 @@ void team::remove(vector<team> t){
     {
         team_map[this->team_id]->sub_teams.erase(team_map[teams.get_id()]);
     }
-    updateJsonTeams();
+    //updateJsonTeams();
 }
 
 vector<member> team::members(){
@@ -717,21 +783,21 @@ vector<member> task::assigned_to(){
 }
 
 //  ********************Event Class*******************
-event::event(string title, string description, date event_date){
-    this->title = title;
-    this->description = description;
-    this->event_date = event_date;
-    all_events.push_back(this);
-}
+// event::event(string title, string description, date event_date){
+//     this->title = title;
+//     this->description = description;
+//     this->event_date = event_date;
+//     all_events.push_back(this);
+// }
 
-string event::get_id(){
-    return this->event_id;
-}
+// string event::get_id(){
+//     return this->event_id;
+// }
 
-event create_event(string title = "random title", string description = "No Description Given", date event_date = date()){
-    event *e = new event(title, description, event_date);
-    return *e;
-}
+// event create_event(string title = "random title", string description = "No Description Given", date event_date = date()){
+//     event *e = new event(title, description, event_date);
+//     return *e;
+// }
 // ******************** DataBase System *******************
 
 json teamtoDocument(team _t){
@@ -806,4 +872,11 @@ void savetoDocument(string filename = "database"){
     }
     ofstream outputFile(filename+".json");
     outputFile << j.dump(4);
+}
+
+void loadfromDocument(string filename = "database"){
+    ifstream inputFile(filename+".json");
+    json j;
+    inputFile >> j;
+
 }

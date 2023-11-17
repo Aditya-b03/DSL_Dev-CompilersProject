@@ -1,0 +1,13 @@
+reserved: #include
+constant: "iostream"
+reserved: #include
+constant: "vector"
+reserved: #include
+constant: "map"
+reserved: #include
+constant: "set"
+reserved: #include
+constant: "teamScibe.h"
+identifier: using
+identifier: namespace
+identifier: std

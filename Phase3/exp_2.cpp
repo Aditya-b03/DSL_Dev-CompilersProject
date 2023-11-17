@@ -91,6 +91,7 @@ int main(){
     // cout << m1.member_name << endl;
     // cout << t1.members[0]->member_name << endl;
     team t1 = create_team();
+    
     cout << "here" << endl;
     vector<member> v;
     for(int i = 0; i < 3; i++){
@@ -98,17 +99,18 @@ int main(){
     }
 
     vector<team> t;
-    for(int i = 0; i < 4; i++){
+    for(int i = 0; i < 3; i++){
         t.push_back(create_team("team" + to_string(i)));
     }
-
+    print(team_map);
     cout << "here" << endl;
     t1.insert(v);
-    t1.insert(t);
+    team t2 = create_team("team2");
+    t1.insert(t2);
 
-    task tsk = create_task("task1", "task1 description", 0, "task1 status", date(1, 2, 3));
-    // tsk + v[0];
-    // tsk + v[1];
+    task tsk = create_task();
+    tsk + v[0];
+    tsk + v[1];
     tsk.assign_to(v[0]);
     tsk.assign_to(v[1]);
     cout << "here" << endl;
@@ -123,8 +125,6 @@ int main(){
     member m1 = create_member("member100");
     t1.insert(m1);
     jsonOutput(m1);
-    jsonOutput(t1);
-
-    
+    jsonOutput(tsk);
 
 }

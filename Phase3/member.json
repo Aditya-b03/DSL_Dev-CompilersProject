@@ -1,0 +1,11 @@
+{
+    "member": {
+        "member_email": "NULL",
+        "member_name": "member100",
+        "member_phone": "NULL",
+        "member_tasks": [],
+        "member_teams": [
+            "random name"
+        ]
+    }
+}
