@@ -12,19 +12,12 @@ int sum1 (int d,string s){
 
 int sum2(int A, int B)
 {  
-    int c; 
-    {
-        int a;
-    }
-    if(a is 1){
-        return 0;
-    }
     return 0;
 }
 
 class abd{
     int y;
-    int mul(int b){
+    float mul(float b){
         b = b - 1;
         return b; 
     }
@@ -34,6 +27,7 @@ class abd{
 class abc{
     int x;
     int diff(int c){
+        this.x = this.x + 1;
         return 0;
     }
 }
@@ -49,5 +43,10 @@ int main()
     bool y;
     y = x > x;
     y = not y;
-    abc obb;
-    4.4
+    abd obb;
+    /*obb.obj.y++;*/
+     string names[;
+     string vals[;
+    names = vals;
+    return 0;
+}

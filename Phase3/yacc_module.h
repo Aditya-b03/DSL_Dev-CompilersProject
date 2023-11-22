@@ -218,27 +218,27 @@ slist *init_slist()
 void insert_slist(slist *l, char *s)
 {
    snode *temp = (snode *)malloc(sizeof(snode));
-   temp->val = s;
-   temp->next = NULL;
-   if (l->head == NULL)
+   temp -> val = s;
+   temp -> next = NULL;
+   if (l -> head == NULL)
    {
-      l->head = temp;
-      l->tail = temp;
+      l -> head = temp;
+      l -> tail = temp;
    }
    else
    {
-      l->tail->next = temp;
-      l->tail = temp;
+      l -> tail -> next = temp;
+      l -> tail = temp;
    }
 }
 
 void display_slist(slist *l)
 {
-   snode *temp = l->head;
+   snode *temp = l -> head;
    while (temp != NULL)
    {
-      printf("%s ", temp->val);
-      temp = temp->next;
+      printf("%s ", temp -> val);
+      temp = temp -> next;
    }
    printf("\n");
 }
@@ -246,8 +246,8 @@ void display_slist(slist *l)
 symtab *init_symtab()
 {
    symtab *st = (symtab *)malloc(sizeof(symtab));
-   st->head = NULL;
-   st->tail = NULL;
+   st -> head = NULL;
+   st -> tail = NULL;
    return st;
 }
 
@@ -255,8 +255,8 @@ void insert_symtab(symtab *st, idrec *entry)
 {
    if (st->head == NULL)
    {
-      st->head = entry;
-      st->tail = entry;
+      st -> head = entry;
+      st -> tail = entry;
    }
    else
    {
@@ -732,4 +732,35 @@ bool check_assign_op(int lhs, int rhs, int op)
       }
    }
    
+}
+
+bool check_rel_op(int lhs, int rhs, int op)
+{
+   if(op == 0)
+   {
+      if(lhs == 0 && rhs == 0)
+         return true;
+      else if(lhs == 1 && rhs == 1)
+         return true;
+      else if(lhs == 2 && rhs == 2)
+         return true;
+      else
+      {
+         printf("Error: Invalid operands for comparison operatord\n");
+         printf("Error: LHS is of type %i and RHS is of type %i\n", lhs, rhs);
+         return false;
+      }
+   }
+   else if(op == 1)
+   {
+      if(lhs == rhs)
+         return true;
+      else
+      {
+         printf("Error: Invalid operands for equality operator\n");
+         printf("Error: LHS is of type %i and RHS is of type %i\n", lhs, rhs);
+         return false;
+      }
+   }
+   return false;
 }

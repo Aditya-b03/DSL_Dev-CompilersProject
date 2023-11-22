@@ -12,6 +12,7 @@
  int list_flag = 0;
  int list_print_flag = 0;
  int arrow_flag = 0;
+ int self_flag = 0;
  char s[100];
  int i = 0;
 %}
@@ -31,6 +32,7 @@ IF "if"
 ELSE "else"
 LIST "list"
 CLASS "class"
+SELF "self"
 
 INCLUDE "#include"
 
@@ -193,6 +195,11 @@ ID [A-Za-z][A-Za-z0-9_]*
  print(yytext);
  return CLASS;
 }
+{SELF} {
+ fprintf(tf,"reserved: %s\n", yytext);
+ print("this");
+ return SELF;
+}
 {DATA_TYPE_NEW} {
  fprintf(tf,"datatype: %s\n", yytext);
  print(yytext);
@@ -249,7 +256,12 @@ ID [A-Za-z][A-Za-z0-9_]*
        return COLON;
    }
    else if(strcmp(yytext,c4)==0){
-       print(yytext);
+      if(self_flag == 1){
+         print("->");
+       }
+       else{
+         print(yytext);
+       }
        return DOT;
    }
 }
@@ -280,6 +292,18 @@ ID [A-Za-z][A-Za-z0-9_]*
 {REL_OP} {
  fprintf(tf,"operator: %s\n", yytext);
  print(yytext);
+  char* c1 = ">";
+  char* c2 = "<";
+  char* c3 = ">=";
+  char* c4 = "<=";
+  char* c5 = "is";
+  char* c6 = "is not";
+  if(strcmp(yytext,c1)==0 || strcmp(yytext,c2)==0 || strcmp(yytext,c3)==0 || strcmp(yytext,c4)==0){
+    yylval.assignop = 0;
+  }
+  else if(strcmp(yytext,c5)==0 || strcmp(yytext,c6)==0){
+    yylval.assignop = 1;
+  }
  return REL_OP;
 }
 {UNARY_OP} {
