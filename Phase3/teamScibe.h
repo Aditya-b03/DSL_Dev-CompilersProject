@@ -380,81 +380,81 @@ void jsonOutput(task _t)
     outputFile << j.dump(4);
 }
 
-
-json makeCalendar(member _m){
+string showEvents (){
+    string markWhen = "";    
+    for (auto ev : all_events)
+    {
+        event e = *ev;
+        string due_date = dateToString(e.event_date);
+        markWhen += (due_date + ": " + e.title + " # event\n");
+    }
+    return markWhen;
+}
+string makeCalendar(member _m){
     member *m = member_map[_m.get_id()];
     json j; 
+    string markWhen = "";
 
+    cout << m->tasks().size() << endl;
+    if ((m->tasks().size()) == 0){
+        return markWhen;
+    }
     int month = m->tasks()[0].due_date.month;
     int year = m->tasks()[0].due_date.year;
     cout << "Month: "<<month << "Year: "<<year << "Date: "<<dateToString(date(1, month, year))<<endl;
-    for (int i = 1; i < 31; i++){
+    /*for (int i = 1; i < 31; i++){
         string due_date = dateToString(date(i, month, year));
         cout << "Date: " << due_date << endl;
         // j[due_date] = json::array();
         j[due_date] = "You're free today!";
     }
-    cout << "Pushed!" << endl;
+    cout << "Pushed!" << endl;*/
     for (auto t : m->tasks())
     {
         string due_date = dateToString(t.due_date);
-        string information = "Title: " + t.title + "\nStatus: " + t._status + "Priority: " + to_string(t.priority);
+        string information = t.title + "\nStatus: " + t._status + "\nPriority: " + to_string(t.priority) + " ";
         
-        if (j[due_date] == "You're free today!"){
+        markWhen += (due_date + ": " + information + "# task\n\n");
+        /*if (j[due_date] == "You're free today!"){
             j[due_date] = json::array();
-            j[due_date].push_back(t.title);
             
         }
-        else{
-            j[due_date].push_back(t.title);
-        }
-    }
-    for (auto ev : all_events)
-    {
-        event e = *ev;
-        string due_date = dateToString(e.event_date);
-        string information = "Title: " + e.title;
-        
-        if (j[due_date] == "You're free today!"){
-            j[due_date] = json::array();
-            j[due_date].push_back(e.title);
-            
-        }
-        else{
-            j[due_date].push_back(e.title);
-        }
+        j[due_date].push_back(t.title);*/
     }
     cout << "Pushed!" << endl;
-    return j;
+    return markWhen;
 }
 json makeCalendar (team _t){
     team *t = team_map[_t.get_id()];
-    json j;
+    string markWhen = "";
+    /*json j;
+    j["members"] = json::array();*/
     for (auto mem : t->members())
     {
-        j.update(makeCalendar(mem));
-        cout << j["3-2-3"] << endl;
+        // j["members"].push_back(makeCalendar(mem));
+        markWhen += makeCalendar(mem);
     }
 
-    j["sub_teams"] = json::array();
+    // j["sub_teams"] = json::array();
     for (auto sub : t->teams())
     {
-        j["sub_teams"].update(makeJson(sub));
+        markWhen += makeCalendar(sub);
+        // j["sub_teams"].push_back(makeCalendar(sub));
     }
-    return j;
+    // return j;
+    markWhen += showEvents();
+    return markWhen;
 }
 void showCalendar(member _m){
     json j;
-    j["member"] = makeCalendar(_m);
-    ofstream outputFile("memberCalendar.json");
-    outputFile << j.dump(4);
+    string calendars = makeCalendar(_m);
+    ofstream outputFile("memberCalendar.mw");
+    outputFile << "date formatting\ndateFormat: d-M-y\n" << calendars;
 }
 void showCalendar(team _t){ 
-    cout << "Show Calendar of Team" << endl;
-    json j;
-    j["team"] = makeCalendar(_t);
-    ofstream outputFile("teamCalendar.json");
-    outputFile << j.dump(4);
+    string calendars = makeCalendar(_t);
+    ofstream outputFile("teamCalendar.mw");
+    outputFile << "date formatting\ndateFormat: d-M-y\n" << calendars;
 }
 
 
@@ -790,14 +790,22 @@ vector<member> task::assigned_to(){
 //     all_events.push_back(this);
 // }
 
-// string event::get_id(){
-//     return this->event_id;
-// }
+event::event(string title, string description, date event_date){
+    this->title = title;
+    this->description = description;
+    this->event_date = event_date;
+    this->event_id = gen_ID();
+    all_events.push_back(this);
+}
 
-// event create_event(string title = "random title", string description = "No Description Given", date event_date = date()){
-//     event *e = new event(title, description, event_date);
-//     return *e;
-// }
+string event::get_id(){
+    return this->event_id;
+}
+
+event create_event(string title = "random title", string description = "No Description Given", date event_date = date()){
+    event *e = new event(title, description, event_date);
+    return *e;
+}
 // ******************** DataBase System *******************
 
 json teamtoDocument(team _t){

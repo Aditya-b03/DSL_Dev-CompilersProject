@@ -91,6 +91,10 @@ int main(){
     // cout << m1.member_name << endl;
     // cout << t1.members[0]->member_name << endl;
     team t1 = create_team();
+
+    date d = date(3, 4, 2023);
+    event e = create_event("Title", "Description", d);
+
     
     cout << "here" << endl;
     vector<member> v;
