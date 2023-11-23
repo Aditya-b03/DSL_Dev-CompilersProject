@@ -106,7 +106,6 @@ int main(){
     for(int i = 0; i < 3; i++){
         t.push_back(create_team("team" + to_string(i)));
     }
-    print(team_map);
     cout << "here" << endl;
     t1.insert(v);
     team t2 = create_team("team2");

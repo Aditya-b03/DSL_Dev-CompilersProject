@@ -7,7 +7,10 @@
 #include <time.h>
 #include "json.hpp"
 #include <fstream>
-#include "./cpp-dump/dump.hpp"
+#include <ctime>
+#include <iomanip>
+#include <chrono>
+// #include "./cpp-dump/dump.hpp"
 
 using json = nlohmann::json;
 using namespace std;
@@ -26,11 +29,11 @@ using namespace std;
 
 // definitions
 
-template <typename... Args>
+/*template <typename... Args>
 inline auto print(Args &&...args) -> decltype(cpp_dump::dump(std::forward<Args>(args)...))
 {
     return cpp_dump::dump(std::forward<Args>(args)...);
-}
+}*/
 
 
 
@@ -43,7 +46,19 @@ typedef struct date
     int month;
     int year;
 
-    date(int day = 1, int month = 1, int year = 1972)
+    date()  // Default constructor
+    {
+        auto now = chrono::system_clock::now();
+        time_t currentTime = chrono::system_clock::to_time_t(now);
+        tm* localTime = localtime(&currentTime);
+
+        // Set the date members
+        this->day = localTime->tm_mday;
+        this->month = localTime->tm_mon + 1;  // Month is zero-based
+        this->year = localTime->tm_year + 1900;  // Year is years since 1900
+    }
+
+    date(int day, int month, int year)  // Parameterized constructor
     {
         if (day > 31 || day < 1 || month > 12 || month < 1 || year < 0)
         {
@@ -207,9 +222,9 @@ void tab(int n){
 string dateToString(date d)
 {
     string s = "";
-    s += to_string(d.day);
-    s += "/";
     s += to_string(d.month);
+    s += "/";
+    s += to_string(d.day);
     s += "/";
     s += to_string(d.year);
     return s;
@@ -341,13 +356,14 @@ string makeCalendar(member _m){
     for (auto t : m->tasks())
     {
         string due_date = dateToString(t.due_date);
-        string information = t.title + "\nStatus: " + t._status + "\nPriority: " + to_string(t.priority) + " ";
+        string information = t.title + "-> " + m->info["name"] + "\nStatus: " + t._status + "\nPriority: " + to_string(t.priority) + " ";
         
         markWhen += (due_date + ": " + information + "#task\n\n");
     }
     cout << "Pushed!" << endl;
     return markWhen;
 }
+
 json makeCalendar (team _t){
     team *t = team_map[_t.get_id()];
     string markWhen = "";
@@ -455,17 +471,17 @@ void member::display(int level){
     cout << "Member Phone: " << this->info["phone"] << endl;
     tab(level);
     cout << "Member Tasks: " << endl;
-    for (auto t : this->_tasks)
+    for (auto t : member_map[this->get_id()]->tasks())
     {
         tab(level);
-        cout << "\t" << t->title << endl;
+        cout << "\t" << t.title << endl;
     }
     tab(level);
     cout << "Member Teams: " << endl;
-    for (auto t : this->_teams)
+    for (auto t : member_map[this->get_id()]->teams())
     {
         tab(level);
-        cout << "\t" << t->name << endl;
+        cout << "\t" << t.name << endl;
     }
 }
 
