@@ -85,7 +85,6 @@ class member
     //calendar *m_calendar;
 public:
     map<string, string> info;
-
     // member member functions
     member(string = "random name", string = "NULL", string = "NULL");
     string get_id();
@@ -103,23 +102,23 @@ public:
 
     void display(int = 0);
 
-    // // Operator Overloading
-    // void operator+=(task t)
-    // {
-    //     add_task(t);
-    // }
-    // void operator+=(team t)
-    // {
-    //     add_team(t);
-    // }
-    // void operator-=(task t)
-    // {
-    //     remove(t);
-    // }
-    // void operator-=(team t)
-    // {
-    //     remove(t);
-    // }
+    // Operator Overloading
+    void operator+=(task t)
+    {
+        add_task(t);
+    }
+    void operator+=(team t)
+    {
+        add_team(t);
+    }
+    void operator-=(task t)
+    {
+        remove(t);
+    }
+    void operator-=(team t)
+    {
+        remove(t);
+    }
 
 
     friend class team;
@@ -156,6 +155,7 @@ class team
     //calendar t_calendar;
 
 public:
+    string 
     string name;
     member *lead;
     string description;
@@ -179,39 +179,39 @@ public:
     vector<member> members();
     vector<team> teams();
 
-    // // Operator Overloading
-    // void operator+=(member m)
-    // {
-    //     insert(m);
-    // }
-    // void operator+=(vector<member> m)
-    // {
-    //     insert(m);
-    // }
-    // void operator+=(team t)
-    // {
-    //     insert(t);
-    // }
-    // void operator+=(vector<team> t)
-    // {
-    //     insert(t);
-    // }
-    // void operator-=(member m)
-    // {
-    //     remove(m);
-    // }
-    // void operator-=(vector<member> m)
-    // {
-    //     remove(m);
-    // }
-    // void operator-=(team t)
-    // {
-    //     remove(t);
-    // }
-    // void operator-=(vector<team> t)
-    // {
-    //     remove(t);
-    // }
+    // Operator Overloading
+    void operator+=(member m)
+    {
+        insert(m);
+    }
+    void operator+=(vector<member> m)
+    {
+        insert(m);
+    }
+    void operator+=(team t)
+    {
+        insert(t);
+    }
+    void operator+=(vector<team> t)
+    {
+        insert(t);
+    }
+    void operator-=(member m)
+    {
+        remove(m);
+    }
+    void operator-=(vector<member> m)
+    {
+        remove(m);
+    }
+    void operator-=(team t)
+    {
+        remove(t);
+    }
+    void operator-=(vector<team> t)
+    {
+        remove(t);
+    }
 
 
     void show(int  = 0);
@@ -273,20 +273,20 @@ string dateToString(date d)
 {
     string s = "";
     s += to_string(d.day);
-    s += "-";
+    s += "/";
     s += to_string(d.month);
-    s += "-";
+    s += "/";
     s += to_string(d.year);
     return s;
 }
 
 // generate random ID - done
 string character_string = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-string gen_ID()
+string gen_ID(int n)
 {
     //srand(time(0));
     string s = "";
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < n; i++)
     {
         s += character_string[rand() % 62];
     }
@@ -386,10 +386,11 @@ string showEvents (){
     {
         event e = *ev;
         string due_date = dateToString(e.event_date);
-        markWhen += (due_date + ": " + e.title + " # event\n");
+        markWhen += (due_date + ": " + e.title + " #event\n");
     }
     return markWhen;
 }
+
 string makeCalendar(member _m){
     member *m = member_map[_m.get_id()];
     json j; 
@@ -414,7 +415,7 @@ string makeCalendar(member _m){
         string due_date = dateToString(t.due_date);
         string information = t.title + "\nStatus: " + t._status + "\nPriority: " + to_string(t.priority) + " ";
         
-        markWhen += (due_date + ": " + information + "# task\n\n");
+        markWhen += (due_date + ": " + information + "#task\n\n");
         /*if (j[due_date] == "You're free today!"){
             j[due_date] = json::array();
             
@@ -465,7 +466,7 @@ member::member(string name, string email, string phone){
     this->info["name"] = name;
     this->info["email"] = email;
     this->info["phone"] = phone;
-    this->member_id = gen_ID();
+    this->member_id = gen_ID(10);
     member_map[member_id] = this;
 }
 
@@ -572,7 +573,7 @@ team::team(string name, /*member lead,*/
             {
                 this->sub_teams.insert(t);
             }
-            this->team_id = gen_ID();
+            this->team_id = gen_ID(10);
             cout << this->team_id << endl;
             team_map[this->team_id] = this;
         }
@@ -603,30 +604,12 @@ json team::to_json() {
     return teamJson;
 }
 
-void updateJsonTeams() {
-    nlohmann::json teamsJson = nlohmann::json::array();
-
-    for (const auto& t : team_map) {
-        teamsJson.push_back(t.second->to_json());
-    }
-
-    nlohmann::json outputJson;
-    outputJson["teams"] = teamsJson;
-
-    
-    // std::ofstream outputFile("teams.json");
-    // outputFile << outputJson.dump(4);
-    //std::cout << "Teams data updated in teams.json" << std::endl;
-}
-
-
 
 team create_team(string name = "random name", /*member lead = member(),*/
             string moto = "No Description Given", vector<member> members = {}, vector<team> sub_teams = {}){
         vector<member *> m;
         for (auto mem : members)
-        {   
-
+        {
             m.push_back(member_map[mem.get_id()]);
         }
         vector<team *> v;
@@ -635,14 +618,15 @@ team create_team(string name = "random name", /*member lead = member(),*/
             v.push_back(team_map[teams.get_id()]);
         }
         team *t = new team(name, moto, m, v);
-        //updateJsonTeams();
+        
         return *t;
     }
 
 void team::insert(member m){
+
     team_map[this->team_id]->_members.insert(member_map[m.get_id()]);
     member_map[m.get_id()]->_teams.insert(team_map[this->team_id]);
-    //updateJsonTeams();
+    
 }
 
 void team::insert(vector<member> m){
@@ -652,12 +636,29 @@ void team::insert(vector<member> m){
         team_map[this->team_id]->_members.insert(member_map[mem.get_id()]);
         member_map[mem.get_id()]->_teams.insert(team_map[this->team_id]);
     }
-    //updateJsonTeams();
+    
+}
+
+void get_subteam_ids(set<string> &v,team t,string id){
+    if (v.find(id) != v.end())
+    {
+        cout << "Error: Cyclic Dependency: Insert Subteam Failed " << endl;
+        exit(0);
+    }
+    for (auto teams : team_map[t.get_id()]->sub_teams)
+    {
+        v.insert(teams->get_id());
+        get_subteam_ids(v,*teams,id);
+    }
+    return;
 }
 
 void team::insert(team t){
+    // get all subteams of t and check if this team is already present in them
+    set<string> v;
+    get_subteam_ids(v,t,this->team_id);
     team_map[this->team_id]->sub_teams.insert(team_map[t.get_id()]);
-    //updateJsonTeams();
+    
 }
 
 void team::insert(vector<team> t){
@@ -665,15 +666,17 @@ void team::insert(vector<team> t){
     for (auto teams : t)
     {
         //cout << this->team_id  << endl;
+        set<string> v;
+        get_subteam_ids(v, t, this->team_id);
         team_map[this->team_id]->sub_teams.insert(team_map[teams.get_id()]);
     }
-    //updateJsonTeams();
+    
 }
 
 void team::remove(member m){
     team_map[this->team_id]->_members.erase(member_map[m.get_id()]);
     member_map[m.get_id()]->_teams.erase(team_map[this->team_id]);
-    //updateJsonTeams();
+    
 }
 
 void team::remove(vector<member> m){
@@ -682,20 +685,24 @@ void team::remove(vector<member> m){
         team_map[this->team_id]->_members.erase(member_map[mem.get_id()]);
         member_map[mem.get_id()]->_teams.erase(team_map[this->team_id]);
     }
-    //updateJsonTeams();
+    
 }
 
 void team::remove(team t){
     team_map[this->team_id]->sub_teams.erase(team_map[t.get_id()]);
-    //updateJsonTeams();
+    
 }
 
 void team::remove(vector<team> t){
     for (auto teams : t)
     {
+        if(team_map[this->team_id]->sub_teams.find(team_map[teams.get_id()]) != team_map[this->team_id]->sub_teams.end()){
+            cout << "Error: Team not found" << endl;
+            return;
+        }
         team_map[this->team_id]->sub_teams.erase(team_map[teams.get_id()]);
     }
-    //updateJsonTeams();
+    
 }
 
 vector<member> team::members(){
@@ -751,7 +758,7 @@ task::task(string title, string description, int priority, string status, date d
     this->priority = priority;
     this->_status = status;
     this->due_date = due_date;
-    this->task_id = gen_ID();
+    this->task_id = gen_ID(10);
     task_map[task_id] = this;
 }
 
@@ -794,7 +801,7 @@ event::event(string title, string description, date event_date){
     this->title = title;
     this->description = description;
     this->event_date = event_date;
-    this->event_id = gen_ID();
+    this->event_id = gen_ID(10);
     all_events.push_back(this);
 }
 
@@ -808,83 +815,123 @@ event create_event(string title = "random title", string description = "No Descr
 }
 // ******************** DataBase System *******************
 
-json teamtoDocument(team _t){
-    team *t = team_map[_t.get_id()];
-    json j;
-    j["team_name"] = t->name;
-    //j["team_lead"] = t->lead->info["name"];
-    j["team_description"] = t->description;
-    j["members"] = json::array();
-    for(member m : t->members()){
-        j["members"].push_back(m.get_id());
-    }
-    j["sub_teams"] = json::array();
-    for(team sub : t->teams()){
-        j["sub_teams"].push_back(sub.get_id());
-    }
-    return j;
-}
+// json teamtoDocument(team _t){
+//     team *t = team_map[_t.get_id()];
+//     json j;
+//     j["team_name"] = t->name;
+//     //j["team_lead"] = t->lead->info["name"];
+//     j["team_description"] = t->description;
+//     j["members"] = json::array();
+//     for(member m : t->members()){
+//         j["members"].push_back(m.get_id());
+//     }
+//     j["sub_teams"] = json::array();
+//     for(team sub : t->teams()){
+//         j["sub_teams"].push_back(sub.get_id());
+//     }
+//     return j;
+// }
 
-json membertoDocument(member _m){
-    member *m = member_map[_m.get_id()];
-    json j;
-    for (auto i : m->info)
-    {
-        j[i.first] = i.second;
-    }
-    j["member_tasks"] = json::array();
-    for(task t : m->tasks()){
-        j["member_tasks"].push_back(t.get_id());
-    }
-    j["member_teams"] = json::array();
-    for(team t : m->teams()){
-        j["member_teams"].push_back(t.get_id());
-    }
-    return j;
-}
+// json membertoDocument(member _m){
+//     member *m = member_map[_m.get_id()];
+//     json j;
+//     j[]
+//     j["id"] = m->get_id();
+//     for (auto i : m->info)
+//     {
+//         j[i.first] = i.second;
+//     }
+//     j["member_tasks"] = json::array();
+//     for(task t : m->tasks()){
+//         j["member_tasks"].push_back(t.get_id());
+//     }
+//     j["member_teams"] = json::array();
+//     for(team t : m->teams()){
+//         j["member_teams"].push_back(t.get_id());
+//     }
+//     return j;
+// }
 
-json tasktoDocument(task _t){
-    task *t = task_map[_t.get_id()];
-    json j;
-    j["task_title"] = t->title;
-    j["task_description"] = t->description;
-    j["task_priority"] = t->priority;
-    j["task_status"] = t->_status;
-    j["task_due_date"] = dateToString(t->due_date);
-    j["task_assigned_to"] = json::array();
-    for(member m : t->assigned_to()){
-        j["task_assigned_to"].push_back(m.get_id());
-    }
-    return j;
-}
+// json tasktoDocument(task _t){
+//     task *t = task_map[_t.get_id()];
+//     json j;
+//     j["id"] = t->get_id();
+//     j["task_title"] = t->title;
+//     j["task_description"] = t->description;
+//     j["task_priority"] = t->priority;
+//     j["task_status"] = t->_status;
+//     j["task_due_date"] = dateToString(t->due_date);
+//     j["task_assigned_to"] = json::array();
+//     for(member m : t->assigned_to()){
+//         j["task_assigned_to"].push_back(m.get_id());
+//     }
+//     return j;
+// }
 
-void savetoDocument(string filename = "database"){
-    json j;
-    j["teams"] = json::array();
-    for(auto t : team_map){
-        json teamJson;
-        teamJson[t.first] = teamtoDocument(*t.second);
-        j["teams"].push_back(teamJson);
-    }
-    j["members"] = json::array();
-    for(auto m : member_map){
-        json memberJson;
-        memberJson[m.first] = membertoDocument(*m.second);
-        j["members"].push_back(memberJson);
-    }
-    j["tasks"] = json::array();
-    for(auto t : task_map){
-        json taskJson;
-        taskJson[t.first] = tasktoDocument(*t.second);
-        j["tasks"].push_back(taskJson);
-    }
-    ofstream outputFile(filename+".json");
-    outputFile << j.dump(4);
-}
+// void savetoDocument(string filename = "database"){
+//     json j;
+//     j["teams"] = json::array();
+//     for(auto t : team_map){
+//         json teamJson;
+//         teamJson[t.first] = teamtoDocument(*t.second);
+//         j["teams"].push_back(teamJson);
+//     }
+//     j["members"] = json::array();
+//     for(auto m : member_map){
+//         json memberJson;
+//         memberJson[m.first] = membertoDocument(*m.second);
+//         j["members"].push_back(memberJson);
+//     }
+//     j["tasks"] = json::array();
+//     for(auto t : task_map){
+//         json taskJson;
+//         taskJson[t.first] = tasktoDocument(*t.second);
+//         j["tasks"].push_back(taskJson);
+//     }
+//     ofstream outputFile(filename+".json");
+//     outputFile << j.dump(4);
+// }
 
-void loadfromDocument(string filename = "database"){
-    ifstream inputFile(filename+".json");
-    json j;
-    inputFile >> j;
+// void loadfromDocument(string filename = "database"){
+//     ifstream inputFile(filename+".json");
+//     if(!inputFile.is_open()){
+//         cout << "Error: File not found" << endl;
+//         return;
+//     }
+//     json j;
+//     inputFile >> j;
+//     if(j.find("teams") != j.end()){
+//         for(auto t : j["teams"]){
+//             team *newTeam = new team(t["team_name"], t["team_description"]);
+//             team_map[t["team_name"]] = newTeam;
+//         }
+//     }
+//     else{
+//         cout << "Error: No teams found" << endl;
+//     }
 
-}
+//     if(j.find("members") != j.end()){
+//         for(auto m : j["members"]){
+//             member *newMember = new member(m["member_name"], m["member_email"], m["member_phone"]);
+//             member_map[m["member_name"]] = newMember;
+//         }
+//     }
+//     else{
+//         cout << "Error: No members found" << endl;
+//     }
+
+//     if(j.find("tasks") != j.end()){
+//         for(auto t : j["tasks"]){
+//             task *newTask = new task(t["task_title"], t["task_description"], t["task_priority"], t["task_status"], date());
+//             task_map[t["task_title"]] = newTask;
+//         }
+//     }
+//     else{
+//         cout << "Error: No tasks found" << endl;
+//     }
+
+    
+
+// }
+
+
