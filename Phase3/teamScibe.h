@@ -103,22 +103,10 @@ public:
     void display(int = 0);
 
     // Operator Overloading
-    void operator+=(task t)
-    {
-        add_task(t);
-    }
-    void operator+=(team t)
-    {
-        add_team(t);
-    }
-    void operator-=(task t)
-    {
-        remove(t);
-    }
-    void operator-=(team t)
-    {
-        remove(t);
-    }
+    void operator+=(task t);
+    void operator+=(team t);
+    void operator-=(task t);
+    void operator-=(team t);
 
 
     friend class team;
@@ -155,7 +143,6 @@ class team
     //calendar t_calendar;
 
 public:
-    string 
     string name;
     member *lead;
     string description;
@@ -180,38 +167,14 @@ public:
     vector<team> teams();
 
     // Operator Overloading
-    void operator+=(member m)
-    {
-        insert(m);
-    }
-    void operator+=(vector<member> m)
-    {
-        insert(m);
-    }
-    void operator+=(team t)
-    {
-        insert(t);
-    }
-    void operator+=(vector<team> t)
-    {
-        insert(t);
-    }
-    void operator-=(member m)
-    {
-        remove(m);
-    }
-    void operator-=(vector<member> m)
-    {
-        remove(m);
-    }
-    void operator-=(team t)
-    {
-        remove(t);
-    }
-    void operator-=(vector<team> t)
-    {
-        remove(t);
-    }
+    void operator+=(member m);
+    void operator+=(vector<member> m);
+    void operator+=(team t);
+    void operator+=(vector<team> t);
+    void operator-=(member m);
+    void operator-=(vector<member> m);
+    void operator-=(team t);
+    void operator-=(vector<team> t);
 
 
     void show(int  = 0);
@@ -645,10 +608,10 @@ void get_subteam_ids(set<string> &v,team t,string id){
         cout << "Error: Cyclic Dependency: Insert Subteam Failed " << endl;
         exit(0);
     }
-    for (auto teams : team_map[t.get_id()]->sub_teams)
+    for (auto teams : team_map[t.get_id()]->teams())
     {
-        v.insert(teams->get_id());
-        get_subteam_ids(v,*teams,id);
+        v.insert(teams.get_id());
+        get_subteam_ids(v,teams,id);
     }
     return;
 }
@@ -667,7 +630,7 @@ void team::insert(vector<team> t){
     {
         //cout << this->team_id  << endl;
         set<string> v;
-        get_subteam_ids(v, t, this->team_id);
+        get_subteam_ids(v, teams, this->team_id);
         team_map[this->team_id]->sub_teams.insert(team_map[teams.get_id()]);
     }
     
@@ -929,9 +892,56 @@ event create_event(string title = "random title", string description = "No Descr
 //     else{
 //         cout << "Error: No tasks found" << endl;
 //     }
-
-    
-
 // }
 
+// Operator Overloading
+void member::operator+=(task t)
+{
+    add_task(t);
+}
+void member::operator+=(team t)
+{
+    add_team(t);
+}
+void member::operator-=(task t)
+{
+    remove(t);
+}
+void member::operator-=(team t)
+{
+    remove(t);
+}
 
+// Operator Overloading
+void team::operator+=(member m)
+{
+    insert(m);
+}
+void team::operator+=(vector<member> m)
+{
+    insert(m);
+}
+void team::operator+=(team t)
+{
+    insert(t);
+}
+void team::operator+=(vector<team> t)
+{
+    insert(t);
+}
+void team::operator-=(member m)
+{
+    remove(m);
+}
+void team::operator-=(vector<member> m)
+{
+    remove(m);
+}
+void team::operator-=(team t)
+{
+    remove(t);
+}
+void team::operator-=(vector<team> t)
+{
+    remove(t);
+}
