@@ -65,17 +65,7 @@ map<string, team *> team_map;
 map<string, task *> task_map;
 vector<event *> all_events;
 
-//********************Classes*******************
-// class calendar
-// {
-//     map<string, set<task *>> calendar_map;
-
-// public:
-//     void add_task(task &t, date d);
-//     void remove_task(task &t, date d);
-//     void display(date d);
-// };
-
+//************************ CLASSES ************************
 
 class member
 {
@@ -114,26 +104,6 @@ public:
 
 };
 
-/*class calendar 
-{
-    string calendar_id;
-    set<member *> _members;
-    set<team *> _teams;
-
-public:
-    string name;
-    calendar(string = "name", vector <member *> = {}, vector <team *> = {});
-
-    void insert(task t);
-    void insert(vector<task> t);
-    void remove (task t);
-    void remove (vector<task> t);
-    json show();
-
-    vector <member> members();
-    vector <team> teams();
-
-};*/
 
 class team
 {
@@ -184,7 +154,6 @@ public:
 };
 
 
-
 class task
 {
     string task_id;
@@ -212,6 +181,7 @@ public:
     
 };
 
+
 class event
 {
     string event_id;
@@ -224,8 +194,10 @@ public:
     string get_id();
 };
 
-// ********************Utility features/functions*******************
 
+
+
+// ********************Utility features/functions*******************
 
 void tab(int n){
     for (int i = 0; i < n; i++)
@@ -366,24 +338,12 @@ string makeCalendar(member _m){
     int month = m->tasks()[0].due_date.month;
     int year = m->tasks()[0].due_date.year;
     cout << "Month: "<<month << "Year: "<<year << "Date: "<<dateToString(date(1, month, year))<<endl;
-    /*for (int i = 1; i < 31; i++){
-        string due_date = dateToString(date(i, month, year));
-        cout << "Date: " << due_date << endl;
-        // j[due_date] = json::array();
-        j[due_date] = "You're free today!";
-    }
-    cout << "Pushed!" << endl;*/
     for (auto t : m->tasks())
     {
         string due_date = dateToString(t.due_date);
         string information = t.title + "\nStatus: " + t._status + "\nPriority: " + to_string(t.priority) + " ";
         
         markWhen += (due_date + ": " + information + "#task\n\n");
-        /*if (j[due_date] == "You're free today!"){
-            j[due_date] = json::array();
-            
-        }
-        j[due_date].push_back(t.title);*/
     }
     cout << "Pushed!" << endl;
     return markWhen;
@@ -391,30 +351,26 @@ string makeCalendar(member _m){
 json makeCalendar (team _t){
     team *t = team_map[_t.get_id()];
     string markWhen = "";
-    /*json j;
-    j["members"] = json::array();*/
-    for (auto mem : t->members())
-    {
-        // j["members"].push_back(makeCalendar(mem));
+
+
+    for (auto mem : t->members()){
         markWhen += makeCalendar(mem);
     }
 
-    // j["sub_teams"] = json::array();
-    for (auto sub : t->teams())
-    {
+
+    for (auto sub : t->teams()){
         markWhen += makeCalendar(sub);
-        // j["sub_teams"].push_back(makeCalendar(sub));
     }
-    // return j;
     markWhen += showEvents();
     return markWhen;
 }
+
 void showCalendar(member _m){
-    json j;
     string calendars = makeCalendar(_m);
     ofstream outputFile("memberCalendar.mw");
     outputFile << "date formatting\ndateFormat: d-M-y\n" << calendars;
 }
+
 void showCalendar(team _t){ 
     string calendars = makeCalendar(_t);
     ofstream outputFile("teamCalendar.mw");
@@ -423,7 +379,8 @@ void showCalendar(team _t){
 
 
 
-// ********************Member Class*******************
+
+// ********************Member Class | Function Definitions*******************
 
 member::member(string name, string email, string phone){
     this->info["name"] = name;
@@ -521,7 +478,7 @@ void member::update_info(map<string,string> info){
 }
 
 
-// ********************Team Class*******************
+// ********************Team Class | Function Definitions*******************
 
 team::team(string name, /*member lead,*/
            string moto, vector<member *> members, vector<team *> sub_teams){
@@ -566,7 +523,6 @@ json team::to_json() {
 
     return teamJson;
 }
-
 
 team create_team(string name = "random name", /*member lead = member(),*/
             string moto = "No Description Given", vector<member> members = {}, vector<team> sub_teams = {}){
@@ -713,7 +669,7 @@ void team::show(int level){
 }
 
 
-//  ********************Task Class*******************
+//  ********************Task Class | Function Definitions*******************
 
 task::task(string title, string description, int priority, string status, date due_date){
     this->title = title;
@@ -752,13 +708,7 @@ vector<member> task::assigned_to(){
     return v;
 }
 
-//  ********************Event Class*******************
-// event::event(string title, string description, date event_date){
-//     this->title = title;
-//     this->description = description;
-//     this->event_date = event_date;
-//     all_events.push_back(this);
-// }
+//  ********************Event Class | Function Definitions*******************
 
 event::event(string title, string description, date event_date){
     this->title = title;
@@ -776,6 +726,8 @@ event create_event(string title = "random title", string description = "No Descr
     event *e = new event(title, description, event_date);
     return *e;
 }
+
+
 // ******************** DataBase System *******************
 
 // json teamtoDocument(team _t){
