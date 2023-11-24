@@ -62,7 +62,8 @@
     "string": "cpp",
     "filesystem": "cpp",
     "iosfwd": "cpp",
-    "map": "cpp"
+    "map": "cpp",
+    "bitset": "cpp"
   },
   "C_Cpp.errorSquiggles": "disabled"
 }

@@ -12,9 +12,10 @@
     extern FILE *yyout;
     extern FILE *yyin;
     extern int yylineno;
+    extern int list_flag;
     FILE *tf;
-    int for_loop = 0;       //nested loop
-    int nested_call = 0;    // nested call
+    int for_loop = 0;       
+    int nested_call = 0;    
     int return_flag = 0;
     extern FILE *tf;
 
@@ -376,7 +377,7 @@ function_param: data_type_new IDENTIFIER {
 
 
 // 3. Class 
-class: class_dec LCB class_stmt RCB{
+class: class_dec LCB class_stmt RCB SEMICOLON {
         struct classrec *entry = (struct classrec *)malloc(sizeof(struct classrec));
         entry -> name = $1.name;
         entry -> members = members;
@@ -1229,11 +1230,13 @@ list: LIST dim COLON data_type_pr {
         $$.type = $4;
         $$.dim = $2.dim;
         $$.class_name = NULL;
+        list_flag = 0;
     }
     | LIST dim COLON data_type_new {
         $$.type = $4;
         $$.dim = $2.dim;
         $$.class_name = NULL;
+        list_flag = 0;
     }
     | LIST dim COLON IDENTIFIER {
         if(search_classtab(class_table, $4.name) == NULL)
@@ -1244,6 +1247,7 @@ list: LIST dim COLON data_type_pr {
         $$.type = 14;
         $$.class_name = $4.name;
         $$.dim = $2.dim;
+        list_flag = 1;
     }
     ;
 

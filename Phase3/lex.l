@@ -1,14 +1,11 @@
 %{
  #include <stdio.h>
  #include <stdbool.h>
+ #include "lex_module.h"
  #include "yacc.tab.h"
  extern FILE *yyout;
  extern FILE *tf;
 
-
- void print(char* s){
-   fprintf(yyout,"%s",s);
- }
  int list_flag = 0;
  int list_print_flag = 0;
  int arrow_flag = 0;
@@ -107,6 +104,7 @@ ID [A-Za-z][A-Za-z0-9_]*
 {RETURN} {
  fprintf(tf,"reserved: %s\n", yytext);
  print(yytext);
+ gen_vec("list [2][3+4] : string");
  return RETURN;
 }
 {BOOL} {
