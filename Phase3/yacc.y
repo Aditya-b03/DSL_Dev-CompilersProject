@@ -13,6 +13,7 @@
     extern FILE *yyin;
     extern int yylineno;
     extern int list_flag;
+    extern char* init;
     FILE *tf;
     int for_loop = 0;       
     int nested_call = 0;    
@@ -30,6 +31,7 @@
     int scope;
     bool rflag;
     int return_type;
+    int lflag;
 
 %}
 
@@ -638,6 +640,8 @@ class_decl_stmt: data_type_new id_list SEMICOLON {
             }
             temp = temp->next;
         }
+        init = "";
+        lflag = 1;
     } 
     ;
 
@@ -799,6 +803,8 @@ decl_stmt: data_type_new id_list SEMICOLON {
                 insert_symtab(local_table, entry);
             temp = temp -> next;
         }
+        init = "";
+        lflag = 1;
     }
     ;
 
@@ -806,9 +812,11 @@ decl_stmt: data_type_new id_list SEMICOLON {
 id_list: id_list COMMA IDENTIFIER{
         insert_slist($1, $3.name);
         $$ = $1;
+        printf("%s\n", init);
+        if(lflag)
+            fprintf(yyout, "%s", init);
     }
     | IDENTIFIER EQUALS nested_expr{
-        // check nested expr type
         $$ = init_slist();
         insert_slist($$, $1.name);
     }
@@ -818,7 +826,10 @@ id_list: id_list COMMA IDENTIFIER{
     }
     | IDENTIFIER{
         $$ = init_slist();
-        insert_slist($$, $1.name);   
+        insert_slist($$, $1.name);
+        printf("%s\n", init);
+        if(lflag)
+            fprintf(yyout, "%s", init);
     }
     ;
 
@@ -1226,26 +1237,26 @@ return_stmt: RETURN SEMICOLON {
 
 
 // 11. Identifiers and Lists
-list: LIST dim COLON data_type_pr {
-        $$.type = $4;
+list: LIST dim COLON {lflag = 0;} data_type_pr {
+        $$.type = $5;
         $$.dim = $2.dim;
         $$.class_name = NULL;
         list_flag = 0;
     }
-    | LIST dim COLON data_type_new {
-        $$.type = $4;
+    | LIST dim COLON {lflag = 0;} data_type_new {
+        $$.type = $5;
         $$.dim = $2.dim;
         $$.class_name = NULL;
         list_flag = 0;
     }
-    | LIST dim COLON IDENTIFIER {
-        if(search_classtab(class_table, $4.name) == NULL)
+    | LIST dim COLON {lflag = 0;} IDENTIFIER {
+        if(search_classtab(class_table, $5.name) == NULL)
         {
-            printf("Error: Class %s not declared\n", $4.name);
+            printf("Error: Class %s not declared\n", $5.name);
             YYABORT;
         }
         $$.type = 14;
-        $$.class_name = $4.name;
+        $$.class_name = $5.name;
         $$.dim = $2.dim;
         list_flag = 1;
     }

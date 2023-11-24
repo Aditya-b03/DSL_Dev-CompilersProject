@@ -547,23 +547,24 @@ char *yytext;
 #line 2 "lex.l"
  #include <stdio.h>
  #include <stdbool.h>
- #include "lex_module.h"
  #include "yacc.tab.h"
+ #include "lex_module.h"
  extern FILE *yyout;
  extern FILE *tf;
 
-
- void print(char* s){
-   fprintf(yyout,"%s",s);
- }
  int list_flag = 0;
  int list_print_flag = 0;
  int arrow_flag = 0;
  int self_flag = 0;
  char s[100];
  int i = 0;
-#line 566 "lex.yy.c"
+
+ bool v_flag = false;
+ bool v_id = false;
+ char *vec, *init;
+
 #line 567 "lex.yy.c"
+#line 568 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -780,9 +781,9 @@ YY_DECL
 		}
 
 	{
-#line 73 "lex.l"
+#line 74 "lex.l"
 
-#line 786 "lex.yy.c"
+#line 787 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -842,7 +843,7 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 74 "lex.l"
+#line 75 "lex.l"
 {  
    yylineno++;
    print(yytext);
@@ -851,10 +852,8 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 81 "lex.l"
+#line 82 "lex.l"
 {
-
-
    print(yytext);
  ;
 }
@@ -862,7 +861,7 @@ YY_RULE_SETUP
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 87 "lex.l"
+#line 86 "lex.l"
 {
  fprintf(tf,"comment: %s\n", yytext);
  if(yytext[0]=='$' && yytext[strlen(yytext)-1]=='$'){
@@ -877,7 +876,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 98 "lex.l"
+#line 97 "lex.l"
 {
  fprintf(tf,"reserved: %s\n", yytext);
  print("#include");
@@ -886,7 +885,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 103 "lex.l"
+#line 102 "lex.l"
 {
  fprintf(tf,"datatype: %s\n", yytext);
  print(yytext);
@@ -895,17 +894,16 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 108 "lex.l"
+#line 107 "lex.l"
 {
  fprintf(tf,"reserved: %s\n", yytext);
  print(yytext);
- generate_cpp_vector_initializer("list[2][3+4] : string");
  return RETURN;
 }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 114 "lex.l"
+#line 112 "lex.l"
 {
  fprintf(tf,"datatype: %s\n", yytext);
  print(yytext);
@@ -914,7 +912,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 119 "lex.l"
+#line 117 "lex.l"
 {
  fprintf(tf,"reserved: %s\n", yytext);
  print(yytext);
@@ -923,7 +921,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 124 "lex.l"
+#line 122 "lex.l"
 {
  fprintf(tf,"reserved: %s\n", yytext);
  print(yytext);
@@ -932,7 +930,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 129 "lex.l"
+#line 127 "lex.l"
 {
  fprintf(tf,"reserved: %s\n", yytext);
  print(yytext);
@@ -941,7 +939,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 134 "lex.l"
+#line 132 "lex.l"
 {
  fprintf(tf,"reserved: %s\n", yytext);
  print(yytext);
@@ -950,49 +948,70 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 139 "lex.l"
+#line 137 "lex.l"
 {
  fprintf(tf,"constant: %s\n", yytext);
- if(list_flag==1){
-   s[i] = *yytext;
-   i++;
- }
+ if(v_flag == true){
+  vec = concat(vec,yytext);
+}
  else{
    print(yytext);
  }
+
+ 
  return NUMBER;
 }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 150 "lex.l"
+#line 149 "lex.l"
 {
   fprintf(tf,"constant: %s\n", yytext);
-  print(yytext);
-  return DECIMAL;
+  
+  if(v_flag == true){
+    vec = concat(vec,yytext);
+  }
+  else{
+    print(yytext);
+  }
+return DECIMAL;
 }
 	YY_BREAK
 case 14:
 /* rule 14 can match eol */
 YY_RULE_SETUP
-#line 155 "lex.l"
+#line 160 "lex.l"
 {
  fprintf(tf,"constant: %s\n", yytext);
- print(yytext);
+ 
+
+  if(v_flag == true){
+    vec = concat(vec,yytext);
+  }
+  else{
+    print(yytext);
+  }
  return STRING_LITERAL;
 }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 160 "lex.l"
+#line 172 "lex.l"
 {
  fprintf(tf,"datatype: %s\n", yytext);
- print(yytext);
+ 
    char* c1 = "int";
    char* c3 = "string";
    char* c4 = "bool";
    char* c5 = "void";  
    char* c6 = "float";
+
+  if(v_flag == true){
+    vec = concat(vec,yytext);
+    init = gen_vec(vec);
+    v_flag = false;
+  }
+  else print(yytext);
    if(strcmp(yytext,c1)==0){
      return INT;
    }
@@ -1012,7 +1031,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 184 "lex.l"
+#line 203 "lex.l"
 {
  fprintf(tf,"datatype: %s\n", yytext);
  print(yytext);
@@ -1021,17 +1040,19 @@ YY_RULE_SETUP
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 189 "lex.l"
+#line 208 "lex.l"
 {        
  fprintf(tf,"reserved: %s\n", yytext);  
  list_flag = 1;
  list_print_flag=1;
+v_flag = true;
+vec = strdup(yytext);
  return LIST;
 }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 195 "lex.l"
+#line 216 "lex.l"
 {
  fprintf(tf,"reserved: %s\n", yytext);
  print(yytext);
@@ -1040,7 +1061,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 200 "lex.l"
+#line 221 "lex.l"
 {
  fprintf(tf,"reserved: %s\n", yytext);
  print("this");
@@ -1049,16 +1070,22 @@ YY_RULE_SETUP
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 205 "lex.l"
+#line 226 "lex.l"
 {
  fprintf(tf,"datatype: %s\n", yytext);
- print(yytext);
+ 
    char* c1 = "team";
    char* c2 = "member";
    char* c3 = "task";
    char* c4 = "event";
    char* c5 = "meeting";
    char* c6 = "calendar";
+    if(v_flag == true){
+      vec = concat(vec,yytext);
+      init = gen_vec(vec);
+      v_flag = false;
+    }
+    else print(yytext);
    if(strcmp(yytext,c1)==0){
        return TEAM;
    }
@@ -1081,7 +1108,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 233 "lex.l"
+#line 260 "lex.l"
 {
    fprintf(tf,"punctuation: %s\n", yytext);
    char* c1 = ",";
@@ -1101,13 +1128,16 @@ YY_RULE_SETUP
        return SEMICOLON;
    }
    else if(strcmp(yytext,c3)==0){
-       if(list_flag==1){
-         list_flag = 0;
-       }
-       else{
+       
+       
+
+       if(v_flag == true){
+          vec = concat(vec,yytext);
+        }
+        else{
          print(yytext);
-       }
-       return COLON;
+        }
+        return COLON;
    }
    else if(strcmp(yytext,c4)==0){
       if(self_flag == 1){
@@ -1122,15 +1152,19 @@ YY_RULE_SETUP
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 270 "lex.l"
+#line 300 "lex.l"
 {
  fprintf(tf,"operator: %s\n", yytext);
- print(yytext);
+ 
  char* c1 = "+";
  char* c2 = "-";
  char* c3 = "/";
  char* c4 = "*";
  char* c5 = "%";
+  if(v_flag == true){
+    vec = concat(vec,yytext);
+  }
+  else print(yytext);
  if(strcmp(yytext,c1)==0){
    return ADD;
  }
@@ -1150,16 +1184,21 @@ YY_RULE_SETUP
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 294 "lex.l"
+#line 328 "lex.l"
 {
  fprintf(tf,"operator: %s\n", yytext);
- print(yytext);
+ 
   char* c1 = ">";
   char* c2 = "<";
   char* c3 = ">=";
   char* c4 = "<=";
   char* c5 = "is";
   char* c6 = "is not";
+  if(v_flag == true){
+    vec = concat(vec,yytext);
+  }
+  else print(yytext);
+
   if(strcmp(yytext,c1)==0 || strcmp(yytext,c2)==0 || strcmp(yytext,c3)==0 || strcmp(yytext,c4)==0){
     yylval.assignop = 0;
   }
@@ -1171,22 +1210,30 @@ YY_RULE_SETUP
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 311 "lex.l"
+#line 350 "lex.l"
 {
  fprintf(tf,"operator: %s\n", yytext);
- print(yytext);
+  if(v_flag == true){
+    vec = concat(vec,yytext);
+  }
+  else print(yytext);
  return UNARY_OP;
 }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 316 "lex.l"
+#line 358 "lex.l"
 {
  fprintf(tf,"operator: %s\n", yytext);
- print(yytext);
+ 
  char* c1 = "and";
  char* c2 = "or";
  char* c3 = "not";
+  if(v_flag == true){
+    vec = concat(vec,yytext);
+  }
+  else print(yytext);
+
  if(strcmp(yytext,c1)==0){
    return AND;
  }
@@ -1200,7 +1247,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 332 "lex.l"
+#line 379 "lex.l"
 {
  fprintf(tf,"operator: %s\n", yytext);
  print(yytext);
@@ -1237,7 +1284,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 365 "lex.l"
+#line 412 "lex.l"
 {
  fprintf(tf,"operator: %s\n", yytext);
  print(yytext);
@@ -1246,7 +1293,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 372 "lex.l"
+#line 419 "lex.l"
 {
  fprintf(tf,"operator: %s\n", yytext);
  print(yytext);
@@ -1255,7 +1302,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 377 "lex.l"
+#line 424 "lex.l"
 {
  fprintf(tf,"operator: %s\n", yytext);
  print(yytext);
@@ -1264,7 +1311,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 382 "lex.l"
+#line 429 "lex.l"
 {
  print(".add_member(");
  arrow_flag = 1;
@@ -1273,7 +1320,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 387 "lex.l"
+#line 434 "lex.l"
 {
    fprintf(tf,"brackets: %s\n", yytext);
    char* c1 = "(";
@@ -1282,68 +1329,48 @@ YY_RULE_SETUP
    char* c4 = "}";
    char* c5 = "[";
    char* c6 = "]";
-   if(strcmp(yytext,c1)==0){
-       print(yytext);
-       return LPB;
+   if(v_flag == true){
+    vec = concat(vec,yytext);
    }
-   else if(strcmp(yytext,c2)==0){
-       print(yytext);
-       return RPB;
-   }
-   else if(strcmp(yytext,c3)==0){
-       print(yytext);
-       return LCB;
-   }
-   else if(strcmp(yytext,c4)==0){
-       print(yytext);
-       return RCB;
-   }
-   else if(strcmp(yytext,c5)==0){
-       if(list_flag!=1){
-         print(yytext); 
-       }
-       return LSB;
-   }
-   else if(strcmp(yytext,c6)==0){
-       if(list_flag!=1){
-         print(yytext); 
-       }
-       return RSB;
-   }
+    else print(yytext);
+
+  if(strcmp(yytext,c1)==0){
+      return LPB;
+  }
+  else if(strcmp(yytext,c2)==0){  
+      return RPB;
+  }
+  else if(strcmp(yytext,c3)==0){
+      return LCB;
+  }
+  else if(strcmp(yytext,c4)==0){
+      return RCB;
+  }
+  else if(strcmp(yytext,c5)==0){
+      return LSB;
+  }
+  else if(strcmp(yytext,c6)==0){
+      return RSB;
+  }
 }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 426 "lex.l"
+#line 468 "lex.l"
 {
  fprintf(tf,"identifier: %s\n", yytext);
- if(list_flag==1){
-   s[i] = *yytext;
-   i++;
- }
- else{
-   print(yytext);
-   if(list_print_flag==1){
-     fprintf(yyout,"[");
-     for(int j = 0; j<strlen(s);j++){
-       fprintf(yyout,"%c",s[j]);
-       if(j==strlen(s)-1){
-         fprintf(yyout,"]");
-       }
-       else{
-         fprintf(yyout,"]["); 
-       } 
-     }
-     list_print_flag = 0;
-   }
- }
  yylval.id.name = strdup(yytext);
+ if(v_flag == true){
+    vec = concat(vec,yytext);
+  }
+  else print(yytext);
+
  return IDENTIFIER;
 }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 452 "lex.l"
+#line 479 "lex.l"
 {
  printf("Unrecognized character %s\n", yytext);
  yyterminate();
@@ -1351,10 +1378,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 458 "lex.l"
+#line 485 "lex.l"
 ECHO;
 	YY_BREAK
-#line 1358 "lex.yy.c"
+#line 1385 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2359,7 +2386,5 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 458 "lex.l"
-
-
+#line 485 "lex.l"
 

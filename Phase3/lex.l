@@ -1,8 +1,8 @@
 %{
  #include <stdio.h>
  #include <stdbool.h>
- #include "lex_module.h"
  #include "yacc.tab.h"
+ #include "lex_module.h"
  extern FILE *yyout;
  extern FILE *tf;
 
@@ -12,6 +12,12 @@
  int self_flag = 0;
  char s[100];
  int i = 0;
+
+ bool v_flag = false;
+ bool v_id = false;
+ char *vec;
+ extern char *init;
+
 %}
 
 
@@ -75,8 +81,6 @@ ID [A-Za-z][A-Za-z0-9_]*
 
 
 {WHITESPACE} {
-
-
    print(yytext);
  ;
 }
@@ -104,7 +108,6 @@ ID [A-Za-z][A-Za-z0-9_]*
 {RETURN} {
  fprintf(tf,"reserved: %s\n", yytext);
  print(yytext);
- gen_vec("list [2][3+4] : string");
  return RETURN;
 }
 {BOOL} {
@@ -134,33 +137,54 @@ ID [A-Za-z][A-Za-z0-9_]*
 }
 {NUMBER} {
  fprintf(tf,"constant: %s\n", yytext);
- if(list_flag==1){
-   s[i] = *yytext;
-   i++;
- }
+ if(v_flag == true){
+  vec = concat(vec,yytext);
+}
  else{
    print(yytext);
  }
+
+ 
  return NUMBER;
 }
 {DECIMAL} {
   fprintf(tf,"constant: %s\n", yytext);
-  print(yytext);
-  return DECIMAL;
+  
+  if(v_flag == true){
+    vec = concat(vec,yytext);
+  }
+  else{
+    print(yytext);
+  }
+return DECIMAL;
 }
 {STRING} {
  fprintf(tf,"constant: %s\n", yytext);
- print(yytext);
+ 
+
+  if(v_flag == true){
+    vec = concat(vec,yytext);
+  }
+  else{
+    print(yytext);
+  }
  return STRING_LITERAL;
 }
 {DATA_TYPE_PR} {
  fprintf(tf,"datatype: %s\n", yytext);
- print(yytext);
+ 
    char* c1 = "int";
    char* c3 = "string";
    char* c4 = "bool";
    char* c5 = "void";  
    char* c6 = "float";
+
+  if(v_flag == true){
+    vec = concat(vec,yytext);
+    init = gen_vec(vec);
+    v_flag = false;
+  }
+  else print(yytext);
    if(strcmp(yytext,c1)==0){
      return INT;
    }
@@ -186,6 +210,8 @@ ID [A-Za-z][A-Za-z0-9_]*
  fprintf(tf,"reserved: %s\n", yytext);  
  list_flag = 1;
  list_print_flag=1;
+v_flag = true;
+vec = strdup(yytext);
  return LIST;
 }
 {CLASS} {
@@ -200,13 +226,19 @@ ID [A-Za-z][A-Za-z0-9_]*
 }
 {DATA_TYPE_NEW} {
  fprintf(tf,"datatype: %s\n", yytext);
- print(yytext);
+ 
    char* c1 = "team";
    char* c2 = "member";
    char* c3 = "task";
    char* c4 = "event";
    char* c5 = "meeting";
    char* c6 = "calendar";
+    if(v_flag == true){
+      vec = concat(vec,yytext);
+      init = gen_vec(vec);
+      v_flag = false;
+    }
+    else print(yytext);
    if(strcmp(yytext,c1)==0){
        return TEAM;
    }
@@ -245,13 +277,16 @@ ID [A-Za-z][A-Za-z0-9_]*
        return SEMICOLON;
    }
    else if(strcmp(yytext,c3)==0){
-       if(list_flag==1){
-         list_flag = 0;
-       }
-       else{
+       
+       
+
+       if(v_flag == true){
+          vec = concat(vec,yytext);
+        }
+        else{
          print(yytext);
-       }
-       return COLON;
+        }
+        return COLON;
    }
    else if(strcmp(yytext,c4)==0){
       if(self_flag == 1){
@@ -265,12 +300,16 @@ ID [A-Za-z][A-Za-z0-9_]*
 }
 {ARITH_OP} {
  fprintf(tf,"operator: %s\n", yytext);
- print(yytext);
+ 
  char* c1 = "+";
  char* c2 = "-";
  char* c3 = "/";
  char* c4 = "*";
  char* c5 = "%";
+  if(v_flag == true){
+    vec = concat(vec,yytext);
+  }
+  else print(yytext);
  if(strcmp(yytext,c1)==0){
    return ADD;
  }
@@ -289,13 +328,18 @@ ID [A-Za-z][A-Za-z0-9_]*
 }
 {REL_OP} {
  fprintf(tf,"operator: %s\n", yytext);
- print(yytext);
+ 
   char* c1 = ">";
   char* c2 = "<";
   char* c3 = ">=";
   char* c4 = "<=";
   char* c5 = "is";
   char* c6 = "is not";
+  if(v_flag == true){
+    vec = concat(vec,yytext);
+  }
+  else print(yytext);
+
   if(strcmp(yytext,c1)==0 || strcmp(yytext,c2)==0 || strcmp(yytext,c3)==0 || strcmp(yytext,c4)==0){
     yylval.assignop = 0;
   }
@@ -306,15 +350,23 @@ ID [A-Za-z][A-Za-z0-9_]*
 }
 {UNARY_OP} {
  fprintf(tf,"operator: %s\n", yytext);
- print(yytext);
+  if(v_flag == true){
+    vec = concat(vec,yytext);
+  }
+  else print(yytext);
  return UNARY_OP;
 }
 {LOGICAL_OP} {
  fprintf(tf,"operator: %s\n", yytext);
- print(yytext);
+ 
  char* c1 = "and";
  char* c2 = "or";
  char* c3 = "not";
+  if(v_flag == true){
+    vec = concat(vec,yytext);
+  }
+  else print(yytext);
+
  if(strcmp(yytext,c1)==0){
    return AND;
  }
@@ -388,60 +440,40 @@ ID [A-Za-z][A-Za-z0-9_]*
    char* c4 = "}";
    char* c5 = "[";
    char* c6 = "]";
-   if(strcmp(yytext,c1)==0){
-       print(yytext);
-       return LPB;
+   if(v_flag == true){
+    vec = concat(vec,yytext);
    }
-   else if(strcmp(yytext,c2)==0){
-       print(yytext);
-       return RPB;
-   }
-   else if(strcmp(yytext,c3)==0){
-       print(yytext);
-       return LCB;
-   }
-   else if(strcmp(yytext,c4)==0){
-       print(yytext);
-       return RCB;
-   }
-   else if(strcmp(yytext,c5)==0){
-       if(list_flag!=1){
-         print(yytext); 
-       }
-       return LSB;
-   }
-   else if(strcmp(yytext,c6)==0){
-       if(list_flag!=1){
-         print(yytext); 
-       }
-       return RSB;
-   }
+    else print(yytext);
+
+  if(strcmp(yytext,c1)==0){
+      return LPB;
+  }
+  else if(strcmp(yytext,c2)==0){  
+      return RPB;
+  }
+  else if(strcmp(yytext,c3)==0){
+      return LCB;
+  }
+  else if(strcmp(yytext,c4)==0){
+      return RCB;
+  }
+  else if(strcmp(yytext,c5)==0){
+      return LSB;
+  }
+  else if(strcmp(yytext,c6)==0){
+      return RSB;
+  }
 }
 
 
 {ID} {
  fprintf(tf,"identifier: %s\n", yytext);
- if(list_flag==1){
-   s[i] = *yytext;
-   i++;
- }
- else{
-   print(yytext);
-   if(list_print_flag==1){
-     fprintf(yyout,"[");
-     for(int j = 0; j<strlen(s);j++){
-       fprintf(yyout,"%c",s[j]);
-       if(j==strlen(s)-1){
-         fprintf(yyout,"]");
-       }
-       else{
-         fprintf(yyout,"]["); 
-       } 
-     }
-     list_print_flag = 0;
-   }
- }
  yylval.id.name = strdup(yytext);
+ if(v_flag == true){
+    vec = concat(vec,yytext);
+  }
+  else print(yytext);
+
  return IDENTIFIER;
 }
 
@@ -452,4 +484,3 @@ ID [A-Za-z][A-Za-z0-9_]*
 
 
 %%
-

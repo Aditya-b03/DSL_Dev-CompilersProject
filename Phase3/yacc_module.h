@@ -778,13 +778,13 @@ bool check_rel_op(int lhs, int rhs, int op)
 // entries of default functions in function table
 void init_functab_entries(functab *ft)
 {
-   entry = (funcrec *)malloc(sizeof(funcrec));
+   struct funcrec *entry = (funcrec *)malloc(sizeof(funcrec));
    entry->name = "dateToString";
    entry->type = 2;
    entry->num_params = 1;
    entry->dim = 0;
    entry->params = init_symtab();
-   param = (idrec *)malloc(sizeof(idrec));
+   struct idrec *param = (idrec *)malloc(sizeof(idrec));
    param->name = "d";
    param->type = 15;
    param->arr = false;
@@ -915,7 +915,7 @@ void init_class_methods_member(classrec *class_entry)
    entry->num_params = 1;
    entry->dim = 0;
    entry->params = init_symtab();
-   param = (idrec *)malloc(sizeof(idrec));
+   struct idrec *param = (idrec *)malloc(sizeof(idrec));
    param->name = "assigned_task";
    param->type = 9;
    param->arr = false;
@@ -1041,7 +1041,7 @@ void init_class_methods_team(classrec *class_entry)
    entry->local_table = init_symtab();
    insert_functab(class_entry->methods, entry);
 
-   funcrec *entry = (funcrec *)malloc(sizeof(funcrec));
+   entry = (funcrec *)malloc(sizeof(funcrec));
    entry->name = "to_json";
    entry->type = 2;
    entry->num_params = 0;
@@ -1073,7 +1073,7 @@ void init_class_methods_team(classrec *class_entry)
    entry->num_params = 1;
    entry->dim = 0;
    entry->params = init_symtab();
-   idrec *param = (idrec *)malloc(sizeof(idrec));
+   param = (idrec *)malloc(sizeof(idrec));
    param->name = "m";
    param->type = 8;
    param->arr = true;
@@ -1090,7 +1090,7 @@ void init_class_methods_team(classrec *class_entry)
    entry->num_params = 1;
    entry->dim = 0;
    entry->params = init_symtab();
-   idrec *param = (idrec *)malloc(sizeof(idrec));
+   param = (idrec *)malloc(sizeof(idrec));
    param->name = "t";
    param->type = 7;
    param->arr = false;
@@ -1107,7 +1107,7 @@ void init_class_methods_team(classrec *class_entry)
    entry->num_params = 1;
    entry->dim = 0;
    entry->params = init_symtab();
-   idrec *param = (idrec *)malloc(sizeof(idrec));
+   param = (idrec *)malloc(sizeof(idrec));
    param->name = "t";
    param->type = 7;
    param->arr = true;
@@ -1124,7 +1124,7 @@ void init_class_methods_team(classrec *class_entry)
    entry->num_params = 1;
    entry->dim = 0;
    entry->params = init_symtab();
-   idrec *param = (idrec *)malloc(sizeof(idrec));
+   param = (idrec *)malloc(sizeof(idrec));
    param->name = "m";
    param->type = 8;
    param->arr = false;
@@ -1141,7 +1141,7 @@ void init_class_methods_team(classrec *class_entry)
    entry->num_params = 1;
    entry->dim = 0;
    entry->params = init_symtab();
-   idrec *param = (idrec *)malloc(sizeof(idrec));
+   param = (idrec *)malloc(sizeof(idrec));
    param->name = "m";
    param->type = 8;
    param->arr = true;
@@ -1158,7 +1158,7 @@ void init_class_methods_team(classrec *class_entry)
    entry->num_params = 1;
    entry->dim = 0;
    entry->params = init_symtab();
-   idrec *param = (idrec *)malloc(sizeof(idrec));
+   param = (idrec *)malloc(sizeof(idrec));
    param->name = "t";
    param->type = 7;
    param->arr = false;
@@ -1175,7 +1175,7 @@ void init_class_methods_team(classrec *class_entry)
    entry->num_params = 1;
    entry->dim = 0;
    entry->params = init_symtab();
-   idrec *param = (idrec *)malloc(sizeof(idrec));
+   param = (idrec *)malloc(sizeof(idrec));
    param->name = "t";
    param->type = 7;
    param->arr = true;
@@ -1239,7 +1239,7 @@ void init_class_methods_task(classrec *class_entry)
    entry->num_params = 1;
    entry->dim = 0;
    entry->params = init_symtab();
-   param = (idrec *)malloc(sizeof(idrec));
+   struct idrec *param = (idrec *)malloc(sizeof(idrec));
    param->name = "m";
    param->type = 8;
    param->arr = false;
