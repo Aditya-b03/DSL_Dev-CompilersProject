@@ -51,7 +51,7 @@ int main()
     y = x > x;
     y = not y;
     abd obb;
-    $obb.obj.y++;$
-    list[2][][]: string names;
+    float check = obb.mul(1.0);
+    $list[2][][]: string names;$
     return 0;
 }

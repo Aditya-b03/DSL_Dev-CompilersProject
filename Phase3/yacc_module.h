@@ -453,7 +453,7 @@ classrec *search_classtab(classtab *ct, char *name)
    return NULL;
 }
 
-bool check_member_method(char *m1, snode *m2, classtab *class_table, classrec *class_entry, symtab *params, int num_params)
+bool check_member_method(char *m1, snode *m2, classtab *class_table, classrec *class_entry, symtab *params, int num_params, int *a, int *b)
 {
    if (m2 == NULL)
    {
@@ -462,13 +462,15 @@ bool check_member_method(char *m1, snode *m2, classtab *class_table, classrec *c
          funcrec *entry = (funcrec *)malloc(sizeof(funcrec));
          entry->name = m1;
          entry->params = params;
-         entry->num_params = 0;
+         entry->num_params = num_params;
          funcrec *temp = search_functab(class_entry->methods, entry, 0);
          if (temp == NULL)
          {
             printf("Error: %s is not a method of class %s\n", m1, class_entry->name);
             return false;
          }
+         *a = temp->type;
+         *b = temp->dim;
          return true;
       }
       else
@@ -498,11 +500,11 @@ bool check_member_method(char *m1, snode *m2, classtab *class_table, classrec *c
          return false;
       }
       struct classrec *class_entry = search_classtab(class_table, entry->class_name);
-      return check_member_method(m2->val, m2->next, class_table, class_entry, params, num_params);
+      return check_member_method(m2->val, m2->next, class_table, class_entry, params, num_params, a, b);
    }
 }
 
-bool check_namelist(slist *namelist, symtab *global_table, symtab *local_table, classtab *class_table, symtab *params, int num_params)
+bool check_namelist(slist *namelist, symtab *global_table, symtab *local_table, classtab *class_table, symtab *params, int num_params, int *a, int *b)
 {
    snode *temp = namelist->head;
    idrec *entry = lookup(global_table, local_table, temp->val);
@@ -517,8 +519,7 @@ bool check_namelist(slist *namelist, symtab *global_table, symtab *local_table, 
       return false;
    }
    struct classrec *class_entry = search_classtab(class_table, entry->class_name);
-   struct symtab *members = class_entry->members;
-   return check_member_method(temp->val, temp->next, class_table, class_entry, params, num_params);
+   return check_member_method(temp->next->val, temp->next->next, class_table, class_entry, params, num_params, a, b);
 }
 
 void free_ilist(ilist *l)
@@ -775,10 +776,18 @@ bool check_rel_op(int lhs, int rhs, int op)
    return false;
 }
 
-// entries of default functions in function table
+/*
+
+// Utility functions for database handling
+void savetoDocument(string filename = "database");
+vector<team> loadfromDocument(string filename = "database");
+*/
+
 void init_functab_entries(functab *ft)
 {
    struct funcrec *entry = (funcrec *)malloc(sizeof(funcrec));
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
    entry->name = "dateToString";
    entry->type = 2;
    entry->num_params = 1;
@@ -846,7 +855,6 @@ void init_functab_entries(functab *ft)
    entry->local_table = init_symtab();
    insert_functab(ft, entry);
 
-   // iffy case
    entry = (funcrec *)malloc(sizeof(funcrec));
    entry->name = "showEvents";
    entry->type = 2;
@@ -900,10 +908,12 @@ void init_functab_entries(functab *ft)
 
 void init_class_methods_member(classrec *class_entry)
 {
+   //member create_member(string name = "random name", string email = "NULL", string phone = "NULL");
+
    funcrec *entry = (funcrec *)malloc(sizeof(funcrec));
-   entry->name = "get_id";
-   entry->type = 2;
-   entry->num_params = 0;
+   entry->name = "create_member";
+   entry->type = 8;
+   entry->num_params = -1;
    entry->dim = 0;
    entry->params = init_symtab();
    entry->local_table = init_symtab();
@@ -912,7 +922,7 @@ void init_class_methods_member(classrec *class_entry)
    entry = (funcrec *)malloc(sizeof(funcrec));
    entry->name = "add_task";
    entry->type = 4;
-   entry->num_params = 1;
+   entry->num_params = 1;0
    entry->dim = 0;
    entry->params = init_symtab();
    struct idrec *param = (idrec *)malloc(sizeof(idrec));
@@ -1028,15 +1038,33 @@ void init_class_methods_member(classrec *class_entry)
    insert_symtab(entry->params, param);
    entry->local_table = init_symtab();
    insert_functab(class_entry->methods, entry);
+
+   struct idrec *entry2 = (idrec *)malloc(sizeof(idrec));
+   entry2->name = "info";
+   entry2->type = 2;
+   entry2->arr = true;
+   entry2->dim = 2;
+   entry2->scope = 0;
+   entry2->class_name = "member";
+   insert_symtab(class_entry->members, entry2);
 }
 
 void init_class_methods_team(classrec *class_entry)
 {
    funcrec *entry = (funcrec *)malloc(sizeof(funcrec));
-   entry->name = "get_id";
-   entry->type = 2;
-   entry->num_params = 0;
+   entry->name = "create_team";
+   entry->type = 7;
+   entry->num_params = -1;
    entry->dim = 0;
+   entry->params = init_symtab();
+   entry->local_table = init_symtab();
+   insert_functab(class_entry->methods, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "get_subteam_ids";
+   entry->type = 4;
+   entry->num_params = -1;
+   entry->dim = 1;
    entry->params = init_symtab();
    entry->local_table = init_symtab();
    insert_functab(class_entry->methods, entry);
@@ -1220,20 +1248,28 @@ void init_class_methods_team(classrec *class_entry)
    insert_symtab(entry->params, param);
    entry->local_table = init_symtab();
    insert_functab(class_entry->methods, entry);
+
+   struct idrec *entry1 = (idrec *)malloc(sizeof(idrec));
+   entry1->name = "description";
+   entry1->type = 2;
+   entry1->arr = false;
+   entry1->dim = 0;
+   entry1->scope = 0;
+   entry1->class_name = "team";
+   insert_symtab(class_entry->members, entry1);
 }
 
 void init_class_methods_task(classrec *class_entry)
 {
    funcrec *entry = (funcrec *)malloc(sizeof(funcrec));
-   entry->name = "get_id";
-   entry->type = 2;
-   entry->num_params = 0;
+   entry->name = "create_task";
+   entry->type = 9;
+   entry->num_params = -1;
    entry->dim = 0;
    entry->params = init_symtab();
    entry->local_table = init_symtab();
    insert_functab(class_entry->methods, entry);
 
-   entry = (funcrec *)malloc(sizeof(funcrec));
    entry->name = "assign_to";
    entry->type = 4;
    entry->num_params = 1;
@@ -1275,6 +1311,63 @@ void init_class_methods_task(classrec *class_entry)
    entry->params = init_symtab();
    entry->local_table = init_symtab();
    insert_functab(class_entry->methods, entry);
+
+   struct idrec *entry1 = (idrec*) malloc(sizeof(idrec));
+   entry1->name = "priority";
+   entry1->type = 0;
+   entry1->arr = false;
+   entry1->dim = 0;
+   entry1->scope = 0;
+   entry1->class_name = "task";
+   insert_symtab(class_entry->members, entry1);
+
+   entry1 = (idrec*) malloc(sizeof(idrec));
+   entry1->name = "title";
+   entry1->type = 2;
+   entry1->arr = false;
+   entry1->dim = 0;
+   entry1->scope = 0;
+   entry1->class_name = "task";
+   insert_symtab(class_entry->members, entry1);
+
+   entry1 = (idrec*) malloc(sizeof(idrec));
+   entry1->name = "description";
+   entry1->type = 2;
+   entry1->arr = false;
+   entry1->dim = 0;
+   entry1->scope = 0;
+   entry1->class_name = "task";
+   insert_symtab(class_entry->members, entry1);
+
+   entry1 = (idrec*) malloc(sizeof(idrec));
+   entry1->name = "_status";
+   entry1->type = 2;
+   entry1->arr = false;
+   entry1->dim = 0;
+   entry1->scope = 0;
+   entry1->class_name = "task";
+   insert_symtab(class_entry->members, entry1);
+
+   entry1 = (idrec*) malloc(sizeof(idrec));
+   entry1->name = "due_date";
+   entry1->type = 15;
+   entry1->arr = false;
+   entry1->dim = 0;
+   entry1->scope = 0;
+   entry1->class_name = "task";
+   insert_symtab(class_entry->members, entry1);
+}
+
+void init_class_methods_event()
+{
+   funcrec *entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "create_event";
+   entry->type = 9;
+   entry->num_params = -1;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   entry->local_table = init_symtab();
+   insert_functab(class_entry->methods, entry);
 }
 
 // create a member class entry and add it to the class table with its methods defined above
@@ -1299,5 +1392,12 @@ void init_member_class(classtab *class_table)
    class_entry->members = init_symtab();
    class_entry->methods = init_functab();
    init_class_methods_task(class_entry);
+   insert_classtab(class_table, class_entry);
+
+   class_entry = (classrec *)malloc(sizeof(classrec));
+   class_entry->name = "event";
+   class_entry->members = init_symtab();
+   class_entry->methods = init_functab();
+   init_class_methods_event(class_entry);
    insert_classtab(class_table, class_entry);
 }

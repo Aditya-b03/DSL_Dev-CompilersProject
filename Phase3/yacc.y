@@ -683,7 +683,8 @@ unary_stmt: identifier UNARY_OP {
         $$ = $1.type;
     }
     | class_identifier UNARY_OP {
-        check_namelist($1.namelist, global_table, local_table, class_table, NULL, -1);
+        int *a = (int*) malloc(sizeof(int)), *b = (int*) malloc(sizeof(int));
+        check_namelist($1.namelist, global_table, local_table, class_table, NULL, -1, a, b);
         if($1.type != 0 && $1.type != 1){
             printf("Error: Unary operator not defined for type %s\n", map_type[$1.type]); 
             YYABORT;
@@ -812,7 +813,6 @@ decl_stmt: data_type_new id_list SEMICOLON {
 id_list: id_list COMMA IDENTIFIER{
         insert_slist($1, $3.name);
         $$ = $1;
-        printf("%s\n", init);
         if(lflag)
             fprintf(yyout, "%s", init);
     }
@@ -827,7 +827,6 @@ id_list: id_list COMMA IDENTIFIER{
     | IDENTIFIER{
         $$ = init_slist();
         insert_slist($$, $1.name);
-        printf("%s\n", init);
         if(lflag)
             fprintf(yyout, "%s", init);
     }
@@ -845,7 +844,8 @@ expr_stmt_without_semicolon: identifier ASSIGN_OP nested_expr {
         }
     }
     | class_identifier ASSIGN_OP nested_expr {
-        check_namelist($1.namelist, global_table, local_table, class_table, NULL, -1);
+        int *a = (int*) malloc(sizeof(int)), *b = (int*) malloc(sizeof(int));
+        check_namelist($1.namelist, global_table, local_table, class_table, NULL, -1, a, b);
         if(!check_assign_op($1.type, $3.type, $2)){
             YYABORT;
         }
@@ -879,7 +879,8 @@ expr_stmt_without_semicolon: identifier ASSIGN_OP nested_expr {
         }
     }
     | class_identifier EQUALS nested_expr {
-        check_namelist($1.namelist, global_table, local_table, class_table, NULL, -1);
+        int *a = (int*) malloc(sizeof(int)), *b = (int*) malloc(sizeof(int));
+        check_namelist($1.namelist, global_table, local_table, class_table, NULL, -1, a, b);
         if($1.type == 5 && $3.type == 5){
             if($1.dim != $3.dim){
                 printf("Error: Dimension mismatch in assignment\n");
@@ -1039,7 +1040,8 @@ expr_terminal: unary_stmt {
         $$.dim = 0;
     }
     | NOT class_identifier {
-        if(check_namelist($2.namelist, global_table, local_table, class_table, NULL, -1) == false)
+        int *a = (int*) malloc(sizeof(int)), *b = (int*) malloc(sizeof(int));
+        if(check_namelist($2.namelist, global_table, local_table, class_table, NULL, -1, a, b) == false)
         {
             YYABORT;
         }
@@ -1055,8 +1057,9 @@ expr_terminal: unary_stmt {
         $$.dim = $1.dim;
     }
     | class_identifier{
+        int *a = (int*) malloc(sizeof(int)), *b = (int*) malloc(sizeof(int));
         display_slist($1.namelist);
-        if(check_namelist($1.namelist, global_table, local_table, class_table, NULL, -1) == false)
+        if(check_namelist($1.namelist, global_table, local_table, class_table, NULL, -1, a, b) == false)
         {
             YYABORT;
         }
@@ -1175,22 +1178,14 @@ call: IDENTIFIER LPB call_args RPB {
         $$.dim = func -> dim;
     }
     | class_identifier LPB call_args RPB {
-        if(check_namelist($1.namelist, global_table, local_table, class_table, $3.params, $3.num_params) == false)
+        int *a = (int*) malloc(sizeof(int)), *b = (int*) malloc(sizeof(int));
+        printf("WTF\n");
+        if(check_namelist($1.namelist, global_table, local_table, class_table, $3.params, $3.num_params, a, b) == false)
         {
             YYABORT;
         }
-        struct funcrec *entry = (struct funcrec *)malloc(sizeof(struct funcrec));
-        entry -> name = $1.namelist->tail->val;
-        entry -> params = $3.params;
-        entry -> num_params = $3.num_params;
-        struct funcrec *func = search_functab(methods, entry,1);
-        if(func == NULL)
-        {
-            printf("Error: Method %s not declared\n", entry->name);
-            YYABORT;
-        }
-        $$.type = func -> type;
-        $$.dim = func -> dim;
+        $$.type = *a;
+        $$.dim = *b;
     }
     ;
 
@@ -1199,6 +1194,7 @@ call_args: call_args COMMA nested_expr {
         $$.params = $1.params;
         struct idrec *entry = (struct idrec*) malloc(sizeof(struct idrec));
         entry -> type = $3.type;
+        entry -> dim = $3.dim;
         insert_symtab($$.params, entry);
         $$.num_params = $1.num_params + 1;
     }
@@ -1206,6 +1202,7 @@ call_args: call_args COMMA nested_expr {
         $$.params = init_symtab();
         struct idrec *entry = (struct idrec*) malloc(sizeof(struct idrec));
         entry -> type = $1.type;
+        entry -> dim = $1.dim;
         insert_symtab($$.params, entry);
         $$.num_params = 1;
     }

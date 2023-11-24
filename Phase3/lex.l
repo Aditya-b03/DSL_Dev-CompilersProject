@@ -16,7 +16,7 @@
  bool v_flag = false;
  bool v_id = false;
  char *vec;
- extern char *init;
+ char *init;
 
 %}
 
