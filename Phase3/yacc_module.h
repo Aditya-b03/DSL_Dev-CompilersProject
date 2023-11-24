@@ -922,7 +922,7 @@ void init_class_methods_member(classrec *class_entry)
    entry = (funcrec *)malloc(sizeof(funcrec));
    entry->name = "add_task";
    entry->type = 4;
-   entry->num_params = 1;0
+   entry->num_params = 1;
    entry->dim = 0;
    entry->params = init_symtab();
    struct idrec *param = (idrec *)malloc(sizeof(idrec));
@@ -1358,7 +1358,7 @@ void init_class_methods_task(classrec *class_entry)
    insert_symtab(class_entry->members, entry1);
 }
 
-void init_class_methods_event()
+void init_class_methods_event(classrec *class_entry)
 {
    funcrec *entry = (funcrec *)malloc(sizeof(funcrec));
    entry->name = "create_event";

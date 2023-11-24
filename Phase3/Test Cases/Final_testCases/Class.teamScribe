@@ -1,0 +1,84 @@
+
+class Home{
+Public: 
+    team family;
+    team relatives;
+    team friends;
+    team colleagues;
+    team neighbours; 
+    
+    Home(){
+        family = create_team("family" , "Happy Family");
+        relatives = new team("relatives" , "Relatives");
+        friends = new team("friends" , "cool friends");
+        colleagues = new team("colleagues" , "lets work");
+        neighbours = new team("neighbours", "loser neighbours");
+    }
+
+    Home(team family, team relatives, team friends, team colleagues, team neighbours){
+        family = family;
+        relatives = relatives;
+        friends = friends;
+        colleagues = colleagues;
+        neighbours = neighbours;
+    }
+
+    void addPerson(member p, string relation){
+        if(relation == "family"){
+            family.addPerson(p);
+        }
+        else if(relation == "relatives"){
+            relatives.addPerson(p);
+        }
+        else if(relation == "friends"){
+            friends.addPerson(p);
+        }
+        else if(relation == "colleagues"){
+            colleagues.addPerson(p);
+        }
+        else if(relation == "neighbours"){
+            neighbours.addPerson(p);
+        }
+        else{
+            cout<<"Invalid Relation"<<endl;
+        }
+    }
+
+
+    void display(){
+        cout<<"Family"<<endl;
+        family.display();
+        cout<<"Relatives"<<endl;
+        relatives.display();
+        cout<<"Friends"<<endl;
+        friends.display();
+        cout<<"Colleagues"<<endl;
+        colleagues.display();
+        cout<<"Neighbours"<<endl;
+        neighbours.display();
+    }
+
+    void showTree(){
+        team home = create;
+        home.insert(family);
+        home.insert(relatives);
+        home.insert(friends);
+        home.insert(colleagues);
+        home.insert(neighbours);
+        jsonOutput(home);
+    }
+};
+
+
+
+int main(){
+    Home h;
+    h.addPerson(create_member("A" , "B" , "C" , "D" , "E" , "F" , "G" , "H" , "I") , "family");
+    h.addPerson(create_member("A" , "B" , "C" , "D" , "E" , "F" , "G" , "H" , "I") , "relatives");
+    h.addPerson(create_member("A" , "B" , "C" , "D" , "E" , "F" , "G" , "H" , "I") , "friends");
+    h.addPerson(create_member("A" , "B" , "C" , "D" , "E" , "F" , "G" , "H" , "I") , "colleagues");
+    h.addPerson(create_member("A" , "B" , "C" , "D" , "E" , "F" , "G" , "H" , "I") , "neighbours");
+    h.display();
+    h.showTree();
+    return 0;
+}

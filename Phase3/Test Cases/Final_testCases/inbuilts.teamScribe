@@ -1,0 +1,131 @@
+$
+
+1. Global Functions:
+   - `string dateToString(date d)`
+   - `void jsonOutput(team _t)`
+   - `void jsonOutput(member _m)`
+   - `void jsonOutput(task _t)`
+   
+   - `string makeCalendar(member _m)`
+   - `json makeCalendar(team _t)`
+   - `void showCalendar(member _m)`
+   - `void showCalendar(team _t)`
+
+2. Class Methods - `member` Class:
+   - `string get_id()`
+   - `void update(map<string, string> info)`
+   - `void add_task(task assigned_task)`
+   - `void add_team(team t)`
+   - `void remove(task assigned_task)`
+   - `void remove(team t)`
+   - `void update_info(map<string, string> info)`
+   - `vector<task> tasks()`
+   - `vector<team> teams()`
+   - `void display(int level)`
+   - `void update_info(map<string, string> info)`
+   - Overloaded Operators:
+      - `void operator+=(task t)`
+      - `void operator+=(team t)`
+      - `void operator-=(task t)`
+      - `void operator-=(team t)`
+
+3. Class Methods - `team` Class:
+   - `json to_json()`
+   - `void insert(member m)`
+   - `void insert(vector<member> m)`
+   - `void insert(team t)`
+   - `void insert(vector<team> t)`
+   - `void remove(member m)`
+   - `void remove(vector<member> m)`
+   - `void remove(team t)`
+   - `void remove(vector<team> t)`
+   - `vector<member> members()`
+   - `vector<team> teams()`
+   - `void show(int level)`
+   - Overloaded Operators:
+      - `void operator+=(member m)`
+      - `void operator+=(vector<member> m)`
+      - `void operator+=(team t)`
+      - `void operator+=(vector<team> t)`
+      - `void operator-=(member m)`
+      - `void operator-=(vector<member> m)`
+      - `void operator-=(team t)`
+      - `void operator-=(vector<team> t)`
+
+4. Class Methods - `task` Class:
+   - `string get_id()`
+   - `void assign_to(member m)`
+   - `void status(string status)`
+   - `vector<member> assigned_to()`
+
+5. Class Methods - `event` Class:
+   - `event(string title, string description, date event_date)`
+   - `string get_id()`
+
+6. Utility Functions:
+   - `void loadfromDocument(string filename = "database")`
+   - `void savetoDocument(string filename = "database")`
+
+member create_member(string name = "random name", string email = "NULL", string phone = "NULL")
+
+Creates a new member object with the provided or default parameters.
+team create_team(string name = "random name", string moto = "No Description Given", vector<member> members = {}, vector<team> sub_teams = {})
+
+Creates a new team object with the provided or default parameters.
+task create_task(string title = "random title", string description = "No Description Given", int priority = 0, string status = "To Do", date due_date = date())
+
+Creates a new task object with the provided or default parameters.
+event create_event(string title = "random title", string description = "No Description Given", date event_date = date())
+$
+
+
+int main() {
+
+    $Create a new member$
+    member m1 = create_member("Aditya Sridhar", "I am a student", "1234567890");
+    member m2 = create_member("Aditya Sridhar", "I am a student", "1234567890");
+
+    $$ a new team$$
+    team t1 = create_team("Team 1", "This is team 1");
+    team t2 = create_team("Team 2", "This is team 2");
+
+    $ Create a new task$
+    task tsk1 = create_task("Task 1", "This is task 1", 1, "To Do", date(31, 12, 2023));
+    task tsk2 = create_task("Task 2", "This is task 2", 2, "To Do", date(31, 12, 2023));
+
+    $ Create a new event$
+    event e1 = create_event("Event 1", "This is event 1", date(31, 12, 2023));
+
+    $ using team methods $
+    t1.insert(m1);
+    t1.insert(tsk1);
+    $ operator $
+    t1 += m2;
+    t1 += tsk2;
+
+
+    $ using member methods $
+    m1.add_team(t1);
+    m1.add_task(tsk1);
+    $ operator $
+    m1 += t1;
+    m1 += tsk2;
+
+    $ using task methods $
+    tsk1.assign_to(m1);
+    $ operator $
+    tsk1 + m2;
+
+    $ using event methods $
+    event e2 = create_event("Event 2", "This is event 2", date(31, 12, 2023));
+
+    $ using global functions $
+    jsonOutput(t1);
+    jsonOutput(m1);
+    jsonOutput(tsk1);
+
+
+    
+
+
+}

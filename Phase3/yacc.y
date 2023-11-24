@@ -19,6 +19,7 @@
     int nested_call = 0;    
     int return_flag = 0;
     extern FILE *tf;
+    extern char *vec;
 
     struct symtab *global_table;
     struct functab *function_table;
@@ -32,6 +33,8 @@
     bool rflag;
     int return_type;
     int lflag;
+
+    int 
 
 %}
 
@@ -282,7 +285,7 @@ function_dec: data_type_new IDENTIFIER LPB function_params RPB {
     | list IDENTIFIER LPB function_params RPB {
         struct funcrec *entry = (struct funcrec *)malloc(sizeof(struct funcrec));
         entry -> name = $2.name;
-        entry -> type = 5;
+        entry -> type = $1.type;
         entry -> dim = $1.dim;
         entry -> params = $4.params;
         entry -> num_params = $4.num_params;
@@ -785,7 +788,7 @@ decl_stmt: data_type_new id_list SEMICOLON {
         struct snode* temp = $2->head;
         while(temp != NULL){
             struct idrec *entry = (struct idrec*) malloc(sizeof(struct idrec));
-            entry -> type = 5;
+            entry -> type = $1.type;
             entry -> arr = true;
             entry -> scope = scope; 
             entry -> name = temp->val;
@@ -811,6 +814,7 @@ decl_stmt: data_type_new id_list SEMICOLON {
 
 
 id_list: id_list COMMA IDENTIFIER{
+        fprintf(yyout, "%s", vec);
         insert_slist($1, $3.name);
         $$ = $1;
         if(lflag)
@@ -825,6 +829,7 @@ id_list: id_list COMMA IDENTIFIER{
         insert_slist($$, $3.name);
     }
     | IDENTIFIER{
+        fprintf(yyout, "%s", vec);
         $$ = init_slist();
         insert_slist($$, $1.name);
         if(lflag)
@@ -867,7 +872,7 @@ expr_stmt_without_semicolon: identifier ASSIGN_OP nested_expr {
         }
     }
     | identifier EQUALS nested_expr {
-        if($1.type == 5 && $3.type == 5){
+        if($1.dim != 0 && $3.dim != 0){
             if($1.dim != $3.dim){
                 printf("Error: Dimension mismatch in assignment\n");
                 printf("LHS is of dimension %i and RHS is of dimension %i\n", $1.dim, $3.dim);
@@ -904,7 +909,7 @@ expr_stmt_without_semicolon: identifier ASSIGN_OP nested_expr {
             printf("Error: Class has no member %s declared\n", $3.name);
             YYABORT;
         }
-        if(entry -> type && $5.type == 5){
+        if(entry -> type && $5.dim != 0){
             if(entry -> dim != $5.dim){
                 printf("Error: Dimension mismatch in assignment\n");
                 printf("LHS is of dimension %i and RHS is of dimension %i\n", entry -> dim, $5.dim);
@@ -1067,7 +1072,7 @@ expr_terminal: unary_stmt {
         $$.dim = 0;
     }
     | list_literal {
-        $$.type = 5;
+        $$.type = $1.type;
         $$.dim = $1.dim;
     }
     | SELF DOT IDENTIFIER {
@@ -1116,7 +1121,7 @@ if_stmt: if_expr LCB statements RCB {rflag = false;}
 
 
 if_expr: IF LPB nested_expr RPB {
-        if($3.type != 3){
+        if($3.type != 3 && $3.type != 0){
             printf("Error: If condition must be bool\n");
             YYABORT;
         }
@@ -1132,13 +1137,13 @@ for_stmt: for_exp expr_stmt_without_semicolon RPB LCB {scope++;} statements RCB 
 
 
 for_exp: FOR LPB decl_stmt nested_expr SEMICOLON {
-        if($4.type != 3){
+        if($4.type != 3 && $4.type != 0){
             printf("Error: For condition must be bool\n");
             YYABORT;
         }
     }
     | FOR LPB expr_stmt nested_expr SEMICOLON {
-        if($4.type != 3){
+        if($4.type != 3 && $4.type != 0){
             printf("Error: For condition must be bool\n");
             YYABORT;
         }
@@ -1152,7 +1157,7 @@ while_stmt: while_exp LCB {scope++;} statements RCB {scope--;rflag = false;}
 
 
 while_exp: WHILE LPB nested_expr RPB {
-        if($3.type != 3){
+        if($3.type != 3 && $3.type != 0){
             printf("Error: While condition must be bool\n");
             YYABORT;
         }
@@ -1234,17 +1239,15 @@ return_stmt: RETURN SEMICOLON {
 
 
 // 11. Identifiers and Lists
-list: LIST dim COLON {lflag = 0;} data_type_pr {
-        $$.type = $5;
+list: LIST dim COLON data_type_pr {
+        $$.type = $4;
         $$.dim = $2.dim;
         $$.class_name = NULL;
-        list_flag = 0;
     }
     | LIST dim COLON {lflag = 0;} data_type_new {
         $$.type = $5;
         $$.dim = $2.dim;
         $$.class_name = NULL;
-        list_flag = 0;
     }
     | LIST dim COLON {lflag = 0;} IDENTIFIER {
         if(search_classtab(class_table, $5.name) == NULL)
@@ -1255,7 +1258,6 @@ list: LIST dim COLON {lflag = 0;} data_type_pr {
         $$.type = 14;
         $$.class_name = $5.name;
         $$.dim = $2.dim;
-        list_flag = 1;
     }
     ;
 

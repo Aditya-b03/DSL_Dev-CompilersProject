@@ -10,8 +10,7 @@
 #include <ctime>
 #include <iomanip>
 #include <chrono>
-#include <set>
-// #include "./cpp-dump/dump.hpp"
+#include "./cpp-dump/dump.hpp"
 
 using json = nlohmann::json;
 using namespace std;
@@ -30,12 +29,11 @@ using namespace std;
 
 // definitions
 
-/*template <typename... Args>
+template <typename... Args>
 inline auto print(Args &&...args) -> decltype(cpp_dump::dump(std::forward<Args>(args)...))
 {
     return cpp_dump::dump(std::forward<Args>(args)...);
-}*/
-
+}
 
 
 class team;
@@ -92,16 +90,15 @@ class member
 public:
     map<string, string> info;
     // member member functions
-    member(string = "random name", string = "NULL", string = "NULL");
+    member(string = "random name", string = "NULL", string = "NULL", string = "NULL");
     string get_id();
     //void add_task(task assigned_task);
 
-    void update(map<string, string> = {});
     void add_task(task assigned_task);
     void add_team(team t);
     void remove(task assigned_task);
     void remove(team t);
-    void update_info(map<string,string> info);
+    void update_info(map<string,string> {});
 
     vector<task> tasks();
     vector<team> teams();
@@ -130,11 +127,9 @@ class team
 
 public:
     string name;
-    member *lead;
     string description;
     // team member functions
-    team(string = "random name",/* member = member() ,*/
-         string = "No Description Given", vector<member *> = {}, vector<team *> = {});
+    team(string = "random name", string = "No Description Given", vector<member *> = {}, vector<team *> = {}, string = "NULL");
 
     string get_id();
     json to_json();
@@ -183,7 +178,7 @@ public:
     string description;
     string _status;
     date due_date;
-    task(string = "random title", string = "No Description Given", int = 0, string = "To Do", date = date());
+    task(string = "random title", string = "No Description Given", int = 0, string = "To_Do", date = date(), string = "NULL");
     string get_id();
 
     void assign_to(member);
@@ -232,6 +227,33 @@ string dateToString(date d)
     return s;
 }
 
+date stringToDate(string s)
+{
+    int i = 0;
+    string month_ = "";
+    string day_ = "";
+    string year_ = "";
+    while(s[i] != '/'){
+        month_ += s[i];
+        i++;
+    }
+    i++;
+    while(s[i] != '/'){
+        day_+= s[i];
+        i++;
+    }
+    i++;
+    while(i < s.length()){
+        year_ += s[i];
+        i++;
+    }
+    int day = stoi(day_);
+    int month = stoi(month_);
+    int year = stoi(year_);
+    date* d = new date(day, month, year);
+    return *d;
+}
+
 // generate random ID - done
 string character_string = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 string gen_ID(int n)
@@ -258,10 +280,6 @@ json makeJson(member _m)
         j["member_tasks"].push_back(t.title);
     }
     j["member_teams"] = json::array();
-    for (auto t : m->teams())
-    {
-        j["member_teams"].push_back(t.name);
-    }
     return j;
 }
 
@@ -283,8 +301,6 @@ json makeJson(team _t)
     j["sub_teams"] = json::array();
     for (auto sub : t->teams())
     {   
-        cout<< t->name<< "->" << sub.name << endl;
-
         j["sub_teams"].push_back(makeJson(*team_map[sub.get_id()]));
     }
 
@@ -351,7 +367,7 @@ string makeCalendar(member _m){
     json j; 
     string markWhen = "";
 
-    cout << m->tasks().size() << endl;
+    //cout << m->tasks().size() << endl;
     if ((m->tasks().size()) == 0){
         return markWhen;
     }
@@ -361,9 +377,9 @@ string makeCalendar(member _m){
     for (auto t : m->tasks())
     {
         string due_date = dateToString(t.due_date);
-        string information = t.title + "-> " + m->info["name"] + "\nStatus: " + t._status + "\nPriority: " + to_string(t.priority) + " ";
+        string information = t.title + "-> " + m->info["name"] + " Status: " + t._status + " ";
         
-        markWhen += (due_date + ": " + information + "#task\n\n");
+        markWhen += (due_date + ": " + information + "#" + t.status  +"\n\n");
     }
     return markWhen;
 }
@@ -415,17 +431,21 @@ void showCalendar(){
 
 // ********************Member Class | Function Definitions*******************
 
-member::member(string name, string email, string phone){
+member::member(string name, string email, string phone, string id){
     this->info["name"] = name;
     this->info["email"] = email;
     this->info["phone"] = phone;
-    this->member_id = gen_ID(10);
+    if(id != "NULL")
+        this->member_id = id;
+    else
+        this->member_id = gen_ID(10);
     member_map[member_id] = this;
 }
 
 string member::get_id(){
     return this->member_id;
 }
+
 
 member create_member(string name = "random name", string email = "NULL", string phone = "NULL"){
     member *m = new member(name, email, phone);
@@ -510,11 +530,28 @@ void member::update_info(map<string,string> info){
     }
 }
 
+// Operator Overloading
+void member::operator+=(task t)
+{
+    add_task(t);
+}
+void member::operator+=(team t)
+{
+    add_team(t);
+}
+void member::operator-=(task t)
+{
+    remove(t);
+}
+void member::operator-=(team t)
+{
+    remove(t);
+}
 
 // ********************Team Class | Function Definitions*******************
 
 team::team(string name, /*member lead,*/
-           string moto, vector<member *> members, vector<team *> sub_teams){
+           string moto, vector<member *> members, vector<team *> sub_teams, string id){
             this->name = name;
             //this->lead = member_map[lead.get_id()];
             this->description = moto;
@@ -526,8 +563,11 @@ team::team(string name, /*member lead,*/
             {
                 this->sub_teams.insert(t);
             }
-            this->team_id = gen_ID(10);
-            cout << this->team_id << endl;
+            if(id == "NULL")
+                this->team_id = gen_ID(10);
+            else 
+                this->team_id = id;
+            //cout << this->team_id << endl;
             team_map[this->team_id] = this;
         }
 
@@ -701,16 +741,53 @@ void team::show(int level){
     }
 }
 
+// Operator Overloading
+void team::operator+=(member m)
+{
+    insert(m);
+}
+void team::operator+=(vector<member> m)
+{
+    insert(m);
+}
+void team::operator+=(team t)
+{
+    insert(t);
+}
+void team::operator+=(vector<team> t)
+{
+    insert(t);
+}
+void team::operator-=(member m)
+{
+    remove(m);
+}
+void team::operator-=(vector<member> m)
+{
+    remove(m);
+}
+void team::operator-=(team t)
+{
+    remove(t);
+}
+void team::operator-=(vector<team> t)
+{
+    remove(t);
+}
 
 //  ********************Task Class | Function Definitions*******************
 
-task::task(string title, string description, int priority, string status, date due_date){
+task::task(string title, string description, int priority, string status, date due_date, string id){
     this->title = title;
     this->description = description;
     this->priority = priority;
     this->_status = status;
     this->due_date = due_date;
-    this->task_id = gen_ID(10);
+    if(id != "NULL"){
+        this->task_id = id;
+    }
+    else
+        this->task_id = gen_ID(10);
     task_map[task_id] = this;
 }
 
@@ -766,8 +843,8 @@ event create_event(string title = "random title", string description = "No Descr
 json teamtoDocument(team _t){
     team *t = team_map[_t.get_id()];
     json j;
-    j["id"] = t->get_id();
     j["team_name"] = t->name;
+    //j["team_lead"] = t->lead->info["name"];
     j["team_description"] = t->description;
     j["members"] = json::array();
     for(member m : t->members()){
@@ -783,7 +860,6 @@ json teamtoDocument(team _t){
 json membertoDocument(member _m){
     member *m = member_map[_m.get_id()];
     json j;
-    j["id"] = m->get_id();
     for (auto i : m->info)
     {
         j[i.first] = i.second;
@@ -802,7 +878,6 @@ json membertoDocument(member _m){
 json tasktoDocument(task _t){
     task *t = task_map[_t.get_id()];
     json j;
-    j["id"] = t->get_id();
     j["task_title"] = t->title;
     j["task_description"] = t->description;
     j["task_priority"] = t->priority;
@@ -817,144 +892,113 @@ json tasktoDocument(task _t){
 
 void savetoDocument(string filename = "database"){
     json j;
-    j["teams"] = json::array();
+    json teamJson;
     for(auto t : team_map){
-        json teamJson;
         teamJson[t.first] = teamtoDocument(*t.second);
-        j["teams"].push_back(teamJson);
     }
-    j["members"] = json::array();
+    j["teams"] = teamJson;
+    json memberJson;
     for(auto m : member_map){
-        json memberJson;
         memberJson[m.first] = membertoDocument(*m.second);
-        j["members"].push_back(memberJson);
     }
-    j["tasks"] = json::array();
+    j["members"] = memberJson;
+    json taskJson;
     for(auto t : task_map){
-        json taskJson;
         taskJson[t.first] = tasktoDocument(*t.second);
-        j["tasks"].push_back(taskJson);
     }
+    j["tasks"] = taskJson;
     ofstream outputFile(filename+".json");
     outputFile << j.dump(4);
 }
 
-void loadfromDocument(string filename = "database"){
+vector<team> loadfromDocument(string filename = "database"){
+    
     ifstream inputFile(filename+".json");
-    if(!inputFile.is_open()){
-        cout << "Error: File not found" << endl;
-        return;
+    json j = json::parse(inputFile);
+    json teamJson = j["teams"];
+    vector<team> teams;
+        
+    for(auto& t : teamJson.items()){
+        json team_ = t.value();
+        team *temp = new team(team_["team_name"], team_["team_description"], {}, {}, t.key());
+        teams.push_back(*temp);   
     }
-    json j;
-    inputFile >> j;
-    if(j.find("teams") != j.end()){
-        for(auto t : j["teams"]){
-            team *newTeam = new team(t["team_name"], t["team_description"]);
-            team_map[t["team_name"]] = newTeam;
+    
+    json memberJson = j["members"];
+    for(auto& m : memberJson.items()){
+        json m_ = m.value();
+        string email = "NULL";
+        if(m_.find("email") != m_.end()){
+            email = m_["email"];
+        }
+        string phone = "NULL";
+        if(m_.find("phone_no") != m_.end()){
+            phone = m_["phone_no"];
+        }
+        member *temp = new member(m_["name"],email,phone, m.key());
+    }
+    
+    json taskJson = j["tasks"];
+    for(auto& t : taskJson.items()){
+        json t_ = t.value();
+
+        task *temp = new task(t_["task_title"], t_["task_description"], t_["task_priority"], t_["task_status"], stringToDate(t_["task_due_date"]) , t.key());
+    }
+    
+    for(auto& t_ : teamJson.items()){
+        team *temp = team_map[t_.key()];
+        json t= t_.value();
+        for(auto& mem : t["members"]){
+            temp->insert(*member_map[mem]);
+        }
+        for(auto& sub : t["sub_teams"]){
+            temp->insert(*team_map[sub]);
         }
     }
-    else{
-        cout << "Error: No teams found" << endl;
-    }
 
-    if(j.find("members") != j.end()){
-        for(auto m : j["members"]){
-            member *newMember = new member(m["member_name"], m["member_email"], m["member_phone"]);
-            member_map[m["member_name"]] = newMember;
+    for(auto& m : memberJson.items()){
+        member *temp = member_map[m.key()];
+        json m_ = m.value();
+        for(auto t : m_["member_tasks"]){
+            temp->add_task(*task_map[t]);
         }
     }
-    else{
-        cout << "Error: No members found" << endl;
-    }
-
-    if(j.find("tasks") != j.end()){
-        for(auto t : j["tasks"]){
-            task *newTask = new task(t["task_title"], t["task_description"], t["task_priority"], t["task_status"], date());
-            task_map[t["task_title"]] = newTask;
-        }
-    }
-    else{
-        cout << "Error: No tasks found" << endl;
-    }
+    return teams;
 }
 
-// Operator Overloading
-void member::operator+=(task t)
+team team::operator&(team other)
 {
-    add_task(t);
-}
-void member::operator+=(team t)
-{
-    add_team(t);
-}
-void member::operator-=(task t)
-{
-    remove(t);
-}
-void member::operator-=(team t)
-{
-    remove(t);
-}
-
-// Operator Overloading
-void team::operator+=(member m)
-{
-    insert(m);
-}
-void team::operator+=(vector<member> m)
-{
-    insert(m);
-}
-void team::operator+=(team t)
-{
-    insert(t);
-}
-void team::operator+=(vector<team> t)
-{
-    insert(t);
-}
-void team::operator-=(member m)
-{
-    remove(m);
-}
-void team::operator-=(vector<member> m)
-{
-    remove(m);
-}
-void team::operator-=(team t)
-{
-    remove(t);
-}
-void team::operator-=(vector<team> t)
-{
-    remove(t);
-}
-
-team team::operator&(team other) {
-        string newTeamName = name + "&" + other.name;
-        team t3 = create_team(newTeamName);
-        for (auto memberA : team_map[this->get_id()]->members()) {
-            for (auto memberB : team_map[other.get_id()]->members()) {
-                if (memberA.get_id() == memberB.get_id()) {
-                    t3.insert(memberB);
-                    break;
-                }
+    string newTeamName = name + "&" + other.name;
+    team t3 = create_team(newTeamName);
+    for (auto memberA : team_map[this->get_id()]->members())
+    {
+        for (auto memberB : team_map[other.get_id()]->members())
+        {
+            if (memberA.get_id() == memberB.get_id())
+            {
+                t3.insert(memberB);
+                break;
             }
         }
-        return t3;
     }
+    return t3;
+}
 
-team team::operator|(team other) {
-        string newTeamName = name + "|" + other.name;
-        team t3 = create_team(newTeamName);
-        for (auto memberA : team_map[this->get_id()]->members()) {
-            t3.insert(memberA);
-        }
-        for (auto memberB : team_map[other.get_id()]->members()){
-            t3.insert(memberB);
-        }
-        for (auto memberC : team_map[(*this&other).get_id()]->members()){
-            t3.remove(memberC);
-        }
-        return t3; 
+team team::operator|(team other)
+{
+    string newTeamName = name + "|" + other.name;
+    team t3 = create_team(newTeamName);
+    for (auto memberA : team_map[this->get_id()]->members())
+    {
+        t3.insert(memberA);
+    }
+    for (auto memberB : team_map[other.get_id()]->members())
+    {
+        t3.insert(memberB);
+    }
+    for (auto memberC : team_map[(*this & other).get_id()]->members())
+    {
+        t3.remove(memberC);
+    }
+    return t3;
 }

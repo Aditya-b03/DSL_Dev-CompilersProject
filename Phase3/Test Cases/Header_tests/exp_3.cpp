@@ -18,12 +18,10 @@ int main() {
 
     m1 += task1;
     m1 += task2;
-    m1.remove(task2);
-    m1.add_team(t1);
-    m2.remove(t1);
+    m1 += task3;
     m1 += t1;
     t1 += m2;
-    task4.assign_to(m2);
+    m2 += task4;
 
     // Show member's calendar
     showCalendar(t1);
