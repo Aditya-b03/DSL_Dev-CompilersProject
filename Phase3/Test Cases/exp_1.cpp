@@ -4,7 +4,6 @@
 using namespace std;
 int main() {
     // Test Case 1
-    // Basic operations: Create members, teams, and tasks
 
     member m1 = create_member("Alice", "alice@example.com", "1234567890");
     member m2 = create_member("Bob", "bob@example.com", "9876543210");
@@ -12,15 +11,22 @@ int main() {
     team t2 = create_team("Team B", "Description B");
     task task1 = create_task("Task 1", "Description 1", 1, "To Do", date(31, 12, 2023));
 
-    m1 += task1;   // Add task to member
-    m1 += t1;      // Add member to team
-    t1 += m2;      // Add member to team
-    t1 += t2;      // Add subteam to team
+    m1 += task1;   
+    m1 += t1;      
+    t1 += m2;     
+    t1 += t2;      
 
     // Display information
     m1.display();
     t1.show();
     jsonOutput(m1);
+
+    team t3 = t1|t2;
+    team t4 = t3&t1;
+
+    t3.show();
+    printf("\n\n");
+    t4.show();
 
     return 0;
 }

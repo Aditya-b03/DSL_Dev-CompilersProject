@@ -3,20 +3,35 @@
 
 using namespace std;
 int main() {
-    // Test Case 4
-    // JSON output: Generate JSON files for member, team, and task
+    member Eve = create_member("Eve", "eve@email.com", "777888999");
+    member Charlie = create_member("Charlie", "charlie@email.com", "111222333");
 
-    member m1 = create_member("Alice", "alice@example.com", "1234567890");
-    team t1 = create_team("Team A", "Description A");
-    task task1 = create_task("Task 1", "Description 1", 1, "To Do", date(2023, 12, 31));
+    // Create teams
+    team TeamM = create_team("TeamM", "Team M Description", {Eve});
+    team TeamN = create_team("TeamN", "Team N Description", {Charlie});
 
-    m1 += task1;
-    m1 += t1;
+    // Create sub-teams
+    team SubTeam1 = create_team("SubTeam1", "Sub Team 1 Description", {Eve});
+    team SubTeam2 = create_team("SubTeam2", "Sub Team 2 Description", {Charlie});
+    TeamM += SubTeam1;
+    TeamN += SubTeam2;
 
-    // Generate JSON files
-    jsonOutput(m1);
-    jsonOutput(t1);
-    jsonOutput(task1);
+    // Display member and team info
+    Eve.display();
+    Charlie.display();
+    TeamM.show();
+    TeamN.show();
+    team TeamL = TeamM | TeamN;
+    TeamL.show();
+    // Save and load from document
+    savetoDocument("test_case_3");
+    loadfromDocument("test_case_3");
+
+    // Display member and team info after loading from document
+    Eve.display();
+    Charlie.display();
+    TeamM.show();
+    TeamN.show();
 
     return 0;
 }
