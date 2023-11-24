@@ -6,6 +6,18 @@ int sum1 (int d,string s){
     return d;
 }
 
+string gen_ID()
+{
+
+    string s = "";
+    for (int i = 0; i < 10; i++)
+    {
+        s += character_string[rand() % 62];
+    }
+    return s;
+}
+
+
 int sum2(int A, int B)
 {  
     return 0;

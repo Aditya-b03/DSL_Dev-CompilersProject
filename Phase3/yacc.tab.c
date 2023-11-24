@@ -632,24 +632,24 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,   107,   107,   107,   128,   128,   151,   152,   156,   160,
-     161,   162,   163,   168,   173,   168,   195,   214,   234,   258,
-     278,   302,   312,   317,   324,   335,   346,   363,   378,   397,
-     406,   407,   408,   411,   416,   411,   438,   459,   480,   506,
-     527,   551,   571,   593,   619,   644,   644,   645,   646,   650,
-     651,   652,   653,   654,   655,   656,   657,   658,   659,   660,
-     661,   662,   666,   667,   672,   679,   689,   690,   691,   692,
-     693,   694,   695,   700,   724,   748,   777,   804,   808,   813,
-     817,   825,   829,   834,   840,   856,   868,   881,   904,   908,
-     912,   920,   927,   935,   943,   950,   958,   965,   973,   981,
-     988,   992,   996,  1000,  1004,  1008,  1012,  1020,  1028,  1040,
-    1044,  1053,  1057,  1072,  1091,  1092,  1093,  1094,  1095,  1096,
-    1097,  1098,  1102,  1113,  1113,  1114,  1118,  1124,  1133,  1133,
-    1134,  1138,  1147,  1151,  1164,  1185,  1192,  1199,  1205,  1214,
-    1227,  1232,  1237,  1250,  1257,  1266,  1277,  1284,  1291,  1296,
-    1299,  1304,  1316,  1333,  1338,  1345,  1350,  1355,  1364,  1365,
-    1369,  1370,  1374,  1375,  1376,  1377,  1378,  1382,  1383,  1384,
-    1385,  1386,  1387,  1388,  1392,  1393,  1394,  1395
+       0,   107,   107,   107,   129,   129,   152,   153,   157,   161,
+     162,   163,   164,   169,   174,   169,   196,   215,   235,   259,
+     279,   303,   313,   318,   325,   336,   347,   364,   379,   398,
+     407,   408,   409,   412,   417,   412,   439,   460,   481,   507,
+     528,   552,   572,   594,   620,   645,   645,   646,   647,   651,
+     652,   653,   654,   655,   656,   657,   658,   659,   660,   661,
+     662,   663,   667,   668,   673,   680,   690,   691,   692,   693,
+     694,   695,   696,   701,   725,   749,   778,   805,   809,   814,
+     818,   826,   830,   835,   841,   857,   869,   882,   905,   909,
+     913,   921,   928,   936,   944,   951,   959,   966,   974,   982,
+     989,   993,   997,  1001,  1005,  1009,  1013,  1021,  1029,  1041,
+    1045,  1054,  1058,  1073,  1092,  1093,  1094,  1095,  1096,  1097,
+    1098,  1099,  1103,  1114,  1114,  1115,  1119,  1125,  1134,  1134,
+    1135,  1139,  1148,  1152,  1165,  1186,  1193,  1200,  1206,  1215,
+    1228,  1233,  1238,  1251,  1258,  1267,  1278,  1285,  1292,  1297,
+    1300,  1305,  1317,  1334,  1339,  1346,  1351,  1356,  1365,  1366,
+    1370,  1371,  1375,  1376,  1377,  1378,  1379,  1383,  1384,  1385,
+    1386,  1387,  1388,  1389,  1393,  1394,  1395,  1396
 };
 #endif
 
@@ -1579,6 +1579,7 @@ yyreduce:
       {
         global_table = init_symtab();
         function_table = init_functab();
+        init_functab_entries(function_table);
         class_table = init_classtab();
         params = NULL;
         local_table = global_table;
@@ -1586,11 +1587,11 @@ yyreduce:
         methods = NULL;
         scope = 0;
     }
-#line 1590 "yacc.tab.c"
+#line 1591 "yacc.tab.c"
     break;
 
   case 3: /* start: $@1 include_stmts code  */
-#line 117 "yacc.y"
+#line 118 "yacc.y"
                        {
         printf("Global Table : \n");
         display_symtab(global_table);
@@ -1602,11 +1603,11 @@ yyreduce:
         free_functab(function_table);
         free_classtab(class_table);
     }
-#line 1606 "yacc.tab.c"
+#line 1607 "yacc.tab.c"
     break;
 
   case 4: /* $@2: %empty  */
-#line 128 "yacc.y"
+#line 129 "yacc.y"
       {
         global_table = init_symtab();
         function_table = init_functab();
@@ -1617,11 +1618,11 @@ yyreduce:
         methods = NULL;
         scope = 0;
     }
-#line 1621 "yacc.tab.c"
+#line 1622 "yacc.tab.c"
     break;
 
   case 5: /* start: $@2 code  */
-#line 137 "yacc.y"
+#line 138 "yacc.y"
            {
         printf("Global Table : \n");
         display_symtab(global_table);
@@ -1633,28 +1634,28 @@ yyreduce:
         free_functab(function_table);
         free_classtab(class_table);
     }
-#line 1637 "yacc.tab.c"
+#line 1638 "yacc.tab.c"
     break;
 
   case 13: /* $@3: %empty  */
-#line 168 "yacc.y"
+#line 169 "yacc.y"
                        {
             local_table = (yyvsp[0].functions).local_table;
             params = (yyvsp[0].functions).params;
             rflag = false;
             return_type = (yyvsp[0].functions).type;
         }
-#line 1648 "yacc.tab.c"
+#line 1649 "yacc.tab.c"
     break;
 
   case 14: /* $@4: %empty  */
-#line 173 "yacc.y"
+#line 174 "yacc.y"
               {scope++;}
-#line 1654 "yacc.tab.c"
+#line 1655 "yacc.tab.c"
     break;
 
   case 15: /* function: function_dec $@3 LCB $@4 statements RCB  */
-#line 173 "yacc.y"
+#line 174 "yacc.y"
                                         {
         struct funcrec *entry = (struct funcrec*) malloc(sizeof(struct funcrec));
         entry -> name = (yyvsp[-5].functions).name;
@@ -1674,11 +1675,11 @@ yyreduce:
         params = NULL;
         scope--;
     }
-#line 1678 "yacc.tab.c"
+#line 1679 "yacc.tab.c"
     break;
 
   case 16: /* function_dec: data_type_new IDENTIFIER LPB function_params RPB  */
-#line 195 "yacc.y"
+#line 196 "yacc.y"
                                                                {
         struct funcrec *entry = (struct funcrec*) malloc(sizeof(struct funcrec));
         entry -> name = (yyvsp[-3].id).name;
@@ -1698,11 +1699,11 @@ yyreduce:
         (yyval.functions).num_params = (yyvsp[-1].functions).num_params;
         (yyval.functions).local_table = init_symtab();
     }
-#line 1702 "yacc.tab.c"
+#line 1703 "yacc.tab.c"
     break;
 
   case 17: /* function_dec: data_type_pr IDENTIFIER LPB function_params RPB  */
-#line 214 "yacc.y"
+#line 215 "yacc.y"
                                                       {
         
         struct funcrec *entry = (struct funcrec *)malloc(sizeof(struct funcrec));
@@ -1723,11 +1724,11 @@ yyreduce:
         (yyval.functions).num_params = (yyvsp[-1].functions).num_params;
         (yyval.functions).local_table = init_symtab();
     }
-#line 1727 "yacc.tab.c"
+#line 1728 "yacc.tab.c"
     break;
 
   case 18: /* function_dec: IDENTIFIER IDENTIFIER LPB function_params RPB  */
-#line 234 "yacc.y"
+#line 235 "yacc.y"
                                                     {
         if(search_classtab(class_table, (yyvsp[-4].id).name) == NULL)
         {
@@ -1752,11 +1753,11 @@ yyreduce:
         (yyval.functions).num_params = (yyvsp[-1].functions).num_params;
         (yyval.functions).local_table = init_symtab();
     }
-#line 1756 "yacc.tab.c"
+#line 1757 "yacc.tab.c"
     break;
 
   case 19: /* function_dec: VOID IDENTIFIER LPB function_params RPB  */
-#line 258 "yacc.y"
+#line 259 "yacc.y"
                                               {
         struct funcrec *entry = (struct funcrec *)malloc(sizeof(struct funcrec));
         entry -> name = (yyvsp[-3].id).name;
@@ -1776,11 +1777,11 @@ yyreduce:
         (yyval.functions).num_params = (yyvsp[-1].functions).num_params;
         (yyval.functions).local_table = init_symtab();
     }
-#line 1780 "yacc.tab.c"
+#line 1781 "yacc.tab.c"
     break;
 
   case 20: /* function_dec: list IDENTIFIER LPB function_params RPB  */
-#line 278 "yacc.y"
+#line 279 "yacc.y"
                                               {
         struct funcrec *entry = (struct funcrec *)malloc(sizeof(struct funcrec));
         entry -> name = (yyvsp[-3].id).name;
@@ -1802,11 +1803,11 @@ yyreduce:
         (yyval.functions).num_params = (yyvsp[-1].functions).num_params;
         (yyval.functions).local_table = init_symtab();
     }
-#line 1806 "yacc.tab.c"
+#line 1807 "yacc.tab.c"
     break;
 
   case 21: /* function_params: function_params COMMA function_param  */
-#line 302 "yacc.y"
+#line 303 "yacc.y"
                                                       {
         if(lookup((yyval.functions).params, (yyval.functions).params, (yyvsp[0].param)->name) != NULL)
         {
@@ -1817,30 +1818,30 @@ yyreduce:
         insert_symtab((yyval.functions).params, (yyvsp[0].param));
         (yyval.functions).num_params = (yyvsp[-2].functions).num_params + 1;
     }
-#line 1821 "yacc.tab.c"
+#line 1822 "yacc.tab.c"
     break;
 
   case 22: /* function_params: function_param  */
-#line 312 "yacc.y"
+#line 313 "yacc.y"
                      {
         (yyval.functions).params = init_symtab();
         insert_symtab((yyval.functions).params, (yyvsp[0].param));
         (yyval.functions).num_params = 1;
     }
-#line 1831 "yacc.tab.c"
+#line 1832 "yacc.tab.c"
     break;
 
   case 23: /* function_params: %empty  */
-#line 317 "yacc.y"
+#line 318 "yacc.y"
       {
         (yyval.functions).params = init_symtab();
         (yyval.functions).num_params = 0;
     }
-#line 1840 "yacc.tab.c"
+#line 1841 "yacc.tab.c"
     break;
 
   case 24: /* function_param: data_type_new IDENTIFIER  */
-#line 324 "yacc.y"
+#line 325 "yacc.y"
                                          {
         struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
         entry -> name = (yyvsp[0].id).name;
@@ -1852,11 +1853,11 @@ yyreduce:
         entry -> class_name = NULL;       
         (yyval.param) = entry;
     }
-#line 1856 "yacc.tab.c"
+#line 1857 "yacc.tab.c"
     break;
 
   case 25: /* function_param: data_type_pr IDENTIFIER  */
-#line 335 "yacc.y"
+#line 336 "yacc.y"
                               {
         struct idrec *entry = (struct idrec*) malloc(sizeof(struct idrec));
         entry -> name = (yyvsp[0].id).name;
@@ -1868,11 +1869,11 @@ yyreduce:
         entry -> class_name = NULL;       
         (yyval.param) = entry;
     }
-#line 1872 "yacc.tab.c"
+#line 1873 "yacc.tab.c"
     break;
 
   case 26: /* function_param: IDENTIFIER IDENTIFIER  */
-#line 346 "yacc.y"
+#line 347 "yacc.y"
                             {
         if(search_classtab(class_table, (yyvsp[-1].id).name) == NULL)
         {
@@ -1889,11 +1890,11 @@ yyreduce:
         entry -> dim = 0;
         (yyval.param) = entry;
     }
-#line 1893 "yacc.tab.c"
+#line 1894 "yacc.tab.c"
     break;
 
   case 27: /* function_param: list IDENTIFIER  */
-#line 363 "yacc.y"
+#line 364 "yacc.y"
                       {
         struct idrec *entry = (struct idrec *)malloc(sizeof(struct idrec));
         entry -> name = (yyvsp[0].id).name;
@@ -1905,11 +1906,11 @@ yyreduce:
         entry -> dim = (yyvsp[-1].list).dim;
         (yyval.param) = entry;
     }
-#line 1909 "yacc.tab.c"
+#line 1910 "yacc.tab.c"
     break;
 
   case 28: /* class: class_dec LCB class_stmt RCB  */
-#line 378 "yacc.y"
+#line 379 "yacc.y"
                                    {
         struct classrec *entry = (struct classrec *)malloc(sizeof(struct classrec));
         entry -> name = (yyvsp[-3].id).name;
@@ -1926,39 +1927,39 @@ yyreduce:
         methods = NULL;
         local_table = global_table;
     }
-#line 1930 "yacc.tab.c"
+#line 1931 "yacc.tab.c"
     break;
 
   case 29: /* class_dec: CLASS IDENTIFIER  */
-#line 397 "yacc.y"
+#line 398 "yacc.y"
                             {
         (yyval.id).name = (yyvsp[0].id).name;
         (yyvsp[0].id).type = 14;
         members = init_symtab();
         methods = init_functab();
     }
-#line 1941 "yacc.tab.c"
+#line 1942 "yacc.tab.c"
     break;
 
   case 33: /* $@5: %empty  */
-#line 411 "yacc.y"
+#line 412 "yacc.y"
                                    {
             local_table = (yyvsp[0].functions).local_table;
             params = (yyvsp[0].functions).params;
             rflag = true;
             return_type = (yyvsp[0].functions).type;
         }
-#line 1952 "yacc.tab.c"
+#line 1953 "yacc.tab.c"
     break;
 
   case 34: /* $@6: %empty  */
-#line 416 "yacc.y"
+#line 417 "yacc.y"
               {scope++;}
-#line 1958 "yacc.tab.c"
+#line 1959 "yacc.tab.c"
     break;
 
   case 35: /* class_function: class_function_dec $@5 LCB $@6 statements RCB  */
-#line 416 "yacc.y"
+#line 417 "yacc.y"
                                         {
         if(!rflag)
         {
@@ -1978,11 +1979,11 @@ yyreduce:
         params = NULL;
         scope--;
     }
-#line 1982 "yacc.tab.c"
+#line 1983 "yacc.tab.c"
     break;
 
   case 36: /* class_function_dec: data_type_new IDENTIFIER LPB function_params RPB  */
-#line 438 "yacc.y"
+#line 439 "yacc.y"
                                                                      {
         struct funcrec *entry = (struct funcrec*) malloc(sizeof(struct funcrec));
         entry -> name = (yyvsp[-3].id).name;
@@ -2004,11 +2005,11 @@ yyreduce:
         (yyval.functions).num_params = (yyvsp[-1].functions).num_params;
         (yyval.functions).local_table = init_symtab();
     }
-#line 2008 "yacc.tab.c"
+#line 2009 "yacc.tab.c"
     break;
 
   case 37: /* class_function_dec: data_type_pr IDENTIFIER LPB function_params RPB  */
-#line 459 "yacc.y"
+#line 460 "yacc.y"
                                                       {
         struct funcrec *entry = (struct funcrec *)malloc(sizeof(struct funcrec));
         entry -> name = (yyvsp[-3].id).name;
@@ -2030,11 +2031,11 @@ yyreduce:
         (yyval.functions).num_params = (yyvsp[-1].functions).num_params;
         (yyval.functions).local_table = init_symtab();
     }
-#line 2034 "yacc.tab.c"
+#line 2035 "yacc.tab.c"
     break;
 
   case 38: /* class_function_dec: IDENTIFIER IDENTIFIER LPB function_params RPB  */
-#line 480 "yacc.y"
+#line 481 "yacc.y"
                                                     {
         if(search_classtab(class_table, (yyvsp[-4].id).name) == NULL)
         {
@@ -2061,11 +2062,11 @@ yyreduce:
         (yyval.functions).num_params = (yyvsp[-1].functions).num_params;
         (yyval.functions).local_table = init_symtab();
     }
-#line 2065 "yacc.tab.c"
+#line 2066 "yacc.tab.c"
     break;
 
   case 39: /* class_function_dec: VOID IDENTIFIER LPB function_params RPB  */
-#line 506 "yacc.y"
+#line 507 "yacc.y"
                                               {
         struct funcrec *entry = (struct funcrec *)malloc(sizeof(struct funcrec));
         entry -> name = (yyvsp[-3].id).name;
@@ -2087,11 +2088,11 @@ yyreduce:
         (yyval.functions).num_params = (yyvsp[-1].functions).num_params;
         (yyval.functions).local_table = init_symtab();
     }
-#line 2091 "yacc.tab.c"
+#line 2092 "yacc.tab.c"
     break;
 
   case 40: /* class_function_dec: list IDENTIFIER LPB function_params RPB  */
-#line 527 "yacc.y"
+#line 528 "yacc.y"
                                               {
         struct funcrec *entry = (struct funcrec *)malloc(sizeof(struct funcrec));
         entry -> name = (yyvsp[-3].id).name;
@@ -2113,11 +2114,11 @@ yyreduce:
         (yyval.functions).num_params = (yyvsp[-1].functions).num_params;
         (yyval.functions).local_table = init_symtab();
     }
-#line 2117 "yacc.tab.c"
+#line 2118 "yacc.tab.c"
     break;
 
   case 41: /* class_decl_stmt: data_type_new id_list SEMICOLON  */
-#line 551 "yacc.y"
+#line 552 "yacc.y"
                                                  {
         struct snode* temp = (yyvsp[-1].namelist)->head;
         while(temp != NULL){
@@ -2138,11 +2139,11 @@ yyreduce:
             temp = temp->next;
         }
     }
-#line 2142 "yacc.tab.c"
+#line 2143 "yacc.tab.c"
     break;
 
   case 42: /* class_decl_stmt: data_type_pr id_list SEMICOLON  */
-#line 571 "yacc.y"
+#line 572 "yacc.y"
                                     {
         
         struct snode* temp = (yyvsp[-1].namelist)->head;
@@ -2165,11 +2166,11 @@ yyreduce:
             temp = temp->next;
         } 
     }
-#line 2169 "yacc.tab.c"
+#line 2170 "yacc.tab.c"
     break;
 
   case 43: /* class_decl_stmt: IDENTIFIER id_list SEMICOLON  */
-#line 593 "yacc.y"
+#line 594 "yacc.y"
                                   {
         if(search_classtab(class_table, (yyvsp[-2].id).name) == NULL)
         {
@@ -2196,11 +2197,11 @@ yyreduce:
             temp = temp->next;
         }
     }
-#line 2200 "yacc.tab.c"
+#line 2201 "yacc.tab.c"
     break;
 
   case 44: /* class_decl_stmt: list id_list SEMICOLON  */
-#line 619 "yacc.y"
+#line 620 "yacc.y"
                              {
         struct snode* temp = (yyvsp[-1].namelist)->head;
         while(temp != NULL){
@@ -2222,29 +2223,29 @@ yyreduce:
             temp = temp->next;
         }
     }
-#line 2226 "yacc.tab.c"
+#line 2227 "yacc.tab.c"
     break;
 
   case 45: /* $@7: %empty  */
-#line 644 "yacc.y"
+#line 645 "yacc.y"
                             {scope++;}
-#line 2232 "yacc.tab.c"
+#line 2233 "yacc.tab.c"
     break;
 
   case 46: /* statements: statements LCB $@7 statements RCB  */
-#line 644 "yacc.y"
+#line 645 "yacc.y"
                                                       {scope--;}
-#line 2238 "yacc.tab.c"
+#line 2239 "yacc.tab.c"
     break;
 
   case 48: /* statements: %empty  */
-#line 646 "yacc.y"
+#line 647 "yacc.y"
       {}
-#line 2244 "yacc.tab.c"
+#line 2245 "yacc.tab.c"
     break;
 
   case 64: /* unary_stmt: identifier UNARY_OP  */
-#line 672 "yacc.y"
+#line 673 "yacc.y"
                                 {
         if((yyvsp[-1].class_id).type != 0 && (yyvsp[-1].class_id).type != 1){
             printf("Error: Unary operator not defined for type %s\n", map_type[(yyvsp[-1].class_id).type]); 
@@ -2252,11 +2253,11 @@ yyreduce:
         }
         (yyval.type) = (yyvsp[-1].class_id).type;
     }
-#line 2256 "yacc.tab.c"
+#line 2257 "yacc.tab.c"
     break;
 
   case 65: /* unary_stmt: class_identifier UNARY_OP  */
-#line 679 "yacc.y"
+#line 680 "yacc.y"
                                 {
         check_namelist((yyvsp[-1].class_id).namelist, global_table, local_table, class_table, NULL, -1);
         if((yyvsp[-1].class_id).type != 0 && (yyvsp[-1].class_id).type != 1){
@@ -2264,11 +2265,11 @@ yyreduce:
             YYABORT;
         }
     }
-#line 2268 "yacc.tab.c"
+#line 2269 "yacc.tab.c"
     break;
 
   case 73: /* decl_stmt: data_type_new id_list SEMICOLON  */
-#line 700 "yacc.y"
+#line 701 "yacc.y"
                                            {
         struct snode* temp = (yyvsp[-1].namelist)->head;
         while(temp != NULL){
@@ -2293,11 +2294,11 @@ yyreduce:
             temp = temp -> next;
         }
     }
-#line 2297 "yacc.tab.c"
+#line 2298 "yacc.tab.c"
     break;
 
   case 74: /* decl_stmt: data_type_pr id_list SEMICOLON  */
-#line 724 "yacc.y"
+#line 725 "yacc.y"
                                     {
         struct snode* temp = (yyvsp[-1].namelist)->head;
         while(temp != NULL){
@@ -2322,11 +2323,11 @@ yyreduce:
             temp = temp -> next;
         }
     }
-#line 2326 "yacc.tab.c"
+#line 2327 "yacc.tab.c"
     break;
 
   case 75: /* decl_stmt: IDENTIFIER id_list SEMICOLON  */
-#line 748 "yacc.y"
+#line 749 "yacc.y"
                                    {
         struct snode* temp = (yyvsp[-1].namelist)->head;
         if(search_classtab(class_table, (yyvsp[-2].id).name) == NULL)
@@ -2356,11 +2357,11 @@ yyreduce:
             temp = temp -> next;
         }
     }
-#line 2360 "yacc.tab.c"
+#line 2361 "yacc.tab.c"
     break;
 
   case 76: /* decl_stmt: list id_list SEMICOLON  */
-#line 777 "yacc.y"
+#line 778 "yacc.y"
                              {
         struct snode* temp = (yyvsp[-1].namelist)->head;
         while(temp != NULL){
@@ -2385,69 +2386,69 @@ yyreduce:
             temp = temp -> next;
         }
     }
-#line 2389 "yacc.tab.c"
+#line 2390 "yacc.tab.c"
     break;
 
   case 77: /* id_list: id_list COMMA IDENTIFIER  */
-#line 804 "yacc.y"
+#line 805 "yacc.y"
                                  {
         insert_slist((yyvsp[-2].namelist), (yyvsp[0].id).name);
         (yyval.namelist) = (yyvsp[-2].namelist);
     }
-#line 2398 "yacc.tab.c"
+#line 2399 "yacc.tab.c"
     break;
 
   case 78: /* id_list: IDENTIFIER EQUALS nested_expr  */
-#line 808 "yacc.y"
+#line 809 "yacc.y"
                                    {
         // check nested expr type
         (yyval.namelist) = init_slist();
         insert_slist((yyval.namelist), (yyvsp[-2].id).name);
     }
-#line 2408 "yacc.tab.c"
+#line 2409 "yacc.tab.c"
     break;
 
   case 79: /* id_list: id_list COMMA IDENTIFIER EQUALS nested_expr  */
-#line 813 "yacc.y"
+#line 814 "yacc.y"
                                                  {
         (yyval.namelist) = init_slist();
         insert_slist((yyval.namelist), (yyvsp[-2].id).name);
     }
-#line 2417 "yacc.tab.c"
+#line 2418 "yacc.tab.c"
     break;
 
   case 80: /* id_list: IDENTIFIER  */
-#line 817 "yacc.y"
+#line 818 "yacc.y"
                 {
         (yyval.namelist) = init_slist();
         insert_slist((yyval.namelist), (yyvsp[0].id).name);   
     }
-#line 2426 "yacc.tab.c"
+#line 2427 "yacc.tab.c"
     break;
 
   case 82: /* expr_stmt_without_semicolon: identifier ASSIGN_OP nested_expr  */
-#line 829 "yacc.y"
+#line 830 "yacc.y"
                                                               {
         if(!check_assign_op((yyvsp[-2].class_id).type, (yyvsp[0].exprs).type, (yyvsp[-1].assignop))){
             YYABORT;
         }
     }
-#line 2436 "yacc.tab.c"
+#line 2437 "yacc.tab.c"
     break;
 
   case 83: /* expr_stmt_without_semicolon: class_identifier ASSIGN_OP nested_expr  */
-#line 834 "yacc.y"
+#line 835 "yacc.y"
                                              {
         check_namelist((yyvsp[-2].class_id).namelist, global_table, local_table, class_table, NULL, -1);
         if(!check_assign_op((yyvsp[-2].class_id).type, (yyvsp[0].exprs).type, (yyvsp[-1].assignop))){
             YYABORT;
         }
     }
-#line 2447 "yacc.tab.c"
+#line 2448 "yacc.tab.c"
     break;
 
   case 84: /* expr_stmt_without_semicolon: SELF DOT IDENTIFIER ASSIGN_OP nested_expr  */
-#line 840 "yacc.y"
+#line 841 "yacc.y"
                                                 {
         struct idrec *entry = lookup(members, members, (yyvsp[-2].id).name);
         if(entry == NULL)
@@ -2464,11 +2465,11 @@ yyreduce:
             YYABORT;
         }
     }
-#line 2468 "yacc.tab.c"
+#line 2469 "yacc.tab.c"
     break;
 
   case 85: /* expr_stmt_without_semicolon: identifier EQUALS nested_expr  */
-#line 856 "yacc.y"
+#line 857 "yacc.y"
                                     {
         if((yyvsp[-2].class_id).type == 5 && (yyvsp[0].exprs).type == 5){
             if((yyvsp[-2].class_id).dim != (yyvsp[0].exprs).dim){
@@ -2481,11 +2482,11 @@ yyreduce:
             YYABORT;
         }
     }
-#line 2485 "yacc.tab.c"
+#line 2486 "yacc.tab.c"
     break;
 
   case 86: /* expr_stmt_without_semicolon: class_identifier EQUALS nested_expr  */
-#line 868 "yacc.y"
+#line 869 "yacc.y"
                                           {
         check_namelist((yyvsp[-2].class_id).namelist, global_table, local_table, class_table, NULL, -1);
         if((yyvsp[-2].class_id).type == 5 && (yyvsp[0].exprs).type == 5){
@@ -2499,11 +2500,11 @@ yyreduce:
             YYABORT;
         }
     }
-#line 2503 "yacc.tab.c"
+#line 2504 "yacc.tab.c"
     break;
 
   case 87: /* expr_stmt_without_semicolon: SELF DOT IDENTIFIER EQUALS nested_expr  */
-#line 881 "yacc.y"
+#line 882 "yacc.y"
                                              {
         if(members == NULL)
         {
@@ -2527,20 +2528,20 @@ yyreduce:
             YYABORT;
         }
     }
-#line 2531 "yacc.tab.c"
+#line 2532 "yacc.tab.c"
     break;
 
   case 89: /* nested_expr: LPB nested_expr RPB  */
-#line 908 "yacc.y"
+#line 909 "yacc.y"
                                  {
         (yyval.exprs).type = (yyvsp[-1].exprs).type;
         (yyval.exprs).dim = (yyvsp[-1].exprs).dim;
     }
-#line 2540 "yacc.tab.c"
+#line 2541 "yacc.tab.c"
     break;
 
   case 90: /* nested_expr: LPB nested_expr RPB conj nested_expr  */
-#line 912 "yacc.y"
+#line 913 "yacc.y"
                                            {
         if((yyvsp[0].exprs).type != 3 || (yyvsp[-3].exprs).type != 3){
             printf("Error: Type mismatch\n");
@@ -2549,11 +2550,11 @@ yyreduce:
         (yyval.exprs).type = (yyvsp[-3].exprs).type;
         (yyval.exprs).dim = 0;
     }
-#line 2553 "yacc.tab.c"
+#line 2554 "yacc.tab.c"
     break;
 
   case 91: /* nested_expr: LPB nested_expr RPB REL_OP nested_expr  */
-#line 920 "yacc.y"
+#line 921 "yacc.y"
                                              {
         if(!check_rel_op((yyvsp[-3].exprs).type, (yyvsp[0].exprs).type, (yyvsp[-1].assignop))){
             YYABORT;
@@ -2561,11 +2562,11 @@ yyreduce:
         (yyval.exprs).type = 3;
         (yyval.exprs).dim = 0;
     }
-#line 2565 "yacc.tab.c"
+#line 2566 "yacc.tab.c"
     break;
 
   case 92: /* nested_expr: LPB nested_expr RPB arith_op nested_expr  */
-#line 927 "yacc.y"
+#line 928 "yacc.y"
                                                {
         (yyval.exprs).type = check_arith_op((yyvsp[-3].exprs).type, (yyvsp[0].exprs).type, (yyvsp[-1].op_type));
         if((yyval.exprs).type == -1)
@@ -2574,11 +2575,11 @@ yyreduce:
         }
         (yyval.exprs).dim = 0;
     }
-#line 2578 "yacc.tab.c"
+#line 2579 "yacc.tab.c"
     break;
 
   case 93: /* nested_expr: LPB nested_expr RPB set_op nested_expr  */
-#line 935 "yacc.y"
+#line 936 "yacc.y"
                                              {
         if((yyvsp[-3].exprs).type != 7 || (yyvsp[0].exprs).type != 7){
             printf("Error: Invalid operands for \n");
@@ -2587,20 +2588,20 @@ yyreduce:
         (yyval.exprs).type = (yyvsp[-3].exprs).type; 
         (yyval.exprs).dim = 0;
     }
-#line 2591 "yacc.tab.c"
+#line 2592 "yacc.tab.c"
     break;
 
   case 94: /* nested_expr: expr  */
-#line 943 "yacc.y"
+#line 944 "yacc.y"
            {
         (yyval.exprs).type = (yyvsp[0].exprs).type;
         (yyval.exprs).dim = (yyvsp[0].exprs).dim; 
     }
-#line 2600 "yacc.tab.c"
+#line 2601 "yacc.tab.c"
     break;
 
   case 95: /* expr: expr_terminal conj nested_expr  */
-#line 950 "yacc.y"
+#line 951 "yacc.y"
                                      {
         if((yyvsp[-2].exprs).type != 3 || (yyvsp[0].exprs).type != 3 ){
             printf("Error: Type mismatch\n");
@@ -2609,11 +2610,11 @@ yyreduce:
         (yyval.exprs).type = 3;
         (yyval.exprs).dim = 0;
     }
-#line 2613 "yacc.tab.c"
+#line 2614 "yacc.tab.c"
     break;
 
   case 96: /* expr: expr_terminal REL_OP nested_expr  */
-#line 958 "yacc.y"
+#line 959 "yacc.y"
                                        {
         if(!check_rel_op((yyvsp[-2].exprs).type, (yyvsp[0].exprs).type, (yyvsp[-1].assignop))){
             YYABORT;
@@ -2621,11 +2622,11 @@ yyreduce:
         (yyval.exprs).type = 3;
         (yyval.exprs).dim = 0;
     }
-#line 2625 "yacc.tab.c"
+#line 2626 "yacc.tab.c"
     break;
 
   case 97: /* expr: expr_terminal arith_op nested_expr  */
-#line 965 "yacc.y"
+#line 966 "yacc.y"
                                          {
         (yyval.exprs).type = check_arith_op((yyvsp[-2].exprs).type, (yyvsp[0].exprs).type, (yyvsp[-1].op_type));
         if((yyval.exprs).type == -1)
@@ -2634,11 +2635,11 @@ yyreduce:
         }
         (yyval.exprs).dim = 0;
     }
-#line 2638 "yacc.tab.c"
+#line 2639 "yacc.tab.c"
     break;
 
   case 98: /* expr: expr_terminal set_op nested_expr  */
-#line 973 "yacc.y"
+#line 974 "yacc.y"
                                        {
         if((yyvsp[-2].exprs).type != 7 || (yyvsp[0].exprs).type != 7){
             printf("Error: Invalid operands for \n");
@@ -2647,74 +2648,74 @@ yyreduce:
         (yyval.exprs).type = (yyvsp[-2].exprs).type;
         (yyval.exprs).dim = 0;    
     }
-#line 2651 "yacc.tab.c"
+#line 2652 "yacc.tab.c"
     break;
 
   case 99: /* expr: expr_terminal  */
-#line 981 "yacc.y"
+#line 982 "yacc.y"
                     {
         (yyval.exprs).type = (yyvsp[0].exprs).type;
         (yyval.exprs).dim = (yyvsp[0].exprs).dim;
     }
-#line 2660 "yacc.tab.c"
+#line 2661 "yacc.tab.c"
     break;
 
   case 100: /* expr_terminal: unary_stmt  */
-#line 988 "yacc.y"
+#line 989 "yacc.y"
                           {
         (yyval.exprs).type = (yyvsp[0].type);
         (yyval.exprs).dim = 0;
     }
-#line 2669 "yacc.tab.c"
+#line 2670 "yacc.tab.c"
     break;
 
   case 101: /* expr_terminal: NUMBER  */
-#line 992 "yacc.y"
+#line 993 "yacc.y"
             {
         (yyval.exprs).type = 0;
         (yyval.exprs).dim = 0;
     }
-#line 2678 "yacc.tab.c"
+#line 2679 "yacc.tab.c"
     break;
 
   case 102: /* expr_terminal: DECIMAL  */
-#line 996 "yacc.y"
+#line 997 "yacc.y"
              { 
         (yyval.exprs).type = 1;
         (yyval.exprs).dim = 0;
     }
-#line 2687 "yacc.tab.c"
+#line 2688 "yacc.tab.c"
     break;
 
   case 103: /* expr_terminal: STRING_LITERAL  */
-#line 1000 "yacc.y"
+#line 1001 "yacc.y"
                     {
         (yyval.exprs).type = 2;   
         (yyval.exprs).dim = 0; 
     }
-#line 2696 "yacc.tab.c"
+#line 2697 "yacc.tab.c"
     break;
 
   case 104: /* expr_terminal: BOOL_LITERAL  */
-#line 1004 "yacc.y"
+#line 1005 "yacc.y"
                   {
         (yyval.exprs).type = 3;
         (yyval.exprs).dim = 0;
     }
-#line 2705 "yacc.tab.c"
+#line 2706 "yacc.tab.c"
     break;
 
   case 105: /* expr_terminal: call  */
-#line 1008 "yacc.y"
+#line 1009 "yacc.y"
            {
         (yyval.exprs).type = (yyvsp[0].exprs).type;
         (yyval.exprs).dim = (yyvsp[0].exprs).dim;
     }
-#line 2714 "yacc.tab.c"
+#line 2715 "yacc.tab.c"
     break;
 
   case 106: /* expr_terminal: NOT LPB nested_expr RPB  */
-#line 1012 "yacc.y"
+#line 1013 "yacc.y"
                               {
         if((yyvsp[-1].exprs).type != 3){
             printf("Error: Not operator not defined for type %s\n", map_type[(yyvsp[-1].exprs).type]); 
@@ -2723,11 +2724,11 @@ yyreduce:
         (yyval.exprs).type = 3;
         (yyval.exprs).dim = 0;
     }
-#line 2727 "yacc.tab.c"
+#line 2728 "yacc.tab.c"
     break;
 
   case 107: /* expr_terminal: NOT identifier  */
-#line 1020 "yacc.y"
+#line 1021 "yacc.y"
                      {
         if((yyvsp[0].class_id).type != 3){
             printf("Error: Not operator not defined for type %s\n", map_type[(yyvsp[0].class_id).type]); 
@@ -2736,11 +2737,11 @@ yyreduce:
         (yyval.exprs).type = 3;
         (yyval.exprs).dim = 0;
     }
-#line 2740 "yacc.tab.c"
+#line 2741 "yacc.tab.c"
     break;
 
   case 108: /* expr_terminal: NOT class_identifier  */
-#line 1028 "yacc.y"
+#line 1029 "yacc.y"
                            {
         if(check_namelist((yyvsp[0].class_id).namelist, global_table, local_table, class_table, NULL, -1) == false)
         {
@@ -2753,20 +2754,20 @@ yyreduce:
         (yyval.exprs).type = 3;
         (yyval.exprs).dim = 0;
     }
-#line 2757 "yacc.tab.c"
+#line 2758 "yacc.tab.c"
     break;
 
   case 109: /* expr_terminal: identifier  */
-#line 1040 "yacc.y"
+#line 1041 "yacc.y"
                  {
         (yyval.exprs).type = (yyvsp[0].class_id).type;
         (yyval.exprs).dim = (yyvsp[0].class_id).dim;
     }
-#line 2766 "yacc.tab.c"
+#line 2767 "yacc.tab.c"
     break;
 
   case 110: /* expr_terminal: class_identifier  */
-#line 1044 "yacc.y"
+#line 1045 "yacc.y"
                       {
         display_slist((yyvsp[0].class_id).namelist);
         if(check_namelist((yyvsp[0].class_id).namelist, global_table, local_table, class_table, NULL, -1) == false)
@@ -2776,20 +2777,20 @@ yyreduce:
         (yyval.exprs).type = 3;
         (yyval.exprs).dim = 0;
     }
-#line 2780 "yacc.tab.c"
+#line 2781 "yacc.tab.c"
     break;
 
   case 111: /* expr_terminal: list_literal  */
-#line 1053 "yacc.y"
+#line 1054 "yacc.y"
                    {
         (yyval.exprs).type = 5;
         (yyval.exprs).dim = (yyvsp[0].list).dim;
     }
-#line 2789 "yacc.tab.c"
+#line 2790 "yacc.tab.c"
     break;
 
   case 112: /* expr_terminal: SELF DOT IDENTIFIER  */
-#line 1057 "yacc.y"
+#line 1058 "yacc.y"
                           {
         if(members == NULL)
         {
@@ -2805,11 +2806,11 @@ yyreduce:
         (yyval.exprs).type = entry->type;
         (yyval.exprs).dim = entry->dim;
     }
-#line 2809 "yacc.tab.c"
+#line 2810 "yacc.tab.c"
     break;
 
   case 113: /* expr_terminal: SELF DOT IDENTIFIER dim  */
-#line 1072 "yacc.y"
+#line 1073 "yacc.y"
                               {
         if(members == NULL)
         {
@@ -2825,59 +2826,59 @@ yyreduce:
         (yyval.exprs).type = entry->type;
         (yyval.exprs).dim = entry->dim - (yyvsp[0].list).dim;
     }
-#line 2829 "yacc.tab.c"
+#line 2830 "yacc.tab.c"
     break;
 
   case 114: /* if_stmt: if_expr LCB statements RCB  */
-#line 1091 "yacc.y"
+#line 1092 "yacc.y"
                                     {rflag = false;}
-#line 2835 "yacc.tab.c"
+#line 2836 "yacc.tab.c"
     break;
 
   case 115: /* if_stmt: if_expr single_stmt  */
-#line 1092 "yacc.y"
+#line 1093 "yacc.y"
                           {rflag = false;}
-#line 2841 "yacc.tab.c"
+#line 2842 "yacc.tab.c"
     break;
 
   case 116: /* if_stmt: if_expr LCB statements RCB ELSE if_stmt  */
-#line 1093 "yacc.y"
+#line 1094 "yacc.y"
                                               {rflag = false;}
-#line 2847 "yacc.tab.c"
+#line 2848 "yacc.tab.c"
     break;
 
   case 117: /* if_stmt: if_expr single_stmt ELSE if_stmt  */
-#line 1094 "yacc.y"
+#line 1095 "yacc.y"
                                        {rflag = false;}
-#line 2853 "yacc.tab.c"
+#line 2854 "yacc.tab.c"
     break;
 
   case 118: /* if_stmt: if_expr LCB statements RCB ELSE LCB statements RCB  */
-#line 1095 "yacc.y"
+#line 1096 "yacc.y"
                                                          {rflag = false;}
-#line 2859 "yacc.tab.c"
+#line 2860 "yacc.tab.c"
     break;
 
   case 119: /* if_stmt: if_expr single_stmt ELSE LCB statements RCB  */
-#line 1096 "yacc.y"
+#line 1097 "yacc.y"
                                                   {rflag = false;}
-#line 2865 "yacc.tab.c"
+#line 2866 "yacc.tab.c"
     break;
 
   case 120: /* if_stmt: if_expr LCB statements RCB ELSE single_stmt  */
-#line 1097 "yacc.y"
+#line 1098 "yacc.y"
                                                   {rflag = false;}
-#line 2871 "yacc.tab.c"
+#line 2872 "yacc.tab.c"
     break;
 
   case 121: /* if_stmt: if_expr single_stmt ELSE single_stmt  */
-#line 1098 "yacc.y"
+#line 1099 "yacc.y"
                                            {rflag = false;}
-#line 2877 "yacc.tab.c"
+#line 2878 "yacc.tab.c"
     break;
 
   case 122: /* if_expr: IF LPB nested_expr RPB  */
-#line 1102 "yacc.y"
+#line 1103 "yacc.y"
                                 {
         if((yyvsp[-1].exprs).type != 3){
             printf("Error: If condition must be bool\n");
@@ -2885,80 +2886,80 @@ yyreduce:
         }
         rflag = false;
     }
-#line 2889 "yacc.tab.c"
+#line 2890 "yacc.tab.c"
     break;
 
   case 123: /* $@8: %empty  */
-#line 1113 "yacc.y"
+#line 1114 "yacc.y"
                                                       {scope++;}
-#line 2895 "yacc.tab.c"
+#line 2896 "yacc.tab.c"
     break;
 
   case 124: /* for_stmt: for_exp expr_stmt_without_semicolon RPB LCB $@8 statements RCB  */
-#line 1113 "yacc.y"
+#line 1114 "yacc.y"
                                                                                 {scope--;rflag = false;}
-#line 2901 "yacc.tab.c"
+#line 2902 "yacc.tab.c"
     break;
 
   case 125: /* for_stmt: for_exp expr_stmt_without_semicolon RPB single_stmt  */
-#line 1114 "yacc.y"
+#line 1115 "yacc.y"
                                                           {rflag = false;}
-#line 2907 "yacc.tab.c"
+#line 2908 "yacc.tab.c"
     break;
 
   case 126: /* for_exp: FOR LPB decl_stmt nested_expr SEMICOLON  */
-#line 1118 "yacc.y"
+#line 1119 "yacc.y"
                                                  {
         if((yyvsp[-1].exprs).type != 3){
             printf("Error: For condition must be bool\n");
             YYABORT;
         }
     }
-#line 2918 "yacc.tab.c"
+#line 2919 "yacc.tab.c"
     break;
 
   case 127: /* for_exp: FOR LPB expr_stmt nested_expr SEMICOLON  */
-#line 1124 "yacc.y"
+#line 1125 "yacc.y"
                                               {
         if((yyvsp[-1].exprs).type != 3){
             printf("Error: For condition must be bool\n");
             YYABORT;
         }
     }
-#line 2929 "yacc.tab.c"
+#line 2930 "yacc.tab.c"
     break;
 
   case 128: /* $@9: %empty  */
-#line 1133 "yacc.y"
+#line 1134 "yacc.y"
                           {scope++;}
-#line 2935 "yacc.tab.c"
+#line 2936 "yacc.tab.c"
     break;
 
   case 129: /* while_stmt: while_exp LCB $@9 statements RCB  */
-#line 1133 "yacc.y"
+#line 1134 "yacc.y"
                                                     {scope--;rflag = false;}
-#line 2941 "yacc.tab.c"
+#line 2942 "yacc.tab.c"
     break;
 
   case 130: /* while_stmt: while_exp single_stmt  */
-#line 1134 "yacc.y"
+#line 1135 "yacc.y"
                             {rflag = false;}
-#line 2947 "yacc.tab.c"
+#line 2948 "yacc.tab.c"
     break;
 
   case 131: /* while_exp: WHILE LPB nested_expr RPB  */
-#line 1138 "yacc.y"
+#line 1139 "yacc.y"
                                      {
         if((yyvsp[-1].exprs).type != 3){
             printf("Error: While condition must be bool\n");
             YYABORT;
         }
     }
-#line 2958 "yacc.tab.c"
+#line 2959 "yacc.tab.c"
     break;
 
   case 133: /* call: IDENTIFIER LPB call_args RPB  */
-#line 1151 "yacc.y"
+#line 1152 "yacc.y"
                                    {
         struct funcrec *entry = (struct funcrec *)malloc(sizeof(struct funcrec));
         entry -> name = (yyvsp[-3].id).name;
@@ -2972,11 +2973,11 @@ yyreduce:
         (yyval.exprs).type = func -> type;
         (yyval.exprs).dim = func -> dim;
     }
-#line 2976 "yacc.tab.c"
+#line 2977 "yacc.tab.c"
     break;
 
   case 134: /* call: class_identifier LPB call_args RPB  */
-#line 1164 "yacc.y"
+#line 1165 "yacc.y"
                                          {
         if(check_namelist((yyvsp[-3].class_id).namelist, global_table, local_table, class_table, (yyvsp[-1].functions).params, (yyvsp[-1].functions).num_params) == false)
         {
@@ -2995,11 +2996,11 @@ yyreduce:
         (yyval.exprs).type = func -> type;
         (yyval.exprs).dim = func -> dim;
     }
-#line 2999 "yacc.tab.c"
+#line 3000 "yacc.tab.c"
     break;
 
   case 135: /* call_args: call_args COMMA nested_expr  */
-#line 1185 "yacc.y"
+#line 1186 "yacc.y"
                                        {
         (yyval.functions).params = (yyvsp[-2].functions).params;
         struct idrec *entry = (struct idrec*) malloc(sizeof(struct idrec));
@@ -3007,11 +3008,11 @@ yyreduce:
         insert_symtab((yyval.functions).params, entry);
         (yyval.functions).num_params = (yyvsp[-2].functions).num_params + 1;
     }
-#line 3011 "yacc.tab.c"
+#line 3012 "yacc.tab.c"
     break;
 
   case 136: /* call_args: nested_expr  */
-#line 1192 "yacc.y"
+#line 1193 "yacc.y"
                   {
         (yyval.functions).params = init_symtab();
         struct idrec *entry = (struct idrec*) malloc(sizeof(struct idrec));
@@ -3019,20 +3020,20 @@ yyreduce:
         insert_symtab((yyval.functions).params, entry);
         (yyval.functions).num_params = 1;
     }
-#line 3023 "yacc.tab.c"
+#line 3024 "yacc.tab.c"
     break;
 
   case 137: /* call_args: %empty  */
-#line 1199 "yacc.y"
+#line 1200 "yacc.y"
       {
         (yyval.functions).params = init_symtab();
         (yyval.functions).num_params = 0;
     }
-#line 3032 "yacc.tab.c"
+#line 3033 "yacc.tab.c"
     break;
 
   case 138: /* return_stmt: RETURN SEMICOLON  */
-#line 1205 "yacc.y"
+#line 1206 "yacc.y"
                               {
         if(return_type != 4)
         {
@@ -3042,11 +3043,11 @@ yyreduce:
         }
         rflag = true;
     }
-#line 3046 "yacc.tab.c"
+#line 3047 "yacc.tab.c"
     break;
 
   case 139: /* return_stmt: RETURN nested_expr SEMICOLON  */
-#line 1214 "yacc.y"
+#line 1215 "yacc.y"
                                    {
         if(return_type != (yyvsp[-1].exprs).type)
         {
@@ -3056,31 +3057,31 @@ yyreduce:
         }
         rflag = true;
     }
-#line 3060 "yacc.tab.c"
+#line 3061 "yacc.tab.c"
     break;
 
   case 140: /* list: LIST dim COLON data_type_pr  */
-#line 1227 "yacc.y"
+#line 1228 "yacc.y"
                                   {
         (yyval.list).type = (yyvsp[0].type);
         (yyval.list).dim = (yyvsp[-2].list).dim;
         (yyval.list).class_name = NULL;
     }
-#line 3070 "yacc.tab.c"
+#line 3071 "yacc.tab.c"
     break;
 
   case 141: /* list: LIST dim COLON data_type_new  */
-#line 1232 "yacc.y"
+#line 1233 "yacc.y"
                                    {
         (yyval.list).type = (yyvsp[0].type);
         (yyval.list).dim = (yyvsp[-2].list).dim;
         (yyval.list).class_name = NULL;
     }
-#line 3080 "yacc.tab.c"
+#line 3081 "yacc.tab.c"
     break;
 
   case 142: /* list: LIST dim COLON IDENTIFIER  */
-#line 1237 "yacc.y"
+#line 1238 "yacc.y"
                                 {
         if(search_classtab(class_table, (yyvsp[0].id).name) == NULL)
         {
@@ -3091,20 +3092,20 @@ yyreduce:
         (yyval.list).class_name = (yyvsp[0].id).name;
         (yyval.list).dim = (yyvsp[-2].list).dim;
     }
-#line 3095 "yacc.tab.c"
+#line 3096 "yacc.tab.c"
     break;
 
   case 143: /* list_literal: LCB list_terminal RCB  */
-#line 1250 "yacc.y"
+#line 1251 "yacc.y"
                                      {
         (yyval.list).type = 5;
         (yyval.list).dim = (yyvsp[-1].list).dim+1;
     }
-#line 3104 "yacc.tab.c"
+#line 3105 "yacc.tab.c"
     break;
 
   case 144: /* list_terminal: nested_expr  */
-#line 1257 "yacc.y"
+#line 1258 "yacc.y"
                            {
         (yyval.list).type = (yyvsp[0].exprs).type;
         if((yyvsp[0].exprs).type == 5){
@@ -3114,11 +3115,11 @@ yyreduce:
             (yyval.list).dim = 0;
         }
     }
-#line 3118 "yacc.tab.c"
+#line 3119 "yacc.tab.c"
     break;
 
   case 145: /* list_terminal: list_terminal COMMA nested_expr  */
-#line 1266 "yacc.y"
+#line 1267 "yacc.y"
                                       {
         if((yyvsp[-2].list).type != (yyvsp[0].exprs).type){
             printf("Error: Type mismatch in list terminal\n");
@@ -3127,11 +3128,11 @@ yyreduce:
         (yyval.list).type = (yyvsp[-2].list).type;
         (yyval.list).dim = (yyvsp[-2].list).dim;
     }
-#line 3131 "yacc.tab.c"
+#line 3132 "yacc.tab.c"
     break;
 
   case 146: /* dim: LSB nested_expr RSB dim  */
-#line 1277 "yacc.y"
+#line 1278 "yacc.y"
                              {
         if((yyvsp[-2].exprs).type != 0){
             printf("Error: Array size must be an integer\n");
@@ -3139,11 +3140,11 @@ yyreduce:
         }
         (yyval.list).dim = (yyvsp[0].list).dim + 1;
     }
-#line 3143 "yacc.tab.c"
+#line 3144 "yacc.tab.c"
     break;
 
   case 147: /* dim: LSB nested_expr RSB  */
-#line 1284 "yacc.y"
+#line 1285 "yacc.y"
                           {
         if((yyvsp[-1].exprs).type != 0){
             printf("Error: Array size must be an integer\n");
@@ -3151,35 +3152,35 @@ yyreduce:
         }
         (yyval.list).dim = 1;
     }
-#line 3155 "yacc.tab.c"
+#line 3156 "yacc.tab.c"
     break;
 
   case 148: /* dim: empty_dim  */
-#line 1291 "yacc.y"
+#line 1292 "yacc.y"
                 {
         (yyval.list).dim = (yyvsp[0].list).dim;
     }
-#line 3163 "yacc.tab.c"
+#line 3164 "yacc.tab.c"
     break;
 
   case 149: /* empty_dim: empty_dim LSB RSB  */
-#line 1296 "yacc.y"
+#line 1297 "yacc.y"
                              {
         (yyval.list).dim = (yyvsp[-2].list).dim + 1;
     }
-#line 3171 "yacc.tab.c"
+#line 3172 "yacc.tab.c"
     break;
 
   case 150: /* empty_dim: LSB RSB  */
-#line 1299 "yacc.y"
+#line 1300 "yacc.y"
               {
         (yyval.list).dim = 1;
     }
-#line 3179 "yacc.tab.c"
+#line 3180 "yacc.tab.c"
     break;
 
   case 151: /* identifier: IDENTIFIER  */
-#line 1304 "yacc.y"
+#line 1305 "yacc.y"
                        {
         struct idrec *entry = lookup(global_table, local_table, (yyvsp[0].id).name);
         if(entry == NULL){
@@ -3192,11 +3193,11 @@ yyreduce:
         (yyval.class_id).type = entry -> type;
         (yyval.class_id).dim = entry -> dim;
     }
-#line 3196 "yacc.tab.c"
+#line 3197 "yacc.tab.c"
     break;
 
   case 152: /* identifier: IDENTIFIER dim  */
-#line 1316 "yacc.y"
+#line 1317 "yacc.y"
                      {
         struct idrec *entry = lookup(global_table, local_table, (yyvsp[-1].id).name);
         if(entry == NULL){
@@ -3211,21 +3212,21 @@ yyreduce:
         (yyval.class_id).type = entry->type;
         (yyval.class_id).dim = entry->dim - (yyvsp[0].list).dim;
     }
-#line 3215 "yacc.tab.c"
+#line 3216 "yacc.tab.c"
     break;
 
   case 153: /* class_identifier: IDENTIFIER DOT IDENTIFIER  */
-#line 1333 "yacc.y"
+#line 1334 "yacc.y"
                                              {
         (yyval.class_id).namelist = init_slist();
         insert_slist((yyval.class_id).namelist, (yyvsp[-2].id).name);
         insert_slist((yyval.class_id).namelist, (yyvsp[0].id).name);   
     }
-#line 3225 "yacc.tab.c"
+#line 3226 "yacc.tab.c"
     break;
 
   case 154: /* class_identifier: IDENTIFIER DOT class_identifier  */
-#line 1338 "yacc.y"
+#line 1339 "yacc.y"
                                       {
         struct snode* temp = (struct snode*) malloc(sizeof(struct snode));
         temp -> val = (yyvsp[-2].id).name;
@@ -3233,137 +3234,137 @@ yyreduce:
         (yyvsp[0].class_id).namelist -> head = temp;
         (yyval.class_id).namelist = (yyvsp[0].class_id).namelist;        
     }
-#line 3237 "yacc.tab.c"
+#line 3238 "yacc.tab.c"
     break;
 
   case 155: /* class_identifier: IDENTIFIER DOT IDENTIFIER dim  */
-#line 1345 "yacc.y"
+#line 1346 "yacc.y"
                                     {
         (yyval.class_id).namelist = init_slist();
         insert_slist((yyval.class_id).namelist, (yyvsp[-3].id).name);
         insert_slist((yyval.class_id).namelist, (yyvsp[-1].id).name);   
     }
-#line 3247 "yacc.tab.c"
+#line 3248 "yacc.tab.c"
     break;
 
   case 156: /* class_identifier: IDENTIFIER dim DOT IDENTIFIER  */
-#line 1350 "yacc.y"
+#line 1351 "yacc.y"
                                     {
         (yyval.class_id).namelist = init_slist();
         insert_slist((yyval.class_id).namelist, (yyvsp[-3].id).name);
         insert_slist((yyval.class_id).namelist, (yyvsp[0].id).name);   
     }
-#line 3257 "yacc.tab.c"
+#line 3258 "yacc.tab.c"
     break;
 
   case 157: /* class_identifier: IDENTIFIER dim DOT IDENTIFIER dim  */
-#line 1355 "yacc.y"
+#line 1356 "yacc.y"
                                         {
         (yyval.class_id).namelist = init_slist();
         insert_slist((yyval.class_id).namelist, (yyvsp[-4].id).name);
         insert_slist((yyval.class_id).namelist, (yyvsp[-1].id).name);   
     }
-#line 3267 "yacc.tab.c"
+#line 3268 "yacc.tab.c"
     break;
 
   case 162: /* arith_op: ADD  */
-#line 1374 "yacc.y"
+#line 1375 "yacc.y"
               {(yyval.op_type) = 0;}
-#line 3273 "yacc.tab.c"
+#line 3274 "yacc.tab.c"
     break;
 
   case 163: /* arith_op: SUB  */
-#line 1375 "yacc.y"
+#line 1376 "yacc.y"
           {(yyval.op_type) = 1;}
-#line 3279 "yacc.tab.c"
+#line 3280 "yacc.tab.c"
     break;
 
   case 164: /* arith_op: MUL  */
-#line 1376 "yacc.y"
+#line 1377 "yacc.y"
           {(yyval.op_type) = 2;}
-#line 3285 "yacc.tab.c"
+#line 3286 "yacc.tab.c"
     break;
 
   case 165: /* arith_op: DIV  */
-#line 1377 "yacc.y"
+#line 1378 "yacc.y"
           {(yyval.op_type) = 3;}
-#line 3291 "yacc.tab.c"
+#line 3292 "yacc.tab.c"
     break;
 
   case 166: /* arith_op: MOD  */
-#line 1378 "yacc.y"
+#line 1379 "yacc.y"
           {(yyval.op_type) = 4;}
-#line 3297 "yacc.tab.c"
+#line 3298 "yacc.tab.c"
     break;
 
   case 167: /* data_type_new: DOCUMENT  */
-#line 1382 "yacc.y"
+#line 1383 "yacc.y"
                        { (yyval.type) = 12;}
-#line 3303 "yacc.tab.c"
+#line 3304 "yacc.tab.c"
     break;
 
   case 168: /* data_type_new: TEAM  */
-#line 1383 "yacc.y"
+#line 1384 "yacc.y"
            { (yyval.type) = 7;}
-#line 3309 "yacc.tab.c"
+#line 3310 "yacc.tab.c"
     break;
 
   case 169: /* data_type_new: MEMBERS  */
-#line 1384 "yacc.y"
+#line 1385 "yacc.y"
               { (yyval.type) = 8;}
-#line 3315 "yacc.tab.c"
+#line 3316 "yacc.tab.c"
     break;
 
   case 170: /* data_type_new: TASK  */
-#line 1385 "yacc.y"
+#line 1386 "yacc.y"
             { (yyval.type) = 9;}
-#line 3321 "yacc.tab.c"
+#line 3322 "yacc.tab.c"
     break;
 
   case 171: /* data_type_new: EVENT  */
-#line 1386 "yacc.y"
+#line 1387 "yacc.y"
             { (yyval.type) = 10;}
-#line 3327 "yacc.tab.c"
+#line 3328 "yacc.tab.c"
     break;
 
   case 172: /* data_type_new: MEETING  */
-#line 1387 "yacc.y"
+#line 1388 "yacc.y"
                { (yyval.type) = 11;}
-#line 3333 "yacc.tab.c"
+#line 3334 "yacc.tab.c"
     break;
 
   case 173: /* data_type_new: CALENDAR  */
-#line 1388 "yacc.y"
+#line 1389 "yacc.y"
                { (yyval.type) = 13;}
-#line 3339 "yacc.tab.c"
+#line 3340 "yacc.tab.c"
     break;
 
   case 174: /* data_type_pr: INT  */
-#line 1392 "yacc.y"
+#line 1393 "yacc.y"
                    { (yyval.type) = 0;}
-#line 3345 "yacc.tab.c"
+#line 3346 "yacc.tab.c"
     break;
 
   case 175: /* data_type_pr: STRING  */
-#line 1393 "yacc.y"
+#line 1394 "yacc.y"
              { (yyval.type) = 2;}
-#line 3351 "yacc.tab.c"
+#line 3352 "yacc.tab.c"
     break;
 
   case 176: /* data_type_pr: BOOL  */
-#line 1394 "yacc.y"
+#line 1395 "yacc.y"
             { (yyval.type) = 3;}
-#line 3357 "yacc.tab.c"
+#line 3358 "yacc.tab.c"
     break;
 
   case 177: /* data_type_pr: FLOAT  */
-#line 1395 "yacc.y"
+#line 1396 "yacc.y"
             { (yyval.type) = 1;}
-#line 3363 "yacc.tab.c"
+#line 3364 "yacc.tab.c"
     break;
 
 
-#line 3367 "yacc.tab.c"
+#line 3368 "yacc.tab.c"
 
       default: break;
     }
@@ -3556,7 +3557,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 1398 "yacc.y"
+#line 1399 "yacc.y"
 
 
 

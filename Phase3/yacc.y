@@ -107,6 +107,7 @@
 start:{
         global_table = init_symtab();
         function_table = init_functab();
+        init_functab_entries(function_table);
         class_table = init_classtab();
         params = NULL;
         local_table = global_table;

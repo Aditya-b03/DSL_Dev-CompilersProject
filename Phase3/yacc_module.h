@@ -4,6 +4,15 @@
 #include <stdbool.h>
 
 /*
+   *Class Methods - `task` Class:*
+   - `string get_id()`
+   - `void assign_to(member m)`
+   - `void status(string status)`
+   - `vector<member> assigned_to()`
+
+*/
+
+/*
 Type Encodings:
    0: int
    1: float
@@ -20,6 +29,8 @@ Type Encodings:
    12: document
    13: calendar
    14: class
+   15: date // new entry
+   16: json // new entry
 
 */
 
@@ -218,27 +229,27 @@ slist *init_slist()
 void insert_slist(slist *l, char *s)
 {
    snode *temp = (snode *)malloc(sizeof(snode));
-   temp -> val = s;
-   temp -> next = NULL;
-   if (l -> head == NULL)
+   temp->val = s;
+   temp->next = NULL;
+   if (l->head == NULL)
    {
-      l -> head = temp;
-      l -> tail = temp;
+      l->head = temp;
+      l->tail = temp;
    }
    else
    {
-      l -> tail -> next = temp;
-      l -> tail = temp;
+      l->tail->next = temp;
+      l->tail = temp;
    }
 }
 
 void display_slist(slist *l)
 {
-   snode *temp = l -> head;
+   snode *temp = l->head;
    while (temp != NULL)
    {
-      printf("%s ", temp -> val);
-      temp = temp -> next;
+      printf("%s ", temp->val);
+      temp = temp->next;
    }
    printf("\n");
 }
@@ -246,8 +257,8 @@ void display_slist(slist *l)
 symtab *init_symtab()
 {
    symtab *st = (symtab *)malloc(sizeof(symtab));
-   st -> head = NULL;
-   st -> tail = NULL;
+   st->head = NULL;
+   st->tail = NULL;
    return st;
 }
 
@@ -255,8 +266,8 @@ void insert_symtab(symtab *st, idrec *entry)
 {
    if (st->head == NULL)
    {
-      st -> head = entry;
-      st -> tail = entry;
+      st->head = entry;
+      st->tail = entry;
    }
    else
    {
@@ -731,18 +742,17 @@ bool check_assign_op(int lhs, int rhs, int op)
          return false;
       }
    }
-   
 }
 
 bool check_rel_op(int lhs, int rhs, int op)
 {
-   if(op == 0)
+   if (op == 0)
    {
-      if(lhs == 0 && rhs == 0)
+      if (lhs == 0 && rhs == 0)
          return true;
-      else if(lhs == 1 && rhs == 1)
+      else if (lhs == 1 && rhs == 1)
          return true;
-      else if(lhs == 2 && rhs == 2)
+      else if (lhs == 2 && rhs == 2)
          return true;
       else
       {
@@ -751,9 +761,9 @@ bool check_rel_op(int lhs, int rhs, int op)
          return false;
       }
    }
-   else if(op == 1)
+   else if (op == 1)
    {
-      if(lhs == rhs)
+      if (lhs == rhs)
          return true;
       else
       {
@@ -763,4 +773,531 @@ bool check_rel_op(int lhs, int rhs, int op)
       }
    }
    return false;
+}
+
+// entries of default functions in function table
+void init_functab_entries(functab *ft)
+{
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "dateToString";
+   entry->type = 2;
+   entry->num_params = 1;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   param = (idrec *)malloc(sizeof(idrec));
+   param->name = "d";
+   param->type = 15;
+   param->arr = false;
+   param->dim = 0;
+   param->scope = 0;
+   param->class_name = NULL;
+   insert_symtab(entry->params, param);
+   entry->local_table = init_symtab();
+   insert_functab(ft, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "jsonOutput";
+   entry->type = 4;
+   entry->num_params = 1;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   param = (idrec *)malloc(sizeof(idrec));
+   param->name = "_m";
+   param->type = 8;
+   param->arr = false;
+   param->dim = 0;
+   param->scope = 0;
+   param->class_name = NULL;
+   insert_symtab(entry->params, param);
+   entry->local_table = init_symtab();
+   insert_functab(ft, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "jsonOutput";
+   entry->type = 16;
+   entry->num_params = 1;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   param = (idrec *)malloc(sizeof(idrec));
+   param->name = "_t";
+   param->type = 7;
+   param->arr = false;
+   param->dim = 0;
+   param->scope = 0;
+   param->class_name = NULL;
+   insert_symtab(entry->params, param);
+   entry->local_table = init_symtab();
+   insert_functab(ft, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "jsonOutput";
+   entry->type = 16;
+   entry->num_params = 1;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   param = (idrec *)malloc(sizeof(idrec));
+   param->name = "_t";
+   param->type = 9;
+   param->arr = false;
+   param->dim = 0;
+   param->scope = 0;
+   param->class_name = NULL;
+   insert_symtab(entry->params, param);
+   entry->local_table = init_symtab();
+   insert_functab(ft, entry);
+
+   // iffy case
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "showEvents";
+   entry->type = 2;
+   entry->num_params = 0;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   entry->local_table = init_symtab();
+   insert_functab(ft, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "showCalendar";
+   entry->type = 4;
+   entry->num_params = 1;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   param = (idrec *)malloc(sizeof(idrec));
+   param->name = "_m";
+   param->type = 8;
+   param->arr = false;
+   param->dim = 0;
+   param->scope = 0;
+   param->class_name = NULL;
+   insert_symtab(entry->params, param);
+   entry->local_table = init_symtab();
+   insert_functab(ft, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "showCalendar";
+   entry->type = 4;
+   entry->num_params = 1;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   param = (idrec *)malloc(sizeof(idrec));
+   param->name = "_m";
+   param->type = 7;
+   param->arr = false;
+   param->dim = 0;
+   param->scope = 0;
+   param->class_name = NULL;
+   insert_symtab(entry->params, param);
+   entry->local_table = init_symtab();
+   insert_functab(ft, entry);
+}
+
+// entries of some default class methods which only members can access
+// these are not in the function table
+// these functions will be added to the methods of the class
+// these functions will be called by the class object
+
+// create a member class entry and add it to the class table
+
+void init_class_methods_member(classrec *class_entry)
+{
+   funcrec *entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "get_id";
+   entry->type = 2;
+   entry->num_params = 0;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   entry->local_table = init_symtab();
+   insert_functab(class_entry->methods, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "add_task";
+   entry->type = 4;
+   entry->num_params = 1;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   param = (idrec *)malloc(sizeof(idrec));
+   param->name = "assigned_task";
+   param->type = 9;
+   param->arr = false;
+   param->dim = 0;
+   param->scope = 0;
+   param->class_name = "member";
+   insert_symtab(entry->params, param);
+   entry->local_table = init_symtab();
+   insert_functab(class_entry->methods, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "add_team";
+   entry->type = 4;
+   entry->num_params = 1;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   param = (idrec *)malloc(sizeof(idrec));
+   param->name = "t";
+   param->type = 7;
+   param->arr = false;
+   param->dim = 0;
+   param->scope = 0;
+   param->class_name = "member";
+   insert_symtab(entry->params, param);
+   entry->local_table = init_symtab();
+   insert_functab(class_entry->methods, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "remove";
+   entry->type = 4;
+   entry->num_params = 1;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   param = (idrec *)malloc(sizeof(idrec));
+   param->name = "assigned_task";
+   param->type = 9;
+   param->arr = false;
+   param->dim = 0;
+   param->scope = 0;
+   param->class_name = "member";
+   insert_symtab(entry->params, param);
+   entry->local_table = init_symtab();
+   insert_functab(class_entry->methods, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "remove";
+   entry->type = 4;
+   entry->num_params = 1;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   param = (idrec *)malloc(sizeof(idrec));
+   param->name = "t";
+   param->type = 7;
+   param->arr = false;
+   param->dim = 0;
+   param->scope = 0;
+   param->class_name = "member";
+   insert_symtab(entry->params, param);
+   entry->local_table = init_symtab();
+   insert_functab(class_entry->methods, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "tasks";
+   entry->type = 9;
+   entry->num_params = 0;
+   entry->dim = 1;
+   entry->params = init_symtab();
+   entry->local_table = init_symtab();
+   insert_functab(class_entry->methods, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "teams";
+   entry->type = 7;
+   entry->num_params = 0;
+   entry->dim = 1;
+   entry->params = init_symtab();
+   entry->local_table = init_symtab();
+   insert_functab(class_entry->methods, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "display";
+   entry->type = 4;
+   entry->num_params = 1;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   param = (idrec *)malloc(sizeof(idrec));
+   param->name = "level";
+   param->type = 0;
+   param->arr = false;
+   param->dim = 0;
+   param->scope = 0;
+   param->class_name = "member";
+   insert_symtab(entry->params, param);
+   entry->local_table = init_symtab();
+   insert_functab(class_entry->methods, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "update_info";
+   entry->type = 4;
+   entry->num_params = 1;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   param = (idrec *)malloc(sizeof(idrec));
+   param->name = "info";
+   param->type = 2;
+   param->arr = true;
+   param->dim = 2;
+   param->scope = 0;
+   param->class_name = "member";
+   insert_symtab(entry->params, param);
+   entry->local_table = init_symtab();
+   insert_functab(class_entry->methods, entry);
+}
+
+void init_class_methods_team(classrec *class_entry)
+{
+   funcrec *entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "get_id";
+   entry->type = 2;
+   entry->num_params = 0;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   entry->local_table = init_symtab();
+   insert_functab(class_entry->methods, entry);
+
+   funcrec *entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "to_json";
+   entry->type = 2;
+   entry->num_params = 0;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   entry->local_table = init_symtab();
+   insert_functab(class_entry->methods, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "insert";
+   entry->type = 4;
+   entry->num_params = 1;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   idrec *param = (idrec *)malloc(sizeof(idrec));
+   param->name = "m";
+   param->type = 8;
+   param->arr = false;
+   param->dim = 0;
+   param->scope = 0;
+   param->class_name = "team";
+   insert_symtab(entry->params, param);
+   entry->local_table = init_symtab();
+   insert_functab(class_entry->methods, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "insert";
+   entry->type = 4;
+   entry->num_params = 1;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   idrec *param = (idrec *)malloc(sizeof(idrec));
+   param->name = "m";
+   param->type = 8;
+   param->arr = true;
+   param->dim = 1;
+   param->scope = 0;
+   param->class_name = "team";
+   insert_symtab(entry->params, param);
+   entry->local_table = init_symtab();
+   insert_functab(class_entry->methods, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "insert";
+   entry->type = 4;
+   entry->num_params = 1;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   idrec *param = (idrec *)malloc(sizeof(idrec));
+   param->name = "t";
+   param->type = 7;
+   param->arr = false;
+   param->dim = 0;
+   param->scope = 0;
+   param->class_name = "team";
+   insert_symtab(entry->params, param);
+   entry->local_table = init_symtab();
+   insert_functab(class_entry->methods, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "insert";
+   entry->type = 4;
+   entry->num_params = 1;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   idrec *param = (idrec *)malloc(sizeof(idrec));
+   param->name = "t";
+   param->type = 7;
+   param->arr = true;
+   param->dim = 1;
+   param->scope = 0;
+   param->class_name = "team";
+   insert_symtab(entry->params, param);
+   entry->local_table = init_symtab();
+   insert_functab(class_entry->methods, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "remove";
+   entry->type = 4;
+   entry->num_params = 1;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   idrec *param = (idrec *)malloc(sizeof(idrec));
+   param->name = "m";
+   param->type = 8;
+   param->arr = false;
+   param->dim = 0;
+   param->scope = 0;
+   param->class_name = "team";
+   insert_symtab(entry->params, param);
+   entry->local_table = init_symtab();
+   insert_functab(class_entry->methods, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "remove";
+   entry->type = 4;
+   entry->num_params = 1;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   idrec *param = (idrec *)malloc(sizeof(idrec));
+   param->name = "m";
+   param->type = 8;
+   param->arr = true;
+   param->dim = 1;
+   param->scope = 0;
+   param->class_name = "team";
+   insert_symtab(entry->params, param);
+   entry->local_table = init_symtab();
+   insert_functab(class_entry->methods, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "remove";
+   entry->type = 4;
+   entry->num_params = 1;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   idrec *param = (idrec *)malloc(sizeof(idrec));
+   param->name = "t";
+   param->type = 7;
+   param->arr = false;
+   param->dim = 0;
+   param->scope = 0;
+   param->class_name = "team";
+   insert_symtab(entry->params, param);
+   entry->local_table = init_symtab();
+   insert_functab(class_entry->methods, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "remove";
+   entry->type = 4;
+   entry->num_params = 1;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   idrec *param = (idrec *)malloc(sizeof(idrec));
+   param->name = "t";
+   param->type = 7;
+   param->arr = true;
+   param->dim = 1;
+   param->scope = 0;
+   param->class_name = "team";
+   insert_symtab(entry->params, param);
+   entry->local_table = init_symtab();
+   insert_functab(class_entry->methods, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "members";
+   entry->type = 8;
+   entry->num_params = 0;
+   entry->dim = 1;
+   entry->params = init_symtab();
+   entry->local_table = init_symtab();
+   insert_functab(class_entry->methods, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "teams";
+   entry->type = 7;
+   entry->num_params = 0;
+   entry->dim = 1;
+   entry->params = init_symtab();
+   entry->local_table = init_symtab();
+   insert_functab(class_entry->methods, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "show";
+   entry->type = 4;
+   entry->num_params = 1;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   param = (idrec *)malloc(sizeof(idrec));
+   param->name = "level";
+   param->type = 0;
+   param->arr = false;
+   param->dim = 0;
+   param->scope = 0;
+   param->class_name = "member";
+   insert_symtab(entry->params, param);
+   entry->local_table = init_symtab();
+   insert_functab(class_entry->methods, entry);
+}
+
+void init_class_methods_task(classrec *class_entry)
+{
+   funcrec *entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "get_id";
+   entry->type = 2;
+   entry->num_params = 0;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   entry->local_table = init_symtab();
+   insert_functab(class_entry->methods, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "assign_to";
+   entry->type = 4;
+   entry->num_params = 1;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   param = (idrec *)malloc(sizeof(idrec));
+   param->name = "m";
+   param->type = 8;
+   param->arr = false;
+   param->dim = 0;
+   param->scope = 0;
+   param->class_name = "class";
+   insert_symtab(entry->params, param);
+   entry->local_table = init_symtab();
+   insert_functab(class_entry->methods, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "status";
+   entry->type = 4;
+   entry->num_params = 1;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   param = (idrec *)malloc(sizeof(idrec));
+   param->name = "status";
+   param->type = 2;
+   param->arr = false;
+   param->dim = 0;
+   param->scope = 0;
+   param->class_name = "class";
+   insert_symtab(entry->params, param);
+   entry->local_table = init_symtab();
+   insert_functab(class_entry->methods, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "assigned_to";
+   entry->type = 8;
+   entry->num_params = 1;
+   entry->dim = 1;
+   entry->params = init_symtab();
+   entry->local_table = init_symtab();
+   insert_functab(class_entry->methods, entry);
+}
+
+// create a member class entry and add it to the class table with its methods defined above
+void init_member_class(classtab *class_table)
+{
+   classrec *class_entry = (classrec *)malloc(sizeof(classrec));
+   class_entry->name = "member";
+   class_entry->members = init_symtab();
+   class_entry->methods = init_functab();
+   init_class_methods_member(class_entry);
+   insert_classtab(class_table, class_entry);
+
+   class_entry = (classrec *)malloc(sizeof(classrec));
+   class_entry->name = "team";
+   class_entry->members = init_symtab();
+   class_entry->methods = init_functab();
+   init_class_methods_team(class_entry);
+   insert_classtab(class_table, class_entry);
+
+   class_entry = (classrec *)malloc(sizeof(classrec));
+   class_entry->name = "task";
+   class_entry->members = init_symtab();
+   class_entry->methods = init_functab();
+   init_class_methods_task(class_entry);
+   insert_classtab(class_table, class_entry);
 }
