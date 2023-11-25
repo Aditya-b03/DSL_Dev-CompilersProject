@@ -1,0 +1,28 @@
+{
+    "team": {
+        "members": [
+            {
+                "member_email": "I am a student",
+                "member_name": "Aditya Sridhar",
+                "member_phone": "1234567890",
+                "member_tasks": [
+                    "Task 1",
+                    "Task 2"
+                ],
+                "member_teams": []
+            },
+            {
+                "member_email": "I am a student",
+                "member_name": "Aditya Sridhar",
+                "member_phone": "1234567890",
+                "member_tasks": [
+                    "Task 1"
+                ],
+                "member_teams": []
+            }
+        ],
+        "sub_teams": [],
+        "team_description": "This is team 1",
+        "team_name": "Team 1"
+    }
+}

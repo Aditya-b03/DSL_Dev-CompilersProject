@@ -1,7 +1,62 @@
-#include <iostream>
-#include <string>
-#include <vector>
-#include "teamScribe.h"
+#include "../Phase3/teamScribe.h"
+void simulateProjectWorkflow() {
+    /* Creating members */
+    member alice = create_member("Alice", "alice@email.com", "123-456");
+    member bob = create_member("Bob", "bob@email.com", "789-012");
+    member charlie = create_member("Charlie", "charlie@email.com", "345-678");
 
+    /* Creating teams */
+    team developmentTeam = create_team("Development Team", "Coding Wizards");
 
-class custom_member:
+    /* Adding members to teams */
+    developmentTeam += alice;
+    developmentTeam += bob;
+    developmentTeam += charlie;
+
+    /* Displaying initial team information */
+    developmentTeam.show(0);
+
+    /* Creating sub-teams */
+    team frontendTeam = create_team("Frontend Team", "UI/UX Experts");
+    team backendTeam = create_team("Backend Team", "Server-side Masters");
+
+    /* Adding sub-teams to the development team */
+    developmentTeam += frontendTeam;
+    developmentTeam += backendTeam;
+
+    /* Displaying updated team hierarchy */
+    developmentTeam.show(0);
+
+    /* Creating tasks for the project */
+    task planningTask = create_task("Project Planning", "Define project scope and goals", 1, "To Do");
+    task codingTask = create_task("Coding Task", "Implement new feature", 2, "In Progress");
+    task testingTask = create_task("Testing Task", "Verify code functionality", 3, "In Progress");
+
+    /* Assigning tasks to members */
+    alice += planningTask;
+    bob += codingTask;
+    charlie += testingTask;
+
+    /* Displaying member information after task assignment */
+    alice.display(0);
+    bob.display(0);
+    charlie.display(0);
+
+    /* Updating task status and team information */
+    planningTask.status("Done");
+    developmentTeam.show(0);
+
+    /* Creating an event for project release */
+    event releaseEvent = create_event("Project Release", "Official launch of the project");
+    showCalendar(alice);
+}
+
+int main() {
+    /* Simulating a project workflow with a mix of everything discussed */
+    simulateProjectWorkflow();
+
+    /* Saving data to document */
+    savetoDocument("comprehensive_test_case");
+
+    return 0;
+}

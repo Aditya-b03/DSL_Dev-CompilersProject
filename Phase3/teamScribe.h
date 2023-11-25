@@ -426,7 +426,15 @@ void showCalendar(){
     outputFile << calendars;
 }
 
+date create_date(int day, int month, int year){
+    date *d = new date(day, month, year);
+    return *d;
+}
 
+date create_date(){
+    date *d = new date();
+    return *d;
+}
 
 
 // ********************Member Class | Function Definitions*******************

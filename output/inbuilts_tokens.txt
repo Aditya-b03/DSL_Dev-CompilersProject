@@ -1,0 +1,207 @@
+datatype: int
+identifier: main
+brackets: (
+brackets: )
+brackets: {
+comment: $Create a new member$
+datatype: member
+identifier: m1
+operator: =
+identifier: create_member
+brackets: (
+constant: "Aditya Sridhar"
+punctuation: ,
+constant: "I am a student"
+punctuation: ,
+constant: "1234567890"
+brackets: )
+punctuation: ;
+datatype: member
+identifier: m2
+operator: =
+identifier: create_member
+brackets: (
+constant: "Aditya Sridhar"
+punctuation: ,
+constant: "I am a student"
+punctuation: ,
+constant: "1234567890"
+brackets: )
+punctuation: ;
+comment: $ a new team$
+datatype: team
+identifier: t1
+operator: =
+identifier: create_team
+brackets: (
+constant: "Team 1"
+punctuation: ,
+constant: "This is team 1"
+brackets: )
+punctuation: ;
+datatype: team
+identifier: t2
+operator: =
+identifier: create_team
+brackets: (
+constant: "Team 2"
+punctuation: ,
+constant: "This is team 2"
+brackets: )
+punctuation: ;
+comment: $ Create a new task$
+datatype: task
+identifier: tsk1
+operator: =
+identifier: create_task
+brackets: (
+constant: "Task 1"
+punctuation: ,
+constant: "This is task 1"
+punctuation: ,
+constant: 1
+punctuation: ,
+constant: "To Do"
+punctuation: ,
+identifier: create_date
+brackets: (
+constant: 31
+punctuation: ,
+constant: 12
+punctuation: ,
+constant: 2023
+brackets: )
+brackets: )
+punctuation: ;
+datatype: task
+identifier: tsk2
+operator: =
+identifier: create_task
+brackets: (
+constant: "Task 2"
+punctuation: ,
+constant: "This is task 2"
+punctuation: ,
+constant: 2
+punctuation: ,
+constant: "To Do"
+punctuation: ,
+identifier: create_date
+brackets: (
+constant: 31
+punctuation: ,
+constant: 12
+punctuation: ,
+constant: 2023
+brackets: )
+brackets: )
+punctuation: ;
+comment: $ Create a new event$
+datatype: event
+identifier: e1
+operator: =
+identifier: create_event
+brackets: (
+constant: "Event 1"
+punctuation: ,
+constant: "This is event 1"
+punctuation: ,
+identifier: create_date
+brackets: (
+constant: 31
+punctuation: ,
+constant: 12
+punctuation: ,
+constant: 2023
+brackets: )
+brackets: )
+punctuation: ;
+comment: $ using team methods $
+identifier: t1
+punctuation: .
+identifier: insert
+brackets: (
+identifier: m1
+brackets: )
+punctuation: ;
+comment: $ operator $
+identifier: t1
+operator: +=
+identifier: m2
+punctuation: ;
+comment: $ using member methods $
+identifier: m1
+punctuation: .
+identifier: add_team
+brackets: (
+identifier: t1
+brackets: )
+punctuation: ;
+identifier: m1
+punctuation: .
+identifier: add_task
+brackets: (
+identifier: tsk1
+brackets: )
+punctuation: ;
+comment: $ operator $
+identifier: m1
+operator: +=
+identifier: t1
+punctuation: ;
+identifier: m1
+operator: +=
+identifier: tsk2
+punctuation: ;
+comment: $ using task methods $
+identifier: tsk1
+punctuation: .
+identifier: assign_to
+brackets: (
+identifier: m1
+brackets: )
+punctuation: ;
+comment: $ operator $
+identifier: tsk1
+identifier: m2
+punctuation: ;
+comment: $ using event methods $
+datatype: event
+identifier: e2
+operator: =
+identifier: create_event
+brackets: (
+constant: "Event 2"
+punctuation: ,
+constant: "This is event 2"
+punctuation: ,
+identifier: create_date
+brackets: (
+constant: 31
+punctuation: ,
+constant: 12
+punctuation: ,
+constant: 2023
+brackets: )
+brackets: )
+punctuation: ;
+comment: $ using global functions $
+identifier: jsonOutput
+brackets: (
+identifier: t1
+brackets: )
+punctuation: ;
+identifier: jsonOutput
+brackets: (
+identifier: m1
+brackets: )
+punctuation: ;
+identifier: jsonOutput
+brackets: (
+identifier: tsk1
+brackets: )
+punctuation: ;
+reserved: return
+constant: 0
+punctuation: ;
+brackets: }

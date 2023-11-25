@@ -1,3 +1,242 @@
-identifier: class
-identifier: custom_member
-punctuation: :
+datatype: void
+identifier: simulateProjectWorkflow
+brackets: (
+brackets: )
+brackets: {
+comment: $ Creating members $
+datatype: member
+identifier: alice
+operator: =
+identifier: create_member
+brackets: (
+constant: "Alice"
+punctuation: ,
+constant: "alice@email.com"
+punctuation: ,
+constant: "123-456"
+brackets: )
+punctuation: ;
+datatype: member
+identifier: bob
+operator: =
+identifier: create_member
+brackets: (
+constant: "Bob"
+punctuation: ,
+constant: "bob@email.com"
+punctuation: ,
+constant: "789-012"
+brackets: )
+punctuation: ;
+datatype: member
+identifier: charlie
+operator: =
+identifier: create_member
+brackets: (
+constant: "Charlie"
+punctuation: ,
+constant: "charlie@email.com"
+punctuation: ,
+constant: "345-678"
+brackets: )
+punctuation: ;
+comment: $ Creating teams $
+datatype: team
+identifier: developmentTeam
+operator: =
+identifier: create_team
+brackets: (
+constant: "Development Team"
+punctuation: ,
+constant: "Coding Wizards"
+brackets: )
+punctuation: ;
+comment: $ Adding members to teams $
+identifier: developmentTeam
+operator: +=
+identifier: alice
+punctuation: ;
+identifier: developmentTeam
+operator: +=
+identifier: bob
+punctuation: ;
+identifier: developmentTeam
+operator: +=
+identifier: charlie
+punctuation: ;
+comment: $ Displaying initial team information $
+identifier: developmentTeam
+punctuation: .
+identifier: show
+brackets: (
+constant: 0
+brackets: )
+punctuation: ;
+comment: $ Creating sub-teams $
+datatype: team
+identifier: frontendTeam
+operator: =
+identifier: create_team
+brackets: (
+constant: "Frontend Team"
+punctuation: ,
+constant: "UI/UX Experts"
+brackets: )
+punctuation: ;
+datatype: team
+identifier: backendTeam
+operator: =
+identifier: create_team
+brackets: (
+constant: "Backend Team"
+punctuation: ,
+constant: "Server-side Masters"
+brackets: )
+punctuation: ;
+comment: $ Adding sub-teams to the development team $
+identifier: developmentTeam
+operator: +=
+identifier: frontendTeam
+punctuation: ;
+identifier: developmentTeam
+operator: +=
+identifier: backendTeam
+punctuation: ;
+comment: $ Displaying updated team hierarchy $
+identifier: developmentTeam
+punctuation: .
+identifier: show
+brackets: (
+constant: 0
+brackets: )
+punctuation: ;
+comment: $ Creating tasks for the project $
+datatype: task
+identifier: planningTask
+operator: =
+identifier: create_task
+brackets: (
+constant: "Project Planning"
+punctuation: ,
+constant: "Define project scope and goals"
+punctuation: ,
+constant: 1
+punctuation: ,
+constant: "To Do"
+brackets: )
+punctuation: ;
+datatype: task
+identifier: codingTask
+operator: =
+identifier: create_task
+brackets: (
+constant: "Coding Task"
+punctuation: ,
+constant: "Implement new feature"
+punctuation: ,
+constant: 2
+punctuation: ,
+constant: "In Progress"
+brackets: )
+punctuation: ;
+datatype: task
+identifier: testingTask
+operator: =
+identifier: create_task
+brackets: (
+constant: "Testing Task"
+punctuation: ,
+constant: "Verify code functionality"
+punctuation: ,
+constant: 3
+punctuation: ,
+constant: "In Progress"
+brackets: )
+punctuation: ;
+comment: $ Assigning tasks to members $
+identifier: alice
+operator: +=
+identifier: planningTask
+punctuation: ;
+identifier: bob
+operator: +=
+identifier: codingTask
+punctuation: ;
+identifier: charlie
+operator: +=
+identifier: testingTask
+punctuation: ;
+comment: $ Displaying member information after task assignment $
+identifier: alice
+punctuation: .
+identifier: display
+brackets: (
+constant: 0
+brackets: )
+punctuation: ;
+identifier: bob
+punctuation: .
+identifier: display
+brackets: (
+constant: 0
+brackets: )
+punctuation: ;
+identifier: charlie
+punctuation: .
+identifier: display
+brackets: (
+constant: 0
+brackets: )
+punctuation: ;
+comment: $ Updating task status and team information $
+identifier: planningTask
+punctuation: .
+identifier: status
+brackets: (
+constant: "Done"
+brackets: )
+punctuation: ;
+identifier: developmentTeam
+punctuation: .
+identifier: show
+brackets: (
+constant: 0
+brackets: )
+punctuation: ;
+comment: $ Creating an event for project release $
+datatype: event
+identifier: releaseEvent
+operator: =
+identifier: create_event
+brackets: (
+constant: "Project Release"
+punctuation: ,
+constant: "Official launch of the project"
+brackets: )
+punctuation: ;
+identifier: showCalendar
+brackets: (
+identifier: alice
+brackets: )
+punctuation: ;
+brackets: }
+datatype: int
+identifier: main
+brackets: (
+brackets: )
+brackets: {
+comment: $ Simulating a project workflow with a mix of everything discussed $
+identifier: simulateProjectWorkflow
+brackets: (
+brackets: )
+punctuation: ;
+comment: $ Saving data to document $
+identifier: savetoDocument
+brackets: (
+constant: "comprehensive_test_case"
+brackets: )
+punctuation: ;
+reserved: return
+constant: 0
+punctuation: ;
+brackets: }

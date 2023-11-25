@@ -1,6 +1,6 @@
-
+$
 team test_team;
-member test_member;
+member test_member;$
 
 $ Custom function $
 team custom_team_create(string name, string description, string url, string email) {

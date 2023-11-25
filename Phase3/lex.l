@@ -8,7 +8,6 @@
 
  int list_flag = 0;
  int list_print_flag = 0;
- int arrow_flag = 0;
  int self_flag = 0;
  char s[100];
  int i = 0;
@@ -276,10 +275,6 @@ vec = strdup(yytext);
        return COMMA;
    }
    else if(strcmp(yytext,c2)==0){
-       if(arrow_flag==1){
-         fprintf(yyout,")");
-         arrow_flag = 0;
-       }
        print(yytext);
        return SEMICOLON;
    }
@@ -435,8 +430,7 @@ vec = strdup(yytext);
  return UNION_OP;
 }
 {ARROW} {
- print(".add_member(");
- arrow_flag = 1;
+ print("+");
  return ARROW;
 }
 {BRACKETS} {

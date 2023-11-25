@@ -9,7 +9,7 @@ void performTeamOperations() {
     developmentTeam += bob;
 
     $ Displaying team information $
-    developmentTeam.show();
+    developmentTeam.show(0);
 
     $ Creating sub-teams $
     team frontendTeam = create_team("Frontend Team", "UI/UX Experts");
@@ -20,7 +20,7 @@ void performTeamOperations() {
     developmentTeam += backendTeam;
 
     $ Displaying updated team hierarchy $
-    developmentTeam.show();
+    developmentTeam.show(0);
 }
 
 void performMemberOperations() {
@@ -30,13 +30,13 @@ void performMemberOperations() {
 
     alice += codingTask;
 
-    alice.display();
+    alice.display(0);
 
     $ Updating member information $
     alice.update_info({{"phone", "987-654"}, {"email", "newalice@email.com"}});
 
     $ Displaying updated member information $
-    alice.display();
+    alice.display(0);
 }
 
 int main() {

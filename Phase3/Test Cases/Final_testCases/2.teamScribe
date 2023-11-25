@@ -9,8 +9,8 @@ void performCombinedOperations() {
 
     task codingTask = create_task("Coding Task", "Implement new feature", 2, "In Progress");
     alice += codingTask;
-    developmentTeam.show();
-    alice.display();
+    developmentTeam.show(0);
+    alice.display(0);
 }
 
 int main() {

@@ -1,0 +1,13 @@
+{
+    "task": {
+        "task_assigned_to": [
+            "Aditya Sridhar",
+            "Aditya Sridhar"
+        ],
+        "task_description": "This is task 1",
+        "task_due_date": "12/31/2023",
+        "task_priority": 1,
+        "task_status": "To Do",
+        "task_title": "Task 1"
+    }
+}

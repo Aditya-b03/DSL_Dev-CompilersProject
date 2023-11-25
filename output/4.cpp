@@ -1,10 +1,49 @@
-#include <iostream>
-#include <string>
-#include <vector>
-#include "teamScribe.h"
+#include "../Phase3/teamScribe.h"
+void performTeamOperations() {
+    /* Creating members */
+    member alice = create_member("Alice", "alice@email.com", "123-456");
+    member bob = create_member("Bob", "bob@email.com", "789-012");
 
+    team developmentTeam = create_team("Development Team", "Coding Wizards");
 
-main data = base.load("../Data/data.json");
+    developmentTeam += alice;
+    developmentTeam += bob;
 
-/* Prototypes for the add_events and holidays_bonus function */
-calendar add_events(team t);
+    /* Displaying team information */
+    developmentTeam.show(0);
+
+    /* Creating sub-teams */
+    team frontendTeam = create_team("Frontend Team", "UI/UX Experts");
+    team backendTeam = create_team("Backend Team", "Server-side Masters");
+
+    /* Adding sub-teams to the development team */
+    developmentTeam += frontendTeam;
+    developmentTeam += backendTeam;
+
+    /* Displaying updated team hierarchy */
+    developmentTeam.show(0);
+}
+
+void performMemberOperations() {
+    member alice = create_member("Alice", "alice@email.com", "123-456");
+
+    task codingTask = create_task("Coding Task", "Implement new feature", 2, "In Progress");
+
+    alice += codingTask;
+
+    alice.display(0);
+
+    /* Updating member information */
+    alice.update_info({{"phone", "987-654"}, {"email", "newalice@email.com"}});
+
+    /* Displaying updated member information */
+    alice.display(0);
+}
+
+int main() {
+    performTeamOperations();
+    performMemberOperations();
+    savetoDocument("test_case_4");
+
+    return 0;
+}

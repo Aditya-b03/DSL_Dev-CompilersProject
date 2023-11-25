@@ -1,0 +1,47 @@
+{
+    "members": {
+        "8n2L9K88eM": {
+            "email": "bob@email.com",
+            "member_tasks": [],
+            "member_teams": [
+                "lGn7CcctT9"
+            ],
+            "name": "Bob",
+            "phone": "789-012"
+        },
+        "PKdhtXMmr1": {
+            "email": "alice@email.com",
+            "member_tasks": [
+                "RwKSB1FebW"
+            ],
+            "member_teams": [
+                "lGn7CcctT9"
+            ],
+            "name": "Alice",
+            "phone": "123-456"
+        }
+    },
+    "tasks": {
+        "RwKSB1FebW": {
+            "task_assigned_to": [
+                "PKdhtXMmr1"
+            ],
+            "task_description": "Implement new feature",
+            "task_due_date": "11/25/2023",
+            "task_priority": 2,
+            "task_status": "In Progress",
+            "task_title": "Coding Task"
+        }
+    },
+    "teams": {
+        "lGn7CcctT9": {
+            "members": [
+                "PKdhtXMmr1",
+                "8n2L9K88eM"
+            ],
+            "sub_teams": [],
+            "team_description": "Coding Wizards",
+            "team_name": "Development Team"
+        }
+    }
+}

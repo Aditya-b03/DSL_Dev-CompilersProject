@@ -13,7 +13,7 @@ void simulateProjectWorkflow() {
     developmentTeam += charlie;
 
     $ Displaying initial team information $
-    developmentTeam.show();
+    developmentTeam.show(0);
 
     $ Creating sub-teams $
     team frontendTeam = create_team("Frontend Team", "UI/UX Experts");
@@ -24,7 +24,7 @@ void simulateProjectWorkflow() {
     developmentTeam += backendTeam;
 
     $ Displaying updated team hierarchy $
-    developmentTeam.show();
+    developmentTeam.show(0);
 
     $ Creating tasks for the project $
     task planningTask = create_task("Project Planning", "Define project scope and goals", 1, "To Do");
@@ -37,13 +37,13 @@ void simulateProjectWorkflow() {
     charlie += testingTask;
 
     $ Displaying member information after task assignment $
-    alice.display();
-    bob.display();
-    charlie.display();
+    alice.display(0);
+    bob.display(0);
+    charlie.display(0);
 
     $ Updating task status and team information $
-    planningTask.update_status("Done");
-    developmentTeam.show();
+    planningTask.status("Done");
+    developmentTeam.show(0);
 
     $ Creating an event for project release $
     event releaseEvent = create_event("Project Release", "Official launch of the project");

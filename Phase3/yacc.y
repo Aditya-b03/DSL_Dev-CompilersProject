@@ -222,7 +222,6 @@ function_dec: data_type_new IDENTIFIER LPB function_params RPB {
         $$.local_table = init_symtab();
     }
     | data_type_pr IDENTIFIER LPB function_params RPB {
-        
         struct funcrec *entry = (struct funcrec *)malloc(sizeof(struct funcrec));
         entry -> name = $2.name;
         entry -> type = $1;
@@ -339,7 +338,7 @@ function_param: data_type_new IDENTIFIER {
         entry -> dim = 0;
         entry -> scope = 1;
         entry -> next = NULL;
-        entry -> class_name = NULL;       
+        entry -> class_name = map_type[$1];       
         $$ = entry;
     }
     | data_type_pr IDENTIFIER {
@@ -570,7 +569,7 @@ class_decl_stmt: data_type_new id_list SEMICOLON {
             entry -> arr = false;
             entry -> scope = 1; 
             entry -> name = temp->val;
-            entry -> class_name = NULL;
+            entry -> class_name = map_type[$1];
             entry -> dim = 0;
             if(lookup(members, members, entry -> name) == NULL){
                 insert_symtab(members, entry);
@@ -722,7 +721,7 @@ decl_stmt: data_type_new id_list SEMICOLON {
             entry -> arr = false;
             entry -> scope = scope; 
             entry -> name = temp->val;
-            entry -> class_name = NULL;
+            entry -> class_name = map_type[$1];
             entry -> dim = 0;
             entry -> next = NULL;
             if(lookup(global_table, local_table, entry->name) != NULL){
@@ -891,7 +890,7 @@ expr_stmt_without_semicolon: identifier ASSIGN_OP nested_expr {
     | class_identifier EQUALS nested_expr {
         int *a = (int*) malloc(sizeof(int)), *b = (int*) malloc(sizeof(int));
         check_namelist($1.namelist, global_table, local_table, class_table, NULL, -1, a, b);
-        if($1.type == 5 && $3.type == 5){
+        if($1.dim != 0 && $3.dim != 0){
             if($1.dim != $3.dim){
                 printf("Error: Dimension mismatch in assignment\n");
                 printf("LHS is of dimension %i and RHS is of dimension %i\n", $1.dim, $3.dim);
@@ -914,14 +913,14 @@ expr_stmt_without_semicolon: identifier ASSIGN_OP nested_expr {
             printf("Error: Class has no member %s declared\n", $3.name);
             YYABORT;
         }
-        if(entry -> type && $5.dim != 0){
+        if(entry -> dim != 0 && $5.dim != 0){
             if(entry -> dim != $5.dim){
                 printf("Error: Dimension mismatch in assignment\n");
                 printf("LHS is of dimension %i and RHS is of dimension %i\n", entry -> dim, $5.dim);
                 YYABORT;
             }
         }
-        else if(!check_assign_op(entry -> dim, $5.type, 7)){
+        else if(!check_assign_op(entry -> type, $5.type, 7)){
             YYABORT;
         }
     }
@@ -1188,10 +1187,30 @@ call: IDENTIFIER LPB call_args RPB {
     }
     | class_identifier LPB call_args RPB {
         int *a = (int*) malloc(sizeof(int)), *b = (int*) malloc(sizeof(int));
-        if(check_namelist($1.namelist, global_table, local_table, class_table, $3.params, $3.num_params, a, b) == false)
+        struct idrec *entry = lookup(global_table, local_table, $1.namelist -> head -> val);
+        if(entry == NULL)
+        {
+            entry = lookup(params, members, $1.namelist -> head -> val);
+            if(entry == NULL)
+            {
+                printf("Error: Variable %s not declared\n", $1.namelist -> head -> val);
+                YYABORT;
+            }
+        }
+        if(entry -> type != 14)
+        {
+            printf("Error: Variable %s is not a class\n", $1.namelist -> head -> val);
+            YYABORT;
+        }
+        struct classrec *class = search_classtab(class_table, entry -> class_name);
+        if(check_member_method($1.namelist -> head -> next -> val, $1.namelist -> head -> next -> next, class_table, class, $3.params, $3.num_params, a, b) == false)
         {
             YYABORT;
         }
+        // if(check_namelist($1.namelist, global_table, local_table, class_table, $3.params, $3.num_params, a, b) == false)
+        // {
+        //     YYABORT;
+        // }
         $$.type = *a;
         $$.dim = *b;
     }
@@ -1237,6 +1256,7 @@ return_stmt: RETURN SEMICOLON {
             YYABORT;
         }
         rflag = true;
+        printf("WTF\n");
     }
     ;
 
@@ -1250,7 +1270,7 @@ list: LIST dim COLON data_type_pr {
     | LIST dim COLON {lflag = 0;} data_type_new {
         $$.type = $5;
         $$.dim = $2.dim;
-        $$.class_name = NULL;
+        $$.class_name = map_type[$5];
     }
     | LIST dim COLON {lflag = 0;} IDENTIFIER {
         if(search_classtab(class_table, $5.name) == NULL)
@@ -1266,7 +1286,7 @@ list: LIST dim COLON data_type_pr {
 
 
 list_literal:  LCB list_terminal RCB {
-        $$.type = 5;
+        $$.type = $2.type;
         $$.dim = $2.dim+1;
     }
     ;

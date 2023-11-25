@@ -24,37 +24,37 @@ public:
     }
 
     void addPerson(member p, string relation){
-        if(relation == "family"){
+        if(relation is "family"){
             family.addPerson(p);
         }
-        else if(relation == "relatives"){
+        else if(relation is "relatives"){
             relatives.addPerson(p);
         }
-        else if(relation == "friends"){
+        else if(relation is "friends"){
             friends.addPerson(p);
         }
-        else if(relation == "colleagues"){
+        else if(relation is "colleagues"){
             colleagues.addPerson(p);
         }
-        else if(relation == "neighbours"){
+        else if(relation is "neighbours"){
             neighbours.addPerson(p);
         }
         else{
-            cout<<"Invalid Relation"<<endl;
+            print("Invalid Relation\n");
         }
     }
 
 
     void display(){
-        cout<<"Family"<<endl;
+        print("Family\n");
         family.display();
-        cout<<"Relatives"<<endl;
+        print("Relatives\n");
         relatives.display();
-        cout<<"Friends"<<endl;
+        print("Friends\n");
         friends.display();
-        cout<<"Colleagues"<<endl;
+        print("Colleagues\n");
         colleagues.display();
-        cout<<"Neighbours"<<endl;
+        print("Neighbours\n");
         neighbours.display();
     }
 

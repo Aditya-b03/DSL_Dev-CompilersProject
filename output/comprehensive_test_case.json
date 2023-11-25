@@ -1,0 +1,96 @@
+{
+    "members": {
+        "8n2L9K88eM": {
+            "email": "bob@email.com",
+            "member_tasks": [
+                "sRwpC5iUza"
+            ],
+            "member_teams": [
+                "RwKSB1FebW"
+            ],
+            "name": "Bob",
+            "phone": "789-012"
+        },
+        "PKdhtXMmr1": {
+            "email": "alice@email.com",
+            "member_tasks": [
+                "9vyJcXyHZz"
+            ],
+            "member_teams": [
+                "RwKSB1FebW"
+            ],
+            "name": "Alice",
+            "phone": "123-456"
+        },
+        "lGn7CcctT9": {
+            "email": "charlie@email.com",
+            "member_tasks": [
+                "hEcaYatja7"
+            ],
+            "member_teams": [
+                "RwKSB1FebW"
+            ],
+            "name": "Charlie",
+            "phone": "345-678"
+        }
+    },
+    "tasks": {
+        "9vyJcXyHZz": {
+            "task_assigned_to": [
+                "PKdhtXMmr1"
+            ],
+            "task_description": "Define project scope and goals",
+            "task_due_date": "11/25/2023",
+            "task_priority": 1,
+            "task_status": "Done",
+            "task_title": "Project Planning"
+        },
+        "hEcaYatja7": {
+            "task_assigned_to": [
+                "lGn7CcctT9"
+            ],
+            "task_description": "Verify code functionality",
+            "task_due_date": "11/25/2023",
+            "task_priority": 3,
+            "task_status": "In Progress",
+            "task_title": "Testing Task"
+        },
+        "sRwpC5iUza": {
+            "task_assigned_to": [
+                "8n2L9K88eM"
+            ],
+            "task_description": "Implement new feature",
+            "task_due_date": "11/25/2023",
+            "task_priority": 2,
+            "task_status": "In Progress",
+            "task_title": "Coding Task"
+        }
+    },
+    "teams": {
+        "397VI5uG1y": {
+            "members": [],
+            "sub_teams": [],
+            "team_description": "UI/UX Experts",
+            "team_name": "Frontend Team"
+        },
+        "RwKSB1FebW": {
+            "members": [
+                "PKdhtXMmr1",
+                "8n2L9K88eM",
+                "lGn7CcctT9"
+            ],
+            "sub_teams": [
+                "397VI5uG1y",
+                "hc3uavuaOb"
+            ],
+            "team_description": "Coding Wizards",
+            "team_name": "Development Team"
+        },
+        "hc3uavuaOb": {
+            "members": [],
+            "sub_teams": [],
+            "team_description": "Server-side Masters",
+            "team_name": "Backend Team"
+        }
+    }
+}
