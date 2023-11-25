@@ -1,0 +1,96 @@
+{
+    "members": {
+        "9VNFsfJ4qH": {
+            "email": "NULL",
+            "member_tasks": [
+                "ehHGCc0Fy6"
+            ],
+            "member_teams": [
+                "fzxc0WG0lV"
+            ],
+            "name": "member0",
+            "phone": "NULL"
+        },
+        "LoGBufBRBH": {
+            "email": "NULL",
+            "member_tasks": [
+                "ehHGCc0Fy6"
+            ],
+            "member_teams": [
+                "fzxc0WG0lV"
+            ],
+            "name": "member1",
+            "phone": "NULL"
+        },
+        "NmNqfXqfK9": {
+            "email": "NULL",
+            "member_tasks": [],
+            "member_teams": [
+                "fzxc0WG0lV"
+            ],
+            "name": "member2",
+            "phone": "NULL"
+        },
+        "fV74lolx4O": {
+            "email": "NULL",
+            "member_tasks": [],
+            "member_teams": [
+                "fzxc0WG0lV"
+            ],
+            "name": "member100",
+            "phone": "NULL"
+        }
+    },
+    "tasks": {
+        "ehHGCc0Fy6": {
+            "task_assigned_to": [
+                "9VNFsfJ4qH",
+                "LoGBufBRBH"
+            ],
+            "task_description": "No Description Given",
+            "task_due_date": "11/25/2023",
+            "task_priority": 0,
+            "task_status": "To Do",
+            "task_title": "random title"
+        }
+    },
+    "teams": {
+        "LK5t5pJqPy": {
+            "members": [],
+            "sub_teams": [],
+            "team_description": "No Description Given",
+            "team_name": "team2"
+        },
+        "Nxwuggw4mF": {
+            "members": [],
+            "sub_teams": [],
+            "team_description": "No Description Given",
+            "team_name": "team0"
+        },
+        "cBdjbEHKvr": {
+            "members": [],
+            "sub_teams": [],
+            "team_description": "No Description Given",
+            "team_name": "team2"
+        },
+        "fzxc0WG0lV": {
+            "members": [
+                "9VNFsfJ4qH",
+                "NmNqfXqfK9",
+                "LoGBufBRBH",
+                "fV74lolx4O"
+            ],
+            "sub_teams": [
+                "LK5t5pJqPy"
+            ],
+            "team_description": "No Description Given",
+            "team_name": "random name"
+        },
+        "gqHSf71iez": {
+            "members": [],
+            "sub_teams": [],
+            "team_description": "No Description Given",
+            "team_name": "team1"
+        }
+    }
+}

@@ -126,6 +126,20 @@ start:{
         display_functab(function_table);
         printf("\n\nClass Table : \n");
         display_classtab(class_table);
+        printf("fds");
+        struct funcrec  *entry = (struct funcrec *)malloc(sizeof(struct funcrec));
+        entry -> name = "main";
+        entry -> type = 0;
+        entry -> dim = 0;
+        entry -> params = NULL;
+        entry -> num_params = 0;
+        entry -> next = NULL;
+        entry -> local_table = init_symtab();
+        if(search_functab(function_table, entry, 0) == NULL)
+        {
+            printf("Error: Main function not declared\n");
+            YYABORT;
+        }      
         free_symtab(global_table);
         free_functab(function_table);
         free_classtab(class_table);
@@ -148,6 +162,19 @@ start:{
         display_functab(function_table);
         printf("\n\nClass Table : \n");
         display_classtab(class_table);
+        struct funcrec  *entry = (struct funcrec *)malloc(sizeof(struct funcrec));
+        entry -> name = "main";
+        entry -> type = 0;
+        entry -> dim = 0;
+        entry -> params = NULL;
+        entry -> num_params = 0;
+        entry -> next = NULL;
+        entry -> local_table = init_symtab();
+        if(search_functab(function_table, entry, 0) == NULL)
+        {
+            printf("Error: Main function not declared\n");
+            YYABORT;
+        }
         free_symtab(global_table);
         free_functab(function_table);
         free_classtab(class_table);

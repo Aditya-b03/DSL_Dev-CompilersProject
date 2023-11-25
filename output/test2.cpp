@@ -1,4 +1,5 @@
-$ function Overloading and class members and method testing $
+#include "../Phase3/teamScribe.h"
+/* function Overloading and class members and method testing */
 
 int add(int a, int b)
 {

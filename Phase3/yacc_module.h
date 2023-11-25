@@ -362,22 +362,32 @@ void display_functab(functab *ft)
 
 funcrec *search_functab(functab *ft, funcrec *entry, bool call)
 {
-   display_symtab(entry->params);
+   //display_symtab(entry->params);
+   
    funcrec *temp = ft->head;
    functab *err = init_functab();
    int Not_found = 1;
    while (temp != NULL)
    {
-      if (strcmp(temp->name, entry->name) == 0)
+      if (strlen(temp->name) == strlen(entry->name) && strcmp(temp->name, entry->name) == 0)
       {
+
          Not_found = 0;
          if(temp->num_params == -1)
             return temp;
-         if (temp->num_params == entry->num_params)
+         else if(temp->num_params == 0 && entry->num_params == 0)
+            return temp;
+         else if (temp->num_params == entry->num_params)
          {
+            printf("searching for %s:%d\n\n\n\n\n\n", entry->name, entry->num_params);
+            printf("found %s:%d\n\n\n\n\n\n", temp->name, temp->num_params);
             // compare temp->params and entry->params
             idrec *temp1 = temp->params->head;
             idrec *temp2 = entry->params->head;
+
+            if(temp1 == NULL) printf("temp1\n");
+            //printf("temp2: %p\n", temp2);
+
             int i = 1;
             int overload_flag = 0;
             while (temp1 != NULL && temp2 != NULL)
@@ -398,8 +408,11 @@ funcrec *search_functab(functab *ft, funcrec *entry, bool call)
                temp2 = temp2->next;
                i++;
             }
-            if(!overload_flag)
+            if(!overload_flag){
+               //printf("found %s:%d\n\n\n\n\n\n", temp->name,temp->num_params);
                return temp;
+            }
+               
          }
          else
          {
@@ -419,6 +432,7 @@ funcrec *search_functab(functab *ft, funcrec *entry, bool call)
       printf("Other overloaded functions:\n");
       display_functab(err);
    }
+   //printf("Error: Function %s has not been declared\n", entry->name);
    return NULL;
 }
 
@@ -764,6 +778,7 @@ bool check_assign_op(int lhs, int rhs, int op)
          return false;
       }
    }
+   return false;
 }
 
 bool check_rel_op(int lhs, int rhs, int op)

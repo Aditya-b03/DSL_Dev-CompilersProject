@@ -1,4 +1,5 @@
-$ sementic checks $
+#include "../Phase3/teamScribe.h"
+/* sementic checks */
 
 int main(){
     int a = 0;
@@ -16,9 +17,9 @@ int main(){
     bool j = TRUE;
     bool k = FALSE;
 
-    list[][]: int l = {{1,2,3},{4,5,6}};
-    list[][]: int m = {{1.0,2.0,3.0},{4.0,5.0,6.0}};
-    list[][]: string n = {{"hello","world"},{"hello","world"}};
+      l = {{1,2,3},{4,5,6}};
+      m = {{1.0,2.0,3.0},{4.0,5.0,6.0}};
+      n = {{"hello","world"},{"hello","world"}};
 
     if(a >= b){
         a = 1;
