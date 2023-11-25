@@ -379,9 +379,6 @@ funcrec *search_functab(functab *ft, funcrec *entry, bool call)
             return temp;
          else if (temp->num_params == entry->num_params)
          {
-            printf("searching for %s:%d\n\n\n\n\n\n", entry->name, entry->num_params);
-            printf("found %s:%d\n\n\n\n\n\n", temp->name, temp->num_params);
-            // compare temp->params and entry->params
             idrec *temp1 = temp->params->head;
             idrec *temp2 = entry->params->head;
 

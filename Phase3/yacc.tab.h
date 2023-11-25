@@ -1,14 +1,14 @@
-/* A Bison parser, made by GNU Bison 2.3.  */
+/* A Bison parser, made by GNU Bison 3.8.2.  */
 
-/* Skeleton interface for Bison's Yacc-like parsers in C
+/* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
-   Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2021 Free Software Foundation,
+   Inc.
 
-   This program is free software; you can redistribute it and/or modify
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,9 +16,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -33,129 +31,92 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-/* Tokens.  */
+/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
+   especially those whose name start with YY_ or yy_.  They are
+   private implementation details that can be changed or removed.  */
+
+#ifndef YY_YY_YACC_TAB_H_INCLUDED
+# define YY_YY_YACC_TAB_H_INCLUDED
+/* Debug traces.  */
+#ifndef YYDEBUG
+# define YYDEBUG 0
+#endif
+#if YYDEBUG
+extern int yydebug;
+#endif
+
+/* Token kinds.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
-   /* Put the tokens into the symbol table, so that GDB and other debuggers
-      know about them.  */
-   enum yytokentype {
-     NUMBER = 258,
-     STRING_LITERAL = 259,
-     BOOL_LITERAL = 260,
-     DECIMAL = 261,
-     CLASS = 262,
-     RETURN = 263,
-     INT = 264,
-     STRING = 265,
-     BOOL = 266,
-     FLOAT = 267,
-     VOID = 268,
-     LIST = 269,
-     DOCUMENT = 270,
-     TEAM = 271,
-     MEMBERS = 272,
-     TASK = 273,
-     EVENT = 274,
-     MEETING = 275,
-     CALENDAR = 276,
-     ADD = 277,
-     SUB = 278,
-     MUL = 279,
-     DIV = 280,
-     MOD = 281,
-     UNARY_OP = 282,
-     ASSIGN_OP = 283,
-     REL_OP = 284,
-     EQUALS = 285,
-     AND = 286,
-     OR = 287,
-     NOT = 288,
-     INTERSECTION_OP = 289,
-     UNION_OP = 290,
-     FOR = 291,
-     WHILE = 292,
-     IF = 293,
-     ELSE = 294,
-     IDENTIFIER = 295,
-     SELF = 296,
-     PUBLIC = 297,
-     LSB = 298,
-     RSB = 299,
-     LCB = 300,
-     RCB = 301,
-     LPB = 302,
-     RPB = 303,
-     SEMICOLON = 304,
-     COMMA = 305,
-     DOT = 306,
-     COLON = 307,
-     ARROW = 308,
-     INCLUDE = 309,
-     TYPEDEF = 310
-   };
+  enum yytokentype
+  {
+    YYEMPTY = -2,
+    YYEOF = 0,                     /* "end of file"  */
+    YYerror = 256,                 /* error  */
+    YYUNDEF = 257,                 /* "invalid token"  */
+    NUMBER = 258,                  /* NUMBER  */
+    STRING_LITERAL = 259,          /* STRING_LITERAL  */
+    BOOL_LITERAL = 260,            /* BOOL_LITERAL  */
+    DECIMAL = 261,                 /* DECIMAL  */
+    CLASS = 262,                   /* CLASS  */
+    RETURN = 263,                  /* RETURN  */
+    INT = 264,                     /* INT  */
+    STRING = 265,                  /* STRING  */
+    BOOL = 266,                    /* BOOL  */
+    FLOAT = 267,                   /* FLOAT  */
+    VOID = 268,                    /* VOID  */
+    LIST = 269,                    /* LIST  */
+    DOCUMENT = 270,                /* DOCUMENT  */
+    TEAM = 271,                    /* TEAM  */
+    MEMBERS = 272,                 /* MEMBERS  */
+    TASK = 273,                    /* TASK  */
+    EVENT = 274,                   /* EVENT  */
+    MEETING = 275,                 /* MEETING  */
+    CALENDAR = 276,                /* CALENDAR  */
+    ADD = 277,                     /* ADD  */
+    SUB = 278,                     /* SUB  */
+    MUL = 279,                     /* MUL  */
+    DIV = 280,                     /* DIV  */
+    MOD = 281,                     /* MOD  */
+    UNARY_OP = 282,                /* UNARY_OP  */
+    ASSIGN_OP = 283,               /* ASSIGN_OP  */
+    REL_OP = 284,                  /* REL_OP  */
+    EQUALS = 285,                  /* EQUALS  */
+    AND = 286,                     /* AND  */
+    OR = 287,                      /* OR  */
+    NOT = 288,                     /* NOT  */
+    INTERSECTION_OP = 289,         /* INTERSECTION_OP  */
+    UNION_OP = 290,                /* UNION_OP  */
+    FOR = 291,                     /* FOR  */
+    WHILE = 292,                   /* WHILE  */
+    IF = 293,                      /* IF  */
+    ELSE = 294,                    /* ELSE  */
+    IDENTIFIER = 295,              /* IDENTIFIER  */
+    SELF = 296,                    /* SELF  */
+    PUBLIC = 297,                  /* PUBLIC  */
+    LSB = 298,                     /* LSB  */
+    RSB = 299,                     /* RSB  */
+    LCB = 300,                     /* LCB  */
+    RCB = 301,                     /* RCB  */
+    LPB = 302,                     /* LPB  */
+    RPB = 303,                     /* RPB  */
+    SEMICOLON = 304,               /* SEMICOLON  */
+    COMMA = 305,                   /* COMMA  */
+    DOT = 306,                     /* DOT  */
+    COLON = 307,                   /* COLON  */
+    ARROW = 308,                   /* ARROW  */
+    INCLUDE = 309,                 /* INCLUDE  */
+    TYPEDEF = 310                  /* TYPEDEF  */
+  };
+  typedef enum yytokentype yytoken_kind_t;
 #endif
-/* Tokens.  */
-#define NUMBER 258
-#define STRING_LITERAL 259
-#define BOOL_LITERAL 260
-#define DECIMAL 261
-#define CLASS 262
-#define RETURN 263
-#define INT 264
-#define STRING 265
-#define BOOL 266
-#define FLOAT 267
-#define VOID 268
-#define LIST 269
-#define DOCUMENT 270
-#define TEAM 271
-#define MEMBERS 272
-#define TASK 273
-#define EVENT 274
-#define MEETING 275
-#define CALENDAR 276
-#define ADD 277
-#define SUB 278
-#define MUL 279
-#define DIV 280
-#define MOD 281
-#define UNARY_OP 282
-#define ASSIGN_OP 283
-#define REL_OP 284
-#define EQUALS 285
-#define AND 286
-#define OR 287
-#define NOT 288
-#define INTERSECTION_OP 289
-#define UNION_OP 290
-#define FOR 291
-#define WHILE 292
-#define IF 293
-#define ELSE 294
-#define IDENTIFIER 295
-#define SELF 296
-#define PUBLIC 297
-#define LSB 298
-#define RSB 299
-#define LCB 300
-#define RCB 301
-#define LPB 302
-#define RPB 303
-#define SEMICOLON 304
-#define COMMA 305
-#define DOT 306
-#define COLON 307
-#define ARROW 308
-#define INCLUDE 309
-#define TYPEDEF 310
 
-
-
-
+/* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef union YYSTYPE
-#line 38 "yacc.y"
+union YYSTYPE
 {
+#line 38 "yacc.y"
+
     struct id{
         char* name;
         int type;
@@ -192,14 +153,20 @@ typedef union YYSTYPE
         int type;
         int dim;
     } exprs;
-}
-/* Line 1529 of yacc.c.  */
-#line 198 "yacc.tab.h"
-	YYSTYPE;
-# define yystype YYSTYPE /* obsolescent; will be withdrawn */
-# define YYSTYPE_IS_DECLARED 1
+
+#line 158 "yacc.tab.h"
+
+};
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
+# define YYSTYPE_IS_DECLARED 1
 #endif
+
 
 extern YYSTYPE yylval;
 
+
+int yyparse (void);
+
+
+#endif /* !YY_YY_YACC_TAB_H_INCLUDED  */

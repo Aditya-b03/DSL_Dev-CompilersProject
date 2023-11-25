@@ -1224,7 +1224,7 @@ call: IDENTIFIER LPB call_args RPB {
                 YYABORT;
             }
         }
-        if(entry -> type != 14)
+        if(entry -> type < 7)
         {
             printf("Error: Variable %s is not a class\n", $1.namelist -> head -> val);
             YYABORT;
@@ -1283,7 +1283,6 @@ return_stmt: RETURN SEMICOLON {
             YYABORT;
         }
         rflag = true;
-        printf("WTF\n");
     }
     ;
 

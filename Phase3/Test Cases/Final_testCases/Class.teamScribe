@@ -25,19 +25,19 @@ public:
 
     void addPerson(member p, string relation){
         if(relation is "family"){
-            family.addPerson(p);
+            family.insert(p);
         }
         else if(relation is "relatives"){
-            relatives.addPerson(p);
+            relatives.insert(p);
         }
         else if(relation is "friends"){
-            friends.addPerson(p);
+            friends.insert(p);
         }
         else if(relation is "colleagues"){
-            colleagues.addPerson(p);
+            colleagues.insert(p);
         }
         else if(relation is "neighbours"){
-            neighbours.addPerson(p);
+            neighbours.insert(p);
         }
         else{
             print("Invalid Relation\n");
