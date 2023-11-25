@@ -7,18 +7,18 @@ void print(char* s)
    fprintf(yyout,"%s",s);
 }
 
- char* concat(char* s1, char* s2){
-   int i = 0;
-   int strlen1 = strlen(s1);
+char* concat(char* s1, char* s2){
+    int i = 0;
+    int strlen1 = strlen(s1);
     int strlen2 = strlen(s2);
     char* s3 = (char*)realloc(s1, strlen1+strlen2+1);
     for(int j = strlen1; j<strlen1+strlen2; j++){
-      s3[j] = s2[i];
-      i++;
+        s3[j] = s2[i];
+        i++;
     }
     s3[strlen1+strlen2] = '\0';
     return s3;
- }
+}
 
  char* make_vector(char* v ,char **s, int i, char *data_type, int dim) 
 {   
@@ -32,6 +32,7 @@ void print(char* s)
 
     for(int i = 0; i < dim; i++)
         print(">");
+
 
     concat(v, " ");
     concat(v, "(");

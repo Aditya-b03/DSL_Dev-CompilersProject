@@ -1,26 +1,26 @@
 
 class Home{
-Public: 
+public: 
     team family;
     team relatives;
     team friends;
     team colleagues;
     team neighbours; 
     
-    Home(){
-        family = create_team("family" , "Happy Family");
-        relatives = new team("relatives" , "Relatives");
-        friends = new team("friends" , "cool friends");
-        colleagues = new team("colleagues" , "lets work");
-        neighbours = new team("neighbours", "loser neighbours");
+    void init(){
+        self.family = create_team("family" , "Happy Family");
+        self.relatives = create_team("relatives" , "Relatives");
+        self.friends = create_team("friends" , "cool friends");
+        self.colleagues = create_team("colleagues" , "lets work");
+        self.neighbours = create_team("neighbours", "loser neighbours");
     }
 
-    Home(team family, team relatives, team friends, team colleagues, team neighbours){
-        family = family;
-        relatives = relatives;
-        friends = friends;
-        colleagues = colleagues;
-        neighbours = neighbours;
+    void init(team family, team relatives, team friends, team colleagues, team neighbours){
+        self.family = family;
+        self.relatives = relatives;
+        self.friends = friends;
+        self.colleagues = colleagues;
+        self.neighbours = neighbours;
     }
 
     void addPerson(member p, string relation){

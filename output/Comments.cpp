@@ -1,4 +1,4 @@
-$this is a Comment$
+/*this is a Comment*/
 #include "../Phase3/teamScribe.h"
 
 int main(){

@@ -1,0 +1,17 @@
+comment: $this is a Comment$
+reserved: #include
+constant: "../Phase3/teamScribe.h"
+datatype: int
+identifier: main
+brackets: (
+brackets: )
+brackets: {
+identifier: print
+brackets: (
+constant: "Hello World"
+brackets: )
+punctuation: ;
+reserved: return
+constant: 0
+punctuation: ;
+brackets: }

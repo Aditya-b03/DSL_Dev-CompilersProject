@@ -19,7 +19,6 @@
     int nested_call = 0;    
     int return_flag = 0;
     extern FILE *tf;
-    extern char *vec;
 
     struct symtab *global_table;
     struct functab *function_table;
@@ -33,8 +32,6 @@
     bool rflag;
     int return_type;
     int lflag;
-
-    int 
 
 %}
 
@@ -90,7 +87,7 @@
 %token ASSIGN_OP REL_OP EQUALS
 %token AND OR NOT INTERSECTION_OP UNION_OP
 %token FOR WHILE IF ELSE
-%token IDENTIFIER SELF
+%token IDENTIFIER SELF PUBLIC
 %token LSB RSB LCB RCB LPB RPB SEMICOLON COMMA DOT COLON ARROW
 %token INCLUDE TYPEDEF
 
@@ -115,6 +112,7 @@ start:{
         function_table = init_functab();
         init_functab_entries(function_table);
         class_table = init_classtab();
+        init_member_class(class_table);
         params = NULL;
         local_table = global_table;
         members = NULL;
@@ -135,7 +133,9 @@ start:{
     | {
         global_table = init_symtab();
         function_table = init_functab();
+        init_functab_entries(function_table);
         class_table = init_classtab();
+        init_member_class(class_table);
         params = NULL;
         local_table = global_table;
         members = NULL;
@@ -175,7 +175,10 @@ code: decl_stmt code
 function: function_dec {
             local_table = $1.local_table;
             params = $1.params;
-            rflag = false;
+            if($1.type == 4)
+                rflag = true;
+            else
+                rflag = false;
             return_type = $1.type;
         } LCB {scope++;} statements RCB {
         struct funcrec *entry = (struct funcrec*) malloc(sizeof(struct funcrec));
@@ -412,13 +415,17 @@ class_dec: CLASS IDENTIFIER {
 
 class_stmt: class_function class_stmt 
     | class_decl_stmt class_stmt
+    | PUBLIC COLON class_stmt
     |
     ;
 
 class_function: class_function_dec {
             local_table = $1.local_table;
             params = $1.params;
-            rflag = true;
+            if($1.type == 4)
+                rflag = true;
+            else
+                rflag = false;
             return_type = $1.type;
         } LCB {scope++;} statements RCB {
         if(!rflag)
@@ -814,7 +821,6 @@ decl_stmt: data_type_new id_list SEMICOLON {
 
 
 id_list: id_list COMMA IDENTIFIER{
-        fprintf(yyout, "%s", vec);
         insert_slist($1, $3.name);
         $$ = $1;
         if(lflag)
@@ -825,11 +831,10 @@ id_list: id_list COMMA IDENTIFIER{
         insert_slist($$, $1.name);
     }
     | id_list COMMA IDENTIFIER EQUALS nested_expr{
-        $$ = init_slist();
-        insert_slist($$, $3.name);
+        insert_slist($1, $3.name);
+        $$ = $1;
     }
     | IDENTIFIER{
-        fprintf(yyout, "%s", vec);
         $$ = init_slist();
         insert_slist($$, $1.name);
         if(lflag)
@@ -1063,7 +1068,6 @@ expr_terminal: unary_stmt {
     }
     | class_identifier{
         int *a = (int*) malloc(sizeof(int)), *b = (int*) malloc(sizeof(int));
-        display_slist($1.namelist);
         if(check_namelist($1.namelist, global_table, local_table, class_table, NULL, -1, a, b) == false)
         {
             YYABORT;
@@ -1184,7 +1188,6 @@ call: IDENTIFIER LPB call_args RPB {
     }
     | class_identifier LPB call_args RPB {
         int *a = (int*) malloc(sizeof(int)), *b = (int*) malloc(sizeof(int));
-        printf("WTF\n");
         if(check_namelist($1.namelist, global_table, local_table, class_table, $3.params, $3.num_params, a, b) == false)
         {
             YYABORT;
@@ -1424,46 +1427,44 @@ int main(int argc, char* argv[]) {
   
    //check for input file aurgument
    if(argc < 2){
-       printf("Missing Argument:./lex_source_program < \"test case path\"");
-       return -1;
-   }
-   else{
-       // InFile and Outfile path and Name Handling
-       yyin = fopen(argv[1],"r");
-       if(!yyin){
-           printf("Error: Input File not found");
-           return -1;
-       }
-       int len = strlen(argv[1]);
-       int i = 0;
-       int filestart=0;
-       while(argv[1][i] != '\0'){
-           if(argv[1][i] == '/'){
-               filestart = i+1;
-           }
-           i++;
-       }
+        printf("Missing Argument:./lex_source_program < \"test case path\"");
+        return -1;
+    }
+    else{
+        // InFile and Outfile path and Name Handling
+        yyin = fopen(argv[1],"r");
+        if(!yyin){
+            printf("Error: Input File not found");
+            return -1;
+        }
+        int len = strlen(argv[1]);
+        int i = 0;
+        int filestart=0;
+        while(argv[1][i] != '\0'){
+            if(argv[1][i] == '/'){
+                filestart = i+1;
+            }
+            i++;
+        }
 
-       // get the file Name in suffix
-       char *suffix = (char *)malloc(100*sizeof(char));
-       i = filestart;
-       while(argv[1][i] != '.'){
-           suffix[i-filestart] = argv[1][i];
-           i++;
-       }
-       // append suffix to outfile and C_outfile name
-       char *C_outfile = (char *)malloc(100*sizeof(char));
-       sprintf(C_outfile,"../output/%s.cpp",suffix);
-       char *token_file = (char *)malloc(100*sizeof(char));
-       sprintf(token_file,"../output/%s_tokens.txt",suffix);
-       // open the respective files
-       yyout = fopen(C_outfile, "w+");
-       tf = fopen(token_file,"w+");
-   }
-   fprintf(yyout,"#include <iostream>\n");
-   fprintf(yyout,"#include <string>\n");
-   fprintf(yyout,"#include <vector>\n");
-   fprintf(yyout,"#include \"teamScribe.h\"\n");
-   yyparse();
-   return 0;
+        // get the file Name in suffix
+        char *suffix = (char *)malloc(100*sizeof(char));
+        i = filestart;
+        while(argv[1][i] != '.'){
+            suffix[i-filestart] = argv[1][i];
+            i++;
+        }
+        // append suffix to outfile and C_outfile name
+        char *C_outfile = (char *)malloc(100*sizeof(char));
+        sprintf(C_outfile,"../output/%s.cpp",suffix);
+        char *token_file = (char *)malloc(100*sizeof(char));
+        sprintf(token_file,"../output/%s_tokens.txt",suffix);
+        // open the respective files
+        yyout = fopen(C_outfile, "w+");
+        tf = fopen(token_file,"w+");
+    }
+
+    fprintf(yyout, "#include \"../Phase3/teamScribe.h\"\n");
+    yyparse();
+    return 0;
 }

@@ -36,6 +36,7 @@ ELSE "else"
 LIST "list"
 CLASS "class"
 SELF "self"
+PUBLIC "public"
 
 INCLUDE "#include"
 
@@ -224,6 +225,11 @@ vec = strdup(yytext);
  print("this");
  return SELF;
 }
+{PUBLIC} {
+ fprintf(tf,"reserved: %s\n", yytext);
+ print(yytext);
+ return PUBLIC;
+}
 {DATA_TYPE_NEW} {
  fprintf(tf,"datatype: %s\n", yytext);
  
@@ -236,6 +242,7 @@ vec = strdup(yytext);
     if(v_flag == true){
       vec = concat(vec,yytext);
       init = gen_vec(vec);
+      print(init);
       v_flag = false;
     }
     else print(yytext);

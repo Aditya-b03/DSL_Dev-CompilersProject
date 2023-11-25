@@ -363,43 +363,61 @@ void display_functab(functab *ft)
 funcrec *search_functab(functab *ft, funcrec *entry, bool call)
 {
    funcrec *temp = ft->head;
+   functab *err = init_functab();
    int Not_found = 1;
    while (temp != NULL)
    {
       if (strcmp(temp->name, entry->name) == 0)
       {
          Not_found = 0;
+         if(temp->num_params == -1)
+            return temp;
          if (temp->num_params == entry->num_params)
          {
             // compare temp->params and entry->params
             idrec *temp1 = temp->params->head;
             idrec *temp2 = entry->params->head;
             int i = 1;
+            int overload_flag = 0;
             while (temp1 != NULL && temp2 != NULL)
             {
                if (temp1->type != temp2->type)
-               {
-                  if (call)
-                     printf("Error: Function %s argument %i mismatch \n", entry->name, i);
-                  return NULL;
+               {  
+                  if(!call){
+                     overload_flag = 1;
+                     break;
+                  }
+                  else
+                  {
+                     insert_functab(err, temp);
+                     break;
+                  }
                }
                temp1 = temp1->next;
                temp2 = temp2->next;
                i++;
             }
-            return temp;
+            if(!overload_flag)
+               return temp;
          }
          else
          {
             if (call)
-               printf("Error: Function %s has been called with wrong number of arguments\n", entry->name);
-            return NULL;
+            {
+               insert_functab(err, temp);
+               temp = temp->next;
+               continue;
+            }
          }
       }
       temp = temp->next;
    }
    if (Not_found && call)
+   {
       printf("Error: Function %s has not been declared\n", entry->name);
+      printf("Other overloaded functions:\n");
+      display_functab(err);
+   }
    return NULL;
 }
 
@@ -786,6 +804,31 @@ vector<team> loadfromDocument(string filename = "database");
 void init_functab_entries(functab *ft)
 {
    struct funcrec *entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "create_task";
+   entry->type = 9;
+   entry->num_params = -1;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   entry->local_table = init_symtab();
+   insert_functab(ft, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "create_member";
+   entry->type = 8;
+   entry->num_params = -1;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   entry->local_table = init_symtab();
+   insert_functab(ft, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "create_team";
+   entry->type = 7;
+   entry->num_params = -1;
+   entry->dim = 0;
+   entry->params = init_symtab();
+   entry->local_table = init_symtab();
+   insert_functab(ft, entry);
 
    entry = (funcrec *)malloc(sizeof(funcrec));
    entry->name = "dateToString";
@@ -801,6 +844,15 @@ void init_functab_entries(functab *ft)
    param->scope = 0;
    param->class_name = NULL;
    insert_symtab(entry->params, param);
+   entry->local_table = init_symtab();
+   insert_functab(ft, entry);
+
+   entry = (funcrec *)malloc(sizeof(funcrec));
+   entry->name = "print";
+   entry->type = 4;
+   entry->num_params = -1;
+   entry->dim = 0;
+   entry->params = init_symtab();
    entry->local_table = init_symtab();
    insert_functab(ft, entry);
 
@@ -908,18 +960,7 @@ void init_functab_entries(functab *ft)
 
 void init_class_methods_member(classrec *class_entry)
 {
-   //member create_member(string name = "random name", string email = "NULL", string phone = "NULL");
-
    funcrec *entry = (funcrec *)malloc(sizeof(funcrec));
-   entry->name = "create_member";
-   entry->type = 8;
-   entry->num_params = -1;
-   entry->dim = 0;
-   entry->params = init_symtab();
-   entry->local_table = init_symtab();
-   insert_functab(class_entry->methods, entry);
-
-   entry = (funcrec *)malloc(sizeof(funcrec));
    entry->name = "add_task";
    entry->type = 4;
    entry->num_params = 1;
@@ -1052,15 +1093,6 @@ void init_class_methods_member(classrec *class_entry)
 void init_class_methods_team(classrec *class_entry)
 {
    funcrec *entry = (funcrec *)malloc(sizeof(funcrec));
-   entry->name = "create_team";
-   entry->type = 7;
-   entry->num_params = -1;
-   entry->dim = 0;
-   entry->params = init_symtab();
-   entry->local_table = init_symtab();
-   insert_functab(class_entry->methods, entry);
-
-   entry = (funcrec *)malloc(sizeof(funcrec));
    entry->name = "get_subteam_ids";
    entry->type = 4;
    entry->num_params = -1;
@@ -1262,14 +1294,6 @@ void init_class_methods_team(classrec *class_entry)
 void init_class_methods_task(classrec *class_entry)
 {
    funcrec *entry = (funcrec *)malloc(sizeof(funcrec));
-   entry->name = "create_task";
-   entry->type = 9;
-   entry->num_params = -1;
-   entry->dim = 0;
-   entry->params = init_symtab();
-   entry->local_table = init_symtab();
-   insert_functab(class_entry->methods, entry);
-
    entry->name = "assign_to";
    entry->type = 4;
    entry->num_params = 1;

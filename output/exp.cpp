@@ -1,6 +1,10 @@
-#include "teamScibe.h"
+#include <iostream>
+#include <string>
+#include <vector>
+#include "teamScribe.h"
+#include "teamScribe.h"
 
-$checks$
+/*checks*/
 int sum1 (int d,string s){
     d++;
     return d;
@@ -34,7 +38,7 @@ class abd{
 class abc{
     int x;
     int diff(int c){
-        self.x = self.x + 1;
+        this.x = this.x + 1;
         return 0;
     }
 };
@@ -51,9 +55,7 @@ int main()
     y = x > x;
     y = not y;
     abd obb;
-    $obb.obj.y++;$
-    list[][][]: string names;
-    list[][][]: string vals;
-    names = vals;
+    float check = obb.mul(1.0);
+     vector<vector<vector<string>>> names;
     return 0;
 }

@@ -98,7 +98,7 @@ public:
     void add_team(team t);
     void remove(task assigned_task);
     void remove(team t);
-    void update_info(map<string,string> {});
+    void update_info(map<string,string> = {});
 
     vector<task> tasks();
     vector<team> teams();
@@ -379,7 +379,7 @@ string makeCalendar(member _m){
         string due_date = dateToString(t.due_date);
         string information = t.title + "-> " + m->info["name"] + " Status: " + t._status + " ";
         
-        markWhen += (due_date + ": " + information + "#" + t.status  +"\n\n");
+        markWhen += (due_date + ": " + information + "#" + t._status +"\n\n");
     }
     return markWhen;
 }
@@ -452,13 +452,6 @@ member create_member(string name = "random name", string email = "NULL", string 
     return *m;
 }
 
-void member::update(map<string, string> info){
-    for (auto i : info)
-    {
-        member_map[this->member_id]->info[i.first] = i.second;
-        this->info[i.first] = i.second;
-    }
-}
 
 void member::add_task(task assigned_task){
     member_map[this->member_id]->_tasks.insert(task_map[assigned_task.get_id()]);
