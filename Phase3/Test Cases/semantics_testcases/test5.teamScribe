@@ -1,0 +1,16 @@
+$Variable declaration and scope checking  (-ve)$
+
+int a = 0;
+
+float c = 0.9;
+
+int main(){
+   int a = 1; 
+   c = 8.0; 
+
+   while(a > 0){
+    string hello = "hi";
+    a--;
+   }
+   return c;
+}

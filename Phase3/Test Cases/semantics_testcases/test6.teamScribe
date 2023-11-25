@@ -1,0 +1,16 @@
+// some complex nested expressions with multiple operators to check semantics
+
+bool checkBooleanExpression(flag1, flag2)
+{
+    return (flag1 || flag2) && !(flag1 && flag2);
+}
+
+int main(int b)
+{
+    int x, y, z = 15;
+    int a = 10;
+    int b, d, f = 13, 20, 30;
+
+    bool result8 = (x < y) && ((y > z) || !(z == x));
+    bool check = checkBooleanExpression(true, false);
+}
